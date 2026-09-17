@@ -1,0 +1,148 @@
+@import "tailwindcss";
+
+/* ─── Design tokens via Tailwind v4 @theme ─────────────────────── */
+@theme inline {
+  /* Color palette — monochrome black & white */
+  --color-background: #000000;
+  --color-foreground: #ffffff;
+  --color-surface: #080808;
+  --color-surface-hover: #141414;
+  --color-surface-card: #0a0a0a;
+  --color-surface-elevated: #161616;
+  --color-surface-overlay: rgba(0, 0, 0, 0.88);
+
+  --color-border: rgba(255, 255, 255, 0.10);
+  --color-border-subtle: rgba(255, 255, 255, 0.06);
+  --color-border-strong: rgba(255, 255, 255, 0.22);
+  --color-muted: #888888;
+  --color-muted-dark: #555555;
+
+  /* Rating & status */
+  --color-rating: #ffffff;
+  --color-danger: #ff3333;
+  --color-success: #ffffff;
+
+  /* Typography */
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system,
+    sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+}
+
+/* ─── Base styles ──────────────────────────────────────────────── */
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans);
+  min-height: 100dvh;
+  overflow-x: hidden;
+}
+
+/* ─── Selection ────────────────────────────────────────────────── */
+
+::selection {
+  background-color: rgba(255, 255, 255, 0.25);
+  color: #000;
+}
+
+/* ─── Scrollbar (webkit) ───────────────────────────────────────── */
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.24);
+}
+
+/* ─── Focus styles ─────────────────────────────────────────────── */
+
+:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.6);
+  outline-offset: 2px;
+}
+
+/* ─── Utility: hide scrollbar but keep scrollable ──────────────── */
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* ─── Utility: gradient text ───────────────────────────────────── */
+
+.text-gradient {
+  background: linear-gradient(
+    135deg,
+    #ffffff,
+    #999999
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ─── Utility: Glassmorphism ───────────────────────────────────── */
+
+.glass {
+  background-color: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--color-border);
+}
+
+.glass-card {
+  background-color: rgba(10, 10, 10, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--color-border-subtle);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-card:hover {
+  background-color: rgba(20, 20, 20, 0.8);
+  border-color: var(--color-border-strong);
+  transform: translateY(-2px);
+}
+
+/* ─── Utility: Vignette gradients for cinematic hero ────────────── */
+
+.vignette-bottom {
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(0, 0, 0, 0.4) 50%,
+    rgba(0, 0, 0, 0.95) 85%,
+    var(--color-background) 100%
+  );
+}
+
+.vignette-left {
+  background: linear-gradient(
+    to right,
+    var(--color-background) 0%,
+    rgba(0, 0, 0, 0.85) 35%,
+    rgba(0, 0, 0, 0.4) 70%,
+    transparent 100%
+  );
+}

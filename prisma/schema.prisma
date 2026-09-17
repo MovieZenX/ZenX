@@ -1,0 +1,78 @@
+// Prisma schema — derived strictly from DATABASE.md
+// Database: SQLite for local development (migratable to PostgreSQL)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Users ──────────────────────────────────────────────────────
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  username     String   @unique
+  passwordHash String   @map("password_hash")
+  avatar       String?
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  watchlist    Watchlist[]
+  watchHistory WatchHistory[]
+  preferences  UserPreferences?
+
+  @@map("users")
+}
+
+// ─── Watchlist ──────────────────────────────────────────────────
+
+model Watchlist {
+  id          String   @id @default(cuid())
+  userId      String   @map("user_id")
+  contentId   String   @map("content_id")
+  contentType String   @map("content_type") // "movie" | "tv"
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, contentId, contentType])
+  @@map("watchlist")
+}
+
+// ─── Watch History ──────────────────────────────────────────────
+
+model WatchHistory {
+  id          String   @id @default(cuid())
+  userId      String   @map("user_id")
+  contentId   String   @map("content_id")
+  contentType String   @map("content_type") // "movie" | "tv"
+  season      Int?
+  episode     Int?
+  progress    Float    @default(0) // seconds watched
+  duration    Float    @default(0) // total duration in seconds
+  lastWatched DateTime @default(now()) @map("last_watched")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, contentId, contentType])
+  @@map("watch_history")
+}
+
+// ─── User Preferences ──────────────────────────────────────────
+
+model UserPreferences {
+  id               String  @id @default(cuid())
+  userId           String  @unique @map("user_id")
+  language         String  @default("en")
+  autoplay         Boolean @default(true)
+  preferredQuality String  @default("auto") @map("preferred_quality")
+  subtitlesEnabled Boolean @default(false) @map("subtitles_enabled")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_preferences")
+}
