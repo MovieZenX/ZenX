@@ -9,6 +9,7 @@ export interface MediaItem {
   overview: string;
   posterUrl: string | null;
   backdropUrl: string | null;
+  logoUrl?: string | null;
   contentType: ContentType;
   releaseYear: number | null;
   releaseDate: string | null;

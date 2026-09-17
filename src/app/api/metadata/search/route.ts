@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { searchMedia } from "@/lib/metadata";
+import { searchMedia, getMediaByProvider } from "@/lib/metadata";
 
 /**
  * Server-side search API proxy.
  *
- * GET /api/metadata/search?q=...&type=all|movie|tv&page=1
+ * GET /api/metadata/search?q=...&type=all|movie|tv&page=1&provider=...&watch_region=US
  *
  * Per SECURITY.md: Never exposes TMDB API key to the client.
  * Enforces query sanitization and parameter limits.
@@ -13,11 +13,16 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const query = searchParams.get("q") || "";
+    const providerParam = searchParams.get("provider") || "";
+    const watchRegion = searchParams.get("watch_region") || "US";
     const typeParam = searchParams.get("type") || "all";
     const pageParam = searchParams.get("page") || "1";
 
     const trimmedQuery = query.trim();
-    if (!trimmedQuery) {
+    const trimmedProvider = providerParam.trim();
+
+    // If neither query nor provider is provided, return empty
+    if (!trimmedQuery && !trimmedProvider) {
       return NextResponse.json({
         page: 1,
         results: [],
@@ -25,9 +30,6 @@ export async function GET(request: NextRequest) {
         totalResults: 0,
       });
     }
-
-    // Sanitize query: limit length to 100 characters to avoid excessive payloads
-    const sanitizedQuery = trimmedQuery.slice(0, 100);
 
     // Validate type parameter
     const type: "all" | "movie" | "tv" =
@@ -37,7 +39,23 @@ export async function GET(request: NextRequest) {
     const pageNum = parseInt(pageParam, 10);
     const page = Number.isInteger(pageNum) ? Math.min(500, Math.max(1, pageNum)) : 1;
 
-    const data = await searchMedia(sanitizedQuery, page, type);
+    let data;
+    if (trimmedProvider) {
+      const providerId = parseInt(trimmedProvider, 10);
+      if (!Number.isInteger(providerId) || providerId <= 0) {
+        return NextResponse.json({
+          page: 1,
+          results: [],
+          totalPages: 0,
+          totalResults: 0,
+        });
+      }
+      data = await getMediaByProvider(providerId, page, type, watchRegion);
+    } else {
+      // Sanitize query: limit length to 100 characters to avoid excessive payloads
+      const sanitizedQuery = trimmedQuery.slice(0, 100);
+      data = await searchMedia(sanitizedQuery, page, type);
+    }
 
     return NextResponse.json(data, {
       headers: {

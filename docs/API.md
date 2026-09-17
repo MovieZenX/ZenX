@@ -24,6 +24,7 @@ TMDB_IMAGE_BASE_URL="https://image.tmdb.org/t/p"
 | `getPopularTv(page)` | `GET /tv/popular` | Top TV shows | 1 hour (3600s) |
 | `getNowPlayingMovies()` | `GET /movie/now_playing` | In theaters & latest releases | 1 hour (3600s) |
 | `searchMedia(q, page, type)` | `GET /search/{multi\|movie\|tv}` | Catalog search with pagination | 5 minutes (300s) |
+| `getMediaByProvider(providerId, page, type, region)` | `GET /discover/{movie\|tv}` | Titles available on watch provider | 1 hour (3600s) |
 | `getMovieDetails(id)` | `GET /movie/{id}?append_to_response=credits,similar` | Full movie details, cast, similar | 24 hours (86400s) |
 | `getTvDetails(id)` | `GET /tv/{id}?append_to_response=credits,similar` | Full TV details, seasons, cast, similar | 24 hours (86400s) |
 | `getTvSeason(id, season)` | `GET /tv/{id}/season/{season}` | TV season episodes breakdown | 24 hours (86400s) |
@@ -34,7 +35,9 @@ TMDB_IMAGE_BASE_URL="https://image.tmdb.org/t/p"
 #### Search Proxy
 - **Path**: `GET /api/metadata/search`
 - **Query Parameters**:
-  - `q` (string, required): Search query
+  - `q` (string, optional if `provider` provided): Search query
+  - `provider` (number | string, optional): TMDB watch provider ID (e.g. `8` for Netflix, `9` for Prime Video, `337` for Disney+)
+  - `watch_region` (string, optional, default: `"US"`): Watch provider region
   - `type` (`"all"` \| `"movie"` \| `"tv"`, optional, default: `"all"`): Filter media type
   - `page` (number, optional, default: `1`): Results page
 - **Response Format**:

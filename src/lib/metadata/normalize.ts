@@ -5,6 +5,7 @@ import type {
   TMDBSeasonDetail,
   TMDBEpisode,
   TMDBCastMember,
+  TMDBImages,
 } from "@/types/tmdb";
 import type {
   MediaItem,
@@ -107,6 +108,34 @@ export function normalizeCast(members?: TMDBCastMember[]): CastMember[] {
 }
 
 /**
+ * Selects the optimal transparent PNG title logo from TMDB images response.
+ * Prefers English language or language-neutral logos with highest votes.
+ */
+export function extractBestLogo(images?: TMDBImages): string | null {
+  if (!images?.logos || !Array.isArray(images.logos) || images.logos.length === 0) {
+    return null;
+  }
+
+  // Filter out invalid or missing file_paths
+  const validLogos = images.logos.filter((l) => Boolean(l.file_path));
+  if (validLogos.length === 0) return null;
+
+  // Filter for English or language-neutral logos
+  const enLogos = validLogos.filter((l) => l.iso_639_1 === "en" || !l.iso_639_1);
+  const candidates = enLogos.length > 0 ? enLogos : validLogos;
+
+  // Sort by vote_count and vote_average descending
+  const sorted = [...candidates].sort((a, b) => {
+    const scoreA = (a.vote_count ?? 0) * 10 + (a.vote_average ?? 0);
+    const scoreB = (b.vote_count ?? 0) * 10 + (b.vote_average ?? 0);
+    return scoreB - scoreA;
+  });
+
+  const best = sorted[0];
+  return best?.file_path ? buildImageUrl(best.file_path, "w500") : null;
+}
+
+/**
  * Normalizes full movie details into MediaDetail.
  */
 export function normalizeMovieDetail(raw: TMDBMovieDetail): MediaDetail {
@@ -116,9 +145,11 @@ export function normalizeMovieDetail(raw: TMDBMovieDetail): MediaDetail {
   const similar = (raw.similar?.results || raw.recommendations?.results || [])
     .slice(0, 10)
     .map((item) => normalizeTMDBItem(item, "movie"));
+  const logoUrl = extractBestLogo(raw.images);
 
   return {
     ...base,
+    logoUrl,
     genres: genres.length > 0 ? genres : base.genres,
     tagline: raw.tagline || null,
     status: raw.status || "Released",
@@ -154,9 +185,11 @@ export function normalizeTvDetail(raw: TMDBTvDetail): MediaDetail {
 
   const seasonCount = raw.number_of_seasons || seasons.length;
   const duration = seasonCount === 1 ? "1 Season" : `${seasonCount} Seasons`;
+  const logoUrl = extractBestLogo(raw.images);
 
   return {
     ...base,
+    logoUrl,
     genres: genres.length > 0 ? genres : base.genres,
     tagline: raw.tagline || null,
     status: raw.status || "Returning Series",

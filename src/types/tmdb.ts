@@ -82,6 +82,23 @@ export interface TMDBSeasonDetail {
   episodes: TMDBEpisode[];
 }
 
+export interface TMDBLogoImage {
+  aspect_ratio?: number;
+  height?: number;
+  width?: number;
+  file_path: string;
+  iso_639_1?: string | null;
+  iso_3166_1?: string | null;
+  vote_average?: number;
+  vote_count?: number;
+}
+
+export interface TMDBImages {
+  backdrops?: Array<{ file_path: string }>;
+  posters?: Array<{ file_path: string }>;
+  logos?: TMDBLogoImage[];
+}
+
 export interface TMDBMovieDetail extends TMDBRawItem {
   tagline: string | null;
   runtime: number | null;
@@ -92,6 +109,7 @@ export interface TMDBMovieDetail extends TMDBRawItem {
   credits?: TMDBCredits;
   similar?: TMDBPaginatedResponse<TMDBRawItem>;
   recommendations?: TMDBPaginatedResponse<TMDBRawItem>;
+  images?: TMDBImages;
 }
 
 export interface TMDBTvDetail extends TMDBRawItem {
@@ -105,4 +123,5 @@ export interface TMDBTvDetail extends TMDBRawItem {
   credits?: TMDBCredits;
   similar?: TMDBPaginatedResponse<TMDBRawItem>;
   recommendations?: TMDBPaginatedResponse<TMDBRawItem>;
+  images?: TMDBImages;
 }

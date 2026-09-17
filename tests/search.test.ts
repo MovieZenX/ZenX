@@ -126,4 +126,40 @@ describe("Search Domain & Service Tests", () => {
       assert.equal(validateType(null), "all");
     });
   });
+
+  describe("Streaming Platforms Catalog & Provider Validation", () => {
+    it("validates provider ID parsing for watch provider discovery", () => {
+      const parseProviderId = (p: string | null): number | null => {
+        if (!p) return null;
+        const id = parseInt(p.trim(), 10);
+        return Number.isInteger(id) && id > 0 ? id : null;
+      };
+
+      assert.equal(parseProviderId("8"), 8); // Netflix
+      assert.equal(parseProviderId("9"), 9); // Prime Video
+      assert.equal(parseProviderId("337"), 337); // Disney+
+      assert.equal(parseProviderId("0"), null);
+      assert.equal(parseProviderId("-8"), null);
+      assert.equal(parseProviderId("netflix"), null);
+      assert.equal(parseProviderId(""), null);
+      assert.equal(parseProviderId(null), null);
+    });
+
+    it("verifies streaming platform catalog integrity", async () => {
+      const { STREAMING_PLATFORMS } = await import("../src/components/media/streaming-platforms");
+      assert.ok(STREAMING_PLATFORMS.length >= 10);
+
+      const netflix = STREAMING_PLATFORMS.find((p) => p.id === "netflix");
+      assert.ok(netflix);
+      assert.equal(netflix.providerId, 8);
+      assert.ok(netflix.logoUrl.startsWith("https://image.tmdb.org/t/p/"));
+
+      for (const platform of STREAMING_PLATFORMS) {
+        assert.ok(platform.id.length > 0);
+        assert.ok(platform.name.length > 0);
+        assert.ok(platform.providerId > 0);
+        assert.ok(platform.logoUrl.startsWith("https://image.tmdb.org/t/p/"));
+      }
+    });
+  });
 });

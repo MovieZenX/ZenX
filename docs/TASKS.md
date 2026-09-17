@@ -34,6 +34,8 @@
 - [x] Now In Theaters & Recent Releases carousel
 - [x] Curated Genre Spotlight (Action & Adventure)
 - [x] Explore by Genre category grid
+- [x] Streaming Platforms section with official TMDB logos and provider filtering (primeshows.org style)
+- [x] Popular by Platform interactive section with network & series/movies switchers (primeshows.org style)
 - [x] Fault-tolerant section fetching (`Promise.allSettled`)
 - [x] Cinematic loading skeletons (`loading.tsx`)
 - [x] SEO & OpenGraph metadata

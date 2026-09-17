@@ -236,7 +236,7 @@ export async function searchMedia(
 export async function getMovieDetails(id: string | number): Promise<MediaDetail | null> {
   const raw = await tmdbFetch<TMDBMovieDetail>(
     `/movie/${id}`,
-    { append_to_response: "credits,similar" },
+    { append_to_response: "credits,similar,images" },
     86400
   );
 
@@ -250,7 +250,7 @@ export async function getMovieDetails(id: string | number): Promise<MediaDetail 
 export async function getTvDetails(id: string | number): Promise<MediaDetail | null> {
   const raw = await tmdbFetch<TMDBTvDetail>(
     `/tv/${id}`,
-    { append_to_response: "credits,similar" },
+    { append_to_response: "credits,similar,images" },
     86400
   );
 
@@ -273,4 +273,118 @@ export async function getTvSeason(
 
   if (!raw || !raw.id) return null;
   return normalizeTvSeason(raw);
+}
+
+/**
+ * Discover movies and/or TV shows available on a specific watch provider.
+ */
+export async function getMediaByProvider(
+  providerId: string | number,
+  page: number = 1,
+  type: "all" | "movie" | "tv" = "all",
+  watchRegion: string = "US"
+): Promise<PaginatedResults<MediaItem>> {
+  const genreMap = await getGenreMap();
+
+  if (type === "movie") {
+    const data = await tmdbFetch<TMDBPaginatedResponse<TMDBRawItem>>(
+      "/discover/movie",
+      {
+        with_watch_providers: providerId,
+        watch_region: watchRegion,
+        sort_by: "popularity.desc",
+        page,
+        include_adult: "false",
+      },
+      3600
+    );
+
+    if (!data?.results) {
+      return { page: 1, results: [], totalPages: 0, totalResults: 0 };
+    }
+
+    return {
+      page: data.page,
+      results: data.results.map((item) => normalizeTMDBItem(item, "movie", genreMap)),
+      totalPages: Math.min(data.total_pages, 500),
+      totalResults: data.total_results,
+    };
+  }
+
+  if (type === "tv") {
+    const data = await tmdbFetch<TMDBPaginatedResponse<TMDBRawItem>>(
+      "/discover/tv",
+      {
+        with_watch_providers: providerId,
+        watch_region: watchRegion,
+        sort_by: "popularity.desc",
+        page,
+        include_adult: "false",
+      },
+      3600
+    );
+
+    if (!data?.results) {
+      return { page: 1, results: [], totalPages: 0, totalResults: 0 };
+    }
+
+    return {
+      page: data.page,
+      results: data.results.map((item) => normalizeTMDBItem(item, "tv", genreMap)),
+      totalPages: Math.min(data.total_pages, 500),
+      totalResults: data.total_results,
+    };
+  }
+
+  // type === "all": fetch both movie and tv and interleave
+  const [movieData, tvData] = await Promise.all([
+    tmdbFetch<TMDBPaginatedResponse<TMDBRawItem>>(
+      "/discover/movie",
+      {
+        with_watch_providers: providerId,
+        watch_region: watchRegion,
+        sort_by: "popularity.desc",
+        page,
+        include_adult: "false",
+      },
+      3600
+    ),
+    tmdbFetch<TMDBPaginatedResponse<TMDBRawItem>>(
+      "/discover/tv",
+      {
+        with_watch_providers: providerId,
+        watch_region: watchRegion,
+        sort_by: "popularity.desc",
+        page,
+        include_adult: "false",
+      },
+      3600
+    ),
+  ]);
+
+  const movies = (movieData?.results || []).map((i) =>
+    normalizeTMDBItem(i, "movie", genreMap)
+  );
+  const tvs = (tvData?.results || []).map((i) =>
+    normalizeTMDBItem(i, "tv", genreMap)
+  );
+
+  const combined: MediaItem[] = [];
+  const maxLen = Math.max(movies.length, tvs.length);
+  for (let i = 0; i < maxLen; i++) {
+    const movie = movies[i];
+    if (movie) combined.push(movie);
+    const tv = tvs[i];
+    if (tv) combined.push(tv);
+  }
+
+  const totalPages = Math.max(movieData?.total_pages || 0, tvData?.total_pages || 0);
+  const totalResults = (movieData?.total_results || 0) + (tvData?.total_results || 0);
+
+  return {
+    page,
+    results: combined,
+    totalPages: Math.min(totalPages, 500),
+    totalResults,
+  };
 }

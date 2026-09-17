@@ -31,7 +31,7 @@ export function SectionHeading({
             {title}
           </h2>
           {badge && (
-            <span className="rounded-full bg-white/[0.12] px-2 py-0.5 text-xs font-semibold text-white border border-white/[0.16]">
+            <span className="rounded-full bg-gradient-to-b from-white/[0.22] via-white/[0.12] to-white/[0.05] px-2.5 py-0.5 text-[11px] font-semibold text-white border border-white/25 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)] backdrop-blur-md">
               {badge}
             </span>
           )}

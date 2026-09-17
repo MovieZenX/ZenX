@@ -12,6 +12,7 @@ export interface ContentRowProps {
   actionLabel?: string;
   children: ReactNode;
   className?: string;
+  isNumbered?: boolean;
 }
 
 /**
@@ -25,6 +26,7 @@ export function ContentRow({
   actionLabel,
   children,
   className,
+  isNumbered = false,
 }: ContentRowProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -83,14 +85,14 @@ export function ContentRow({
             onClick={() => scroll("left")}
             disabled={!canScrollLeft}
             className={cn(
-              "flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-white transition-colors cursor-pointer",
-              "hover:bg-white/15 active:bg-white/20",
-              "disabled:opacity-20 disabled:cursor-not-allowed"
+              "flex h-7.5 w-7.5 items-center justify-center rounded-full border border-white/20 bg-gradient-to-b from-white/[0.18] via-white/[0.08] to-white/[0.03] text-white transition-all duration-200 cursor-pointer shadow-[inset_0_1px_0_rgba(255,255,255,0.3)] backdrop-blur-md",
+              "hover:from-white/[0.28] hover:to-white/[0.10] hover:border-white/35 active:scale-95",
+              "disabled:opacity-20 disabled:cursor-not-allowed disabled:hover:scale-100"
             )}
             aria-label="Scroll left"
           >
-            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M15 19l-7-7 7-7" />
             </svg>
           </button>
 
@@ -99,14 +101,14 @@ export function ContentRow({
             onClick={() => scroll("right")}
             disabled={!canScrollRight}
             className={cn(
-              "flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-white transition-colors cursor-pointer",
-              "hover:bg-white/15 active:bg-white/20",
-              "disabled:opacity-20 disabled:cursor-not-allowed"
+              "flex h-7.5 w-7.5 items-center justify-center rounded-full border border-white/20 bg-gradient-to-b from-white/[0.18] via-white/[0.08] to-white/[0.03] text-white transition-all duration-200 cursor-pointer shadow-[inset_0_1px_0_rgba(255,255,255,0.3)] backdrop-blur-md",
+              "hover:from-white/[0.28] hover:to-white/[0.10] hover:border-white/35 active:scale-95",
+              "disabled:opacity-20 disabled:cursor-not-allowed disabled:hover:scale-100"
             )}
             aria-label="Scroll right"
           >
-            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M9 5l7 7-7 7" />
             </svg>
           </button>
         </div>
@@ -115,7 +117,12 @@ export function ContentRow({
       {/* Horizontally Scrollable Row */}
       <div
         ref={scrollRef}
-        className="scrollbar-hide flex gap-4 overflow-x-auto pb-4 pt-1 snap-x snap-mandatory scroll-smooth"
+        className={cn(
+          "scrollbar-hide flex overflow-x-auto pb-4 pt-1 snap-x snap-mandatory scroll-smooth",
+          isNumbered
+            ? "gap-6 sm:gap-8 md:gap-9 pl-7 sm:pl-9 md:pl-11"
+            : "gap-4"
+        )}
       >
         {children}
       </div>

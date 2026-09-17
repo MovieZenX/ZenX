@@ -19,6 +19,14 @@ Fetch trending content from the configured metadata API.
 
 Display items in a horizontally scrollable section.
 
+### Streaming Platforms
+
+Display official streaming provider networks (Netflix, Prime Video, Disney+, Apple TV+, Max, Paramount+, Hulu, Peacock, Crunchyroll, Starz, Discovery+, AMC+, Tubi, Plex, MUBI, Shudder) in a horizontally scrollable glassmorphic carousel. Clicking any platform filters the catalog to titles streaming on that service.
+
+### Popular by Platform
+
+Interactive platform and series/movies switcher section positioned directly below the Streaming Platforms row. Dynamically updates popular catalog titles, platform logos, and media formats with live carousel navigation.
+
 ---
 
 ## Search

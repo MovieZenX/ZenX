@@ -43,6 +43,8 @@ export function SearchClient() {
   const searchParams = useSearchParams();
 
   const queryFromUrl = searchParams.get("q") || "";
+  const providerFromUrl = searchParams.get("provider") || "";
+  const providerNameFromUrl = searchParams.get("name") || "";
   const typeFromUrl = searchParams.get("type") || "all";
   const pageFromUrl = parseInt(searchParams.get("page") || "1", 10);
 
@@ -59,12 +61,12 @@ export function SearchClient() {
     setInputQuery(queryFromUrl);
   }
 
-  // Execute search whenever query, type, or page in URL changes
+  // Execute search whenever query, provider, type, or page in URL changes
   useEffect(() => {
     let cancelled = false;
     const trimmed = queryFromUrl.trim();
 
-    if (!trimmed) {
+    if (!trimmed && !providerFromUrl) {
       startTransition(() => {
         setData(null);
         setHasError(false);
@@ -74,9 +76,11 @@ export function SearchClient() {
 
     startTransition(async () => {
       try {
-        const res = await fetch(
-          `/api/metadata/search?q=${encodeURIComponent(trimmed)}&type=${typeFromUrl}&page=${pageFromUrl}`
-        );
+        const fetchUrl = providerFromUrl
+          ? `/api/metadata/search?provider=${encodeURIComponent(providerFromUrl)}&type=${typeFromUrl}&page=${pageFromUrl}`
+          : `/api/metadata/search?q=${encodeURIComponent(trimmed)}&type=${typeFromUrl}&page=${pageFromUrl}`;
+
+        const res = await fetch(fetchUrl);
 
         if (!res.ok) throw new Error("Search request failed");
         const json: PaginatedResults<MediaItem> = await res.json();
@@ -94,7 +98,7 @@ export function SearchClient() {
     return () => {
       cancelled = true;
     };
-  }, [queryFromUrl, typeFromUrl, pageFromUrl]);
+  }, [queryFromUrl, providerFromUrl, typeFromUrl, pageFromUrl]);
 
   // Push new query into URL and clear any pending debounce
   const updateQueryInUrl = useCallback(
@@ -238,6 +242,31 @@ export function SearchClient() {
             size="sm"
           />
         </div>
+
+        {/* Active Streaming Platform Filter Chip */}
+        {providerFromUrl && (
+          <div className="flex items-center justify-center pt-1">
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3.5 py-1 text-xs font-medium text-white shadow-sm">
+              <span>
+                Streaming on <strong className="text-white">{providerNameFromUrl || "Platform"}</strong>
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  const params = new URLSearchParams(searchParams.toString());
+                  params.delete("provider");
+                  params.delete("name");
+                  params.delete("page");
+                  router.replace(params.toString() ? `/search?${params.toString()}` : "/search");
+                }}
+                className="ml-1 flex h-4 w-4 items-center justify-center rounded-full bg-white/20 text-white/80 hover:bg-white hover:text-black transition-colors cursor-pointer text-[10px]"
+                aria-label="Clear streaming platform filter"
+              >
+                ✕
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Screen Reader Live Status Region */}
@@ -275,8 +304,18 @@ export function SearchClient() {
         <div className="space-y-8">
           <div className="flex items-center justify-between text-xs text-gray-400 border-b border-white/[0.08] pb-3">
             <span>
-              Found <strong className="text-white">{data.totalResults}</strong> titles for &ldquo;
-              {queryFromUrl}&rdquo;
+              {providerFromUrl ? (
+                <>
+                  Showing <strong className="text-white">{data.totalResults}</strong> titles on{" "}
+                  <strong className="text-white">{providerNameFromUrl || "Platform"}</strong>
+                  {queryFromUrl ? ` matching "${queryFromUrl}"` : ""}
+                </>
+              ) : (
+                <>
+                  Found <strong className="text-white">{data.totalResults}</strong> titles for &ldquo;
+                  {queryFromUrl}&rdquo;
+                </>
+              )}
             </span>
             <span>
               Page <strong className="text-white">{data.page}</strong> of {data.totalPages}

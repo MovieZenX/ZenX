@@ -7,11 +7,14 @@ import {
   getNowPlayingMovies,
   getMovieDetails,
   getTvDetails,
+  getMediaByProvider,
 } from "@/lib/metadata";
 import type { MediaItem } from "@/types/metadata";
-import { Hero } from "@/components/media/hero";
+import { Hero, type HeroSlideItem } from "@/components/media/hero";
 import { ContentRow } from "@/components/media/content-row";
 import { ContentCard } from "@/components/media/content-card";
+import { StreamingPlatforms } from "@/components/media/streaming-platforms";
+import { PopularPlatformSection } from "@/components/media/popular-platform-section";
 import { Container } from "@/components/ui/container";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { Card } from "@/components/ui/card";
@@ -126,17 +129,21 @@ export default async function HomePage() {
     popularMoviesResult,
     popularTvResult,
     nowPlayingResult,
+    popularPlatformResult,
   ] = await Promise.allSettled([
     getTrendingAll("day"),
     getPopularMovies(),
     getPopularTv(),
     getNowPlayingMovies(),
+    getMediaByProvider(8, 1, "tv"),
   ]);
 
   const trending = trendingResult.status === "fulfilled" ? trendingResult.value : [];
   const popularMovies = popularMoviesResult.status === "fulfilled" ? popularMoviesResult.value : [];
   const popularTv = popularTvResult.status === "fulfilled" ? popularTvResult.value : [];
   const nowPlaying = nowPlayingResult.status === "fulfilled" ? nowPlayingResult.value : [];
+  const initialPopularItems =
+    popularPlatformResult.status === "fulfilled" ? popularPlatformResult.value.results : [];
 
   const hasContent =
     trending.length > 0 ||
@@ -163,31 +170,62 @@ export default async function HomePage() {
     );
   }
 
-  // Select primary featured hero candidate
-  const featured = trending[0] ?? popularMovies[0] ?? popularTv[0] ?? null;
-  const trendingList = featured ? trending.filter((i) => i.id !== featured.id) : trending;
-
-  // Enrich featured title with duration and full genres if available
-  let featuredDuration: string | undefined = undefined;
-  let featuredGenres: string[] = featured?.genres ?? [];
-
-  if (featured) {
-    try {
-      const detail =
-        featured.contentType === "movie"
-          ? await getMovieDetails(featured.id)
-          : await getTvDetails(featured.id);
-
-      if (detail) {
-        featuredDuration = detail.duration;
-        if (detail.genres && detail.genres.length > 0) {
-          featuredGenres = detail.genres;
-        }
-      }
-    } catch {
-      // Gracefully fall back to basic metadata without crashing hero
+  // Select at least 5 top candidates with backdrops for the dynamic hero slidebar
+  const candidateMap = new Map<string, MediaItem>();
+  for (const item of [...trending, ...popularMovies, ...popularTv]) {
+    if (item.backdropUrl && !candidateMap.has(item.id)) {
+      candidateMap.set(item.id, item);
+      if (candidateMap.size >= 5) break;
     }
   }
+  const candidates = Array.from(candidateMap.values());
+
+  // Enrich featured slides with durations, genres, and title logos in parallel
+  const featuredSlides: HeroSlideItem[] = await Promise.all(
+    candidates.map(async (item) => {
+      let duration: string | undefined = undefined;
+      let genres: string[] = item.genres ?? [];
+      let logoUrl: string | null = null;
+
+      try {
+        const detail =
+          item.contentType === "movie"
+            ? await getMovieDetails(item.id)
+            : await getTvDetails(item.id);
+
+        if (detail) {
+          duration = detail.duration;
+          if (detail.genres && detail.genres.length > 0) {
+            genres = detail.genres;
+          }
+          logoUrl = detail.logoUrl ?? null;
+        }
+      } catch {
+        // Gracefully fall back to basic metadata
+      }
+
+      return {
+        id: item.id,
+        title: item.title,
+        overview: item.overview,
+        backdropUrl: item.backdropUrl,
+        posterUrl: item.posterUrl,
+        logoUrl,
+        contentType: item.contentType,
+        releaseYear: item.releaseYear ?? undefined,
+        rating: item.rating,
+        duration,
+        genres,
+        quality: "4K",
+        ageRating: item.contentType === "tv" ? "TV-MA" : "PG-13",
+      };
+    })
+  );
+
+  const primaryFeaturedId = featuredSlides[0]?.id;
+  const trendingList = primaryFeaturedId
+    ? trending.filter((i) => i.id !== primaryFeaturedId)
+    : trending;
 
   // Synthesize genre spotlights from loaded metadata (zero redundant API calls)
   const actionSpotlight = extractGenreItems(
@@ -198,25 +236,23 @@ export default async function HomePage() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      {/* 1. Featured Hero Banner */}
-      {featured && (
-        <Hero
-          id={featured.id}
-          title={featured.title}
-          overview={featured.overview}
-          backdropUrl={featured.backdropUrl}
-          posterUrl={featured.posterUrl}
-          contentType={featured.contentType}
-          releaseYear={featured.releaseYear ?? undefined}
-          rating={featured.rating}
-          duration={featuredDuration}
-          genres={featuredGenres}
-          quality="4K"
-        />
+      {/* 1. Dynamic Featured Hero Slider (At Least 5 Slides with Glassmorphic Slidebar) */}
+      {featuredSlides.length > 0 && (
+        <Hero items={featuredSlides} />
       )}
 
       <Container className="space-y-12 sm:space-y-16 pb-20 pt-4">
-        {/* 2. Trending Now */}
+        {/* Streaming Platforms Section (primeshows.org style) */}
+        <StreamingPlatforms />
+
+        {/* Popular by Platform Section (primeshows.org style) */}
+        <PopularPlatformSection
+          initialItems={initialPopularItems}
+          initialPlatformId="netflix"
+          initialType="tv"
+        />
+
+        {/* 2. Trending Now (Top 10 Numbered Row) */}
         {trendingList.length > 0 && (
           <ContentRow
             title="Trending Today"
@@ -224,8 +260,9 @@ export default async function HomePage() {
             badge="Hot"
             actionHref="/search"
             actionLabel="Explore All"
+            isNumbered={true}
           >
-            {trendingList.map((item) => (
+            {trendingList.map((item, index) => (
               <div key={`trend-${item.id}`} className="w-40 sm:w-48 lg:w-56 shrink-0 snap-start">
                 <ContentCard
                   id={item.id}
@@ -235,6 +272,8 @@ export default async function HomePage() {
                   releaseYear={item.releaseYear}
                   rating={item.rating}
                   quality={item.quality}
+                  rank={index < 10 ? index + 1 : undefined}
+                  rankColor="blue"
                 />
               </div>
             ))}
