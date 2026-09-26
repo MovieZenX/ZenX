@@ -454,8 +454,16 @@ body {
   animation: equalizer-bar-4 0.85s ease-in-out infinite 0.1s;
 }
 
+/* ─── Cinema Mode Navigation Transitions ───────────────────────── */
 
+/* Seamlessly hide fixed floating navbar when cinema mode is active */
+body[data-cinema-mode="true"] header.fixed {
+  transform: translateY(-220%) !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease !important;
+}
 
-
-
-
+body[data-cinema-mode="true"] header.fixed * {
+  pointer-events: none !important;
+}

@@ -112,7 +112,7 @@ function NavbarContent() {
   }, [updateIndicator, hoveredIdx]);
 
   return (
-    <header className="fixed top-3 sm:top-4 inset-x-0 z-50 flex flex-col items-center px-3 sm:px-6 pointer-events-none">
+    <header className="fixed top-3 sm:top-4 inset-x-0 z-50 flex flex-col items-center px-3 sm:px-6 pointer-events-none transition-all duration-400 ease-out">
       {/* Compact Floating Soft Glass Capsule */}
       <nav
         aria-label="Main Navigation"

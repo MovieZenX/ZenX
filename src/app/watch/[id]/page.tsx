@@ -126,7 +126,7 @@ export default async function WatchPage({
             {media.similar.map((item) => (
               <div
                 key={item.id}
-                className="w-36 sm:w-44 md:w-48 lg:w-52 shrink-0 snap-start"
+                className="w-32 sm:w-40 md:w-44 lg:w-48 xl:w-52 shrink-0 snap-start"
               >
                 <ContentCard
                   id={item.id}

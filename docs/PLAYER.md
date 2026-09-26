@@ -21,7 +21,7 @@ StreamVault features an ultra-premium, cinematic Watch Theater designed for dist
 ### 1. `WatchTheater` Client Component (`src/components/watch/watch-theater.tsx`)
 - **Immersive Widescreen Frame with Dynamic Ambilight**: 16:9 master video frame with an atmospheric Ambilight backdrop aura (`filter: blur(110px)`) projecting movie backdrop colors behind the screen. Toggleable via Ambilight button.
 - **"Lights Off" Theater Immersion Mode**: One-click mode (or `Esc` key) that plunges surrounding page elements into deep pitch-black (`bg-black/95 backdrop-blur-md`), focusing 100% of viewer attention on the glowing cinema screen with Ambilight backlighting.
-- **Cinema Mode (Theater Expansion)**: One-click toggle that expands the player across the full viewport width and minimizes distractions (keyboard shortcut: `Escape` to exit).
+- **Smart Cinema Mode (Theater Expansion)**: One-click toggle (or `C` key, `Escape` to exit) that expands the player across an expansive widescreen viewport (`max-h-[88vh]`), auto-scrolls smoothly to the player top, and automatically slides up and completely hides the floating top navigation bar (`data-cinema-mode="true"`) for a 100% distraction-free viewing experience.
 - **Futuristic Floating HUD Controls Bar**:
   - Docked frosted glass toolbar (`bg-black/85 backdrop-blur-2xl border border-white/15`) directly under the player.
   - Multi-server toggle pills (`VidFast (Fast)` and `Backup Stream`).
@@ -46,6 +46,13 @@ StreamVault features an ultra-premium, cinematic Watch Theater designed for dist
 
 ### 2. Continuous Recommendations
 - Below the theater view, `WatchPage` dynamically displays a "More Like This" carousel powered by `ContentRow` and `ContentCard`, allowing users to discover similar titles seamlessly.
+
+### 3. Fluid Responsive & Zoom Architecture
+- **Multi-Level Zoom Adaptability**: Theater layout dynamically adjusts across all browser zoom scales (33% to 250% zoom):
+  - Primary Content Column and Netflix Episode Drawer utilize an `xl:grid-cols-12` breakpoint (`xl:col-span-7 2xl:col-span-8` & `xl:col-span-5 2xl:col-span-4`) with `min-w-0` to gracefully stack on high-zoom viewports instead of cramming columns.
+  - Bento Grid cards automatically adjust with `grid-cols-2 md:grid-cols-4`, `break-words`, and `min-w-0` to prevent any text clipping or overflow.
+  - TMDB score header, circular progress gauge, external TMDB link, and episode playlist thumbnails scale fluidly.
+  - Maximum width boundary (`max-w-[1720px] mx-auto`) keeps the theater and cards crisp on ultrawide displays and deep zoom-out scales.
 
 ## Security & Reliability Standards
 - Enforces strict numeric ID validation (`/^\d+$/`) in compliance with `SECURITY.md`.

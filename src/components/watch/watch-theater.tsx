@@ -157,6 +157,20 @@ export function WatchTheater({
     handleSelectEpisode(1, newSeasonNum);
   };
 
+  // Synchronize Cinema Mode with Document Body (hides floating navbar & auto-scrolls to top)
+  useEffect(() => {
+    if (cinemaMode) {
+      document.body.setAttribute("data-cinema-mode", "true");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } else {
+      document.body.removeAttribute("data-cinema-mode");
+    }
+
+    return () => {
+      document.body.removeAttribute("data-cinema-mode");
+    };
+  }, [cinemaMode]);
+
   // Keyboard navigation for theater
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -166,6 +180,9 @@ export function WatchTheater({
       if (e.key === "Escape") {
         if (lightsOff) setLightsOff(false);
         if (cinemaMode) setCinemaMode(false);
+      }
+      if (e.key === "c" || e.key === "C") {
+        setCinemaMode((prev) => !prev);
       }
     };
     window.addEventListener("keydown", handleKeyDown);
@@ -205,7 +222,7 @@ export function WatchTheater({
       suppressHydrationWarning
       className={cn(
         "transition-all duration-300 min-h-screen text-white relative",
-        cinemaMode ? "bg-black pt-4 pb-12" : "pt-20 sm:pt-24 pb-20"
+        cinemaMode ? "bg-black pt-4 sm:pt-6 pb-12" : "pt-20 sm:pt-24 pb-20"
       )}
     >
       {/* Lights Off Pitch-Black Curtain Overlay */}
@@ -235,8 +252,10 @@ export function WatchTheater({
       <div
         suppressHydrationWarning
         className={cn(
-          "w-full transition-all duration-300 px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12",
-          cinemaMode && "max-w-[100vw] px-2 sm:px-4",
+          "w-full transition-all duration-300 mx-auto",
+          cinemaMode
+            ? "max-w-[100vw] xl:max-w-[96vw] 2xl:max-w-[94vw] px-2 sm:px-4"
+            : "max-w-[1720px] px-3 sm:px-6 md:px-8 lg:px-10 xl:px-12",
           lightsOff && "relative z-50"
         )}
       >
@@ -303,8 +322,10 @@ export function WatchTheater({
           <div
             ref={playerRef}
             className={cn(
-              "relative z-10 w-full overflow-hidden rounded-2xl bg-black border border-white/15 shadow-2xl transition-all duration-300",
-              cinemaMode ? "aspect-video max-h-[88vh]" : "aspect-video"
+              "relative z-10 w-full overflow-hidden rounded-2xl bg-black border shadow-2xl transition-all duration-300",
+              cinemaMode
+                ? "aspect-video max-h-[88vh] border-white/25 ring-1 ring-white/10 shadow-[0_24px_70px_rgba(0,0,0,0.95)]"
+                : "aspect-video border-white/15"
             )}
           >
             {/* Subtle Glass Reflection */}
@@ -472,10 +493,10 @@ export function WatchTheater({
               className={cn(
                 "inline-flex items-center gap-1.5 rounded-xl px-2.5 py-1.5 text-xs font-medium transition-all active:scale-95 cursor-pointer border",
                 cinemaMode
-                  ? "bg-white text-black border-white shadow-sm font-semibold"
+                  ? "bg-white text-black border-white shadow-md font-semibold"
                   : "bg-white/[0.04] text-white/70 border-white/10 hover:text-white hover:bg-white/10"
               )}
-              title={cinemaMode ? "Exit Cinema Mode (Esc)" : "Expand Cinema View"}
+              title={cinemaMode ? "Exit Cinema Mode (Esc or C)" : "Expand Cinema View (C)"}
             >
               <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path
@@ -547,19 +568,19 @@ export function WatchTheater({
         </div>
 
         {/* Main Content Details & Netflix-Style Episode Drawer */}
-        <div className="mt-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        <div className="mt-8 grid grid-cols-1 xl:grid-cols-12 gap-6 xl:gap-8 items-start min-w-0">
           {/* Primary Column: Rich TMDB Info Hub, Intel, Bento Specs & Visual Cast */}
-          <div className={cn("space-y-6", isTv ? "lg:col-span-7 xl:col-span-8" : "lg:col-span-12")}>
+          <div className={cn("space-y-6 min-w-0", isTv ? "xl:col-span-7 2xl:col-span-8" : "xl:col-span-12")}>
             {/* 1. Official TMDB Score & Verification Header Card */}
-            <div className="rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-4 sm:p-5 shadow-2xl relative overflow-hidden">
+            <div className="rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-3.5 sm:p-5 shadow-2xl relative overflow-hidden min-w-0">
               {/* Subtle top rim highlight with TMDB cyan accent */}
               <div className="pointer-events-none absolute inset-x-6 top-0 h-[1px] bg-gradient-to-r from-transparent via-[#01b4e4]/60 to-transparent" />
 
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex flex-wrap items-center justify-between gap-3 sm:gap-4 min-w-0">
                 {/* TMDB Badge + Score Gauge + Community Votes */}
-                <div className="flex items-center gap-3.5">
+                <div className="flex items-center gap-3 sm:gap-3.5 min-w-0 flex-1">
                   {/* Signature TMDB Circular Progress Ring */}
-                  <div className="relative h-13 w-13 shrink-0 rounded-full bg-black/80 p-1 border border-white/15 flex items-center justify-center shadow-lg">
+                  <div className="relative h-11 w-11 sm:h-13 sm:w-13 shrink-0 rounded-full bg-black/80 p-0.5 sm:p-1 border border-white/15 flex items-center justify-center shadow-lg">
                     <svg className="h-full w-full -rotate-90 transform" viewBox="0 0 36 36">
                       <path
                         className="text-white/10"
@@ -584,18 +605,18 @@ export function WatchTheater({
                         d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                       />
                     </svg>
-                    <div className="absolute inset-0 flex items-center justify-center font-black text-xs text-white">
+                    <div className="absolute inset-0 flex items-center justify-center font-black text-[11px] sm:text-xs text-white">
                       {scorePercent > 0 ? `${scorePercent}%` : "NR"}
                     </div>
                   </div>
 
                   {/* Score & Community Rating */}
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <span className="px-2 py-0.5 rounded text-[10px] font-black tracking-widest bg-[#01b4e4] text-black uppercase shadow-sm">
+                  <div className="space-y-0.5 sm:space-y-1 min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                      <span className="px-1.5 sm:px-2 py-0.5 rounded text-[9px] sm:text-[10px] font-black tracking-widest bg-[#01b4e4] text-black uppercase shadow-sm shrink-0">
                         TMDB
                       </span>
-                      <span className="text-xs font-bold text-white tracking-wide">
+                      <span className="text-xs sm:text-sm font-bold text-white tracking-wide truncate">
                         {scorePercent >= 75
                           ? "Universal Acclaim"
                           : scorePercent >= 60
@@ -603,8 +624,8 @@ export function WatchTheater({
                           : "TMDB Community Score"}
                       </span>
                     </div>
-                    <p className="text-xs text-gray-400">
-                      Based on <span className="text-white font-medium">{voteCountFormatted}</span> user reviews
+                    <p className="text-[11px] sm:text-xs text-gray-400 truncate">
+                      Based on <span className="text-white font-medium">{voteCountFormatted}</span> reviews
                       {media.rating > 0 && (
                         <span className="ml-1 text-gray-400">
                           (★ {media.rating.toFixed(1)} / 10)
@@ -617,7 +638,7 @@ export function WatchTheater({
                 {/* External TMDB Link + Clean Status Pill */}
                 <div className="flex items-center gap-2 shrink-0">
                   {media.status && (
-                    <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-white/5 border border-white/10 text-gray-300">
+                    <span className="px-2.5 py-1 rounded-full text-[10px] sm:text-[11px] font-semibold bg-white/5 border border-white/10 text-gray-300">
                       {media.status}
                     </span>
                   )}
@@ -625,7 +646,7 @@ export function WatchTheater({
                     href={`https://www.themoviedb.org/${isTv ? "tv" : "movie"}/${media.id}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold bg-white/5 hover:bg-white/15 border border-white/10 text-white/90 hover:text-white transition-all cursor-pointer group"
+                    className="inline-flex items-center gap-1.5 rounded-xl px-2.5 sm:px-3 py-1.5 text-xs font-semibold bg-white/5 hover:bg-white/15 border border-white/10 text-white/90 hover:text-white transition-all cursor-pointer group"
                     title="View official entry on TMDB"
                   >
                     <span>TMDB Entry</span>
@@ -692,49 +713,49 @@ export function WatchTheater({
             </div>
 
             {/* 3. TMDB Technical & Production Bento Grid (4 Cards) */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-3">
               {/* Card 1: Production Status */}
-              <div className="rounded-xl border border-white/10 bg-white/[0.02] p-3 space-y-1 hover:border-white/20 transition-colors">
+              <div className="rounded-xl border border-white/10 bg-white/[0.02] p-2.5 sm:p-3 space-y-1 hover:border-white/20 transition-colors min-w-0">
                 <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Status</p>
-                <p className="text-xs sm:text-sm font-bold text-white truncate">
+                <p className="text-xs sm:text-sm font-bold text-white break-words leading-snug">
                   {media.status || (isTv ? "Returning Series" : "Released")}
                 </p>
-                <p className="text-[10px] text-gray-400 truncate">
+                <p className="text-[10px] text-gray-400 break-words leading-tight">
                   {isTv ? "Television Series" : "Motion Picture"}
                 </p>
               </div>
 
               {/* Card 2: Release Date */}
-              <div className="rounded-xl border border-white/10 bg-white/[0.02] p-3 space-y-1 hover:border-white/20 transition-colors">
+              <div className="rounded-xl border border-white/10 bg-white/[0.02] p-2.5 sm:p-3 space-y-1 hover:border-white/20 transition-colors min-w-0">
                 <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Release Date</p>
-                <p className="text-xs sm:text-sm font-bold text-white truncate">
+                <p className="text-xs sm:text-sm font-bold text-white break-words leading-snug">
                   {media.releaseDate || media.releaseYear || "N/A"}
                 </p>
-                <p className="text-[10px] text-gray-400 truncate">Worldwide Premiere</p>
+                <p className="text-[10px] text-gray-400 break-words leading-tight">Worldwide Premiere</p>
               </div>
 
               {/* Card 3: Scope / Runtime */}
-              <div className="rounded-xl border border-white/10 bg-white/[0.02] p-3 space-y-1 hover:border-white/20 transition-colors">
+              <div className="rounded-xl border border-white/10 bg-white/[0.02] p-2.5 sm:p-3 space-y-1 hover:border-white/20 transition-colors min-w-0">
                 <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400">
                   {isTv ? "Series Content" : "Duration"}
                 </p>
-                <p className="text-xs sm:text-sm font-bold text-white truncate">
+                <p className="text-xs sm:text-sm font-bold text-white break-words leading-snug">
                   {isTv
                     ? `${media.numberOfSeasons || 1} Seasons • ${media.numberOfEpisodes || episodes.length} Ep`
                     : media.duration || (media.runtimeMinutes ? `${media.runtimeMinutes} min` : "Feature")}
                 </p>
-                <p className="text-[10px] text-gray-400 truncate">
+                <p className="text-[10px] text-gray-400 break-words leading-tight">
                   {isTv ? `Streaming S${seasonNum} E${episodeNum}` : "Full Runtime"}
                 </p>
               </div>
 
               {/* Card 4: Quality & Specs */}
-              <div className="rounded-xl border border-white/10 bg-white/[0.02] p-3 space-y-1 hover:border-white/20 transition-colors">
+              <div className="rounded-xl border border-white/10 bg-white/[0.02] p-2.5 sm:p-3 space-y-1 hover:border-white/20 transition-colors min-w-0">
                 <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Master Audio & Video</p>
-                <p className="text-xs sm:text-sm font-bold text-white truncate">
+                <p className="text-xs sm:text-sm font-bold text-white break-words leading-snug">
                   {media.quality || "4K"} UHD • HDR10
                 </p>
-                <p className="text-[10px] text-gray-400 truncate">Dolby 5.1 • Stereo</p>
+                <p className="text-[10px] text-gray-400 break-words leading-tight">Dolby 5.1 • Stereo</p>
               </div>
             </div>
 
@@ -891,7 +912,7 @@ export function WatchTheater({
 
           {/* Secondary Column: Netflix-Style Episode Drawer */}
           {isTv && (
-            <div className="lg:col-span-5 xl:col-span-4 rounded-2xl border border-white/15 bg-black/70 backdrop-blur-xl overflow-hidden shadow-2xl">
+            <div className="xl:col-span-5 2xl:col-span-4 min-w-0 rounded-2xl border border-white/15 bg-black/70 backdrop-blur-xl overflow-hidden shadow-2xl">
               {/* Header: Season Selector & Episode Stats */}
               <div className="p-4 border-b border-white/10 space-y-3 bg-white/[0.02]">
                 <div className="flex items-center justify-between">
@@ -952,7 +973,7 @@ export function WatchTheater({
               </div>
 
               {/* Scrollable Netflix-Style Episode Cards */}
-              <div className="max-h-[580px] overflow-y-auto divide-y divide-white/[0.06] p-2 space-y-1.5">
+              <div className="max-h-[480px] sm:max-h-[560px] xl:max-h-[600px] overflow-y-auto divide-y divide-white/[0.06] p-2 space-y-1.5">
                 {loadingSeason ? (
                   <div className="flex flex-col items-center justify-center p-12 space-y-3">
                     <Spinner size="md" />
@@ -967,14 +988,14 @@ export function WatchTheater({
                         type="button"
                         onClick={() => handleSelectEpisode(ep.episodeNumber)}
                         className={cn(
-                          "w-full text-left p-2.5 rounded-xl transition-all duration-150 flex gap-3 items-start group cursor-pointer border",
+                          "w-full text-left p-2 sm:p-2.5 rounded-xl transition-all duration-150 flex gap-2.5 sm:gap-3 items-start group cursor-pointer border min-w-0",
                           isPlaying
                             ? "bg-white/[0.12] border-white/30 shadow-lg border-l-4 border-l-white"
                             : "border-transparent hover:bg-white/[0.05]"
                         )}
                       >
                         {/* 16:9 Episode Thumbnail with Live Equalizer */}
-                        <div className="relative aspect-video w-24 sm:w-28 shrink-0 rounded-lg overflow-hidden bg-black/80 border border-white/15">
+                        <div className="relative aspect-video w-20 sm:w-24 md:w-28 shrink-0 rounded-lg overflow-hidden bg-black/80 border border-white/15">
                           {ep.stillUrl ? (
                             // eslint-disable-next-line @next/next/no-img-element
                             <img
@@ -983,14 +1004,14 @@ export function WatchTheater({
                               className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
                             />
                           ) : (
-                            <div className="flex h-full w-full items-center justify-center text-xs font-mono text-gray-500">
+                            <div className="flex h-full w-full items-center justify-center text-[10px] sm:text-xs font-mono text-gray-500">
                               EP {ep.episodeNumber}
                             </div>
                           )}
 
                           {/* Duration Tag */}
                           {ep.duration && (
-                            <div className="absolute bottom-1 right-1 px-1.5 py-0.5 rounded bg-black/80 backdrop-blur-sm text-[9px] font-mono text-white/90">
+                            <div className="absolute bottom-1 right-1 px-1 sm:px-1.5 py-0.5 rounded bg-black/80 backdrop-blur-sm text-[8px] sm:text-[9px] font-mono text-white/90">
                               {ep.duration}
                             </div>
                           )}
@@ -998,11 +1019,11 @@ export function WatchTheater({
                           {/* Playing State: Live Animated Equalizer Overlay */}
                           {isPlaying && (
                             <div className="absolute inset-0 bg-black/60 backdrop-blur-[1px] flex items-center justify-center gap-1.5">
-                              <div className="flex items-end gap-[2px] h-4 w-4">
-                                <span className="w-1 bg-white rounded-full equalizer-bar-1" />
-                                <span className="w-1 bg-white rounded-full equalizer-bar-2" />
-                                <span className="w-1 bg-white rounded-full equalizer-bar-3" />
-                                <span className="w-1 bg-white rounded-full equalizer-bar-4" />
+                              <div className="flex items-end gap-[2px] h-3.5 w-3.5 sm:h-4 sm:w-4">
+                                <span className="w-0.5 sm:w-1 bg-white rounded-full equalizer-bar-1" />
+                                <span className="w-0.5 sm:w-1 bg-white rounded-full equalizer-bar-2" />
+                                <span className="w-0.5 sm:w-1 bg-white rounded-full equalizer-bar-3" />
+                                <span className="w-0.5 sm:w-1 bg-white rounded-full equalizer-bar-4" />
                               </div>
                             </div>
                           )}
@@ -1023,18 +1044,18 @@ export function WatchTheater({
                               {ep.name}
                             </span>
                             {isPlaying && (
-                              <span className="inline-flex items-center text-[9px] font-bold tracking-wider uppercase text-white bg-white/20 border border-white/30 px-2 py-0.5 rounded-full shrink-0">
+                              <span className="inline-flex items-center text-[8px] sm:text-[9px] font-bold tracking-wider uppercase text-white bg-white/20 border border-white/30 px-1.5 sm:px-2 py-0.5 rounded-full shrink-0">
                                 Playing
                               </span>
                             )}
                           </div>
 
-                          <div className="flex items-center gap-2 mt-1 text-[11px] text-gray-400">
+                          <div className="flex items-center gap-2 mt-0.5 sm:mt-1 text-[10px] sm:text-[11px] text-gray-400">
                             {ep.airDate && <span>{ep.airDate}</span>}
                           </div>
 
                           {ep.overview && (
-                            <p className="mt-1 line-clamp-2 text-[11px] text-gray-400 leading-normal">
+                            <p className="mt-1 line-clamp-2 text-[10px] sm:text-[11px] text-gray-400 leading-normal">
                               {ep.overview}
                             </p>
                           )}
@@ -1067,8 +1088,8 @@ function CastPortraitCard({ actor }: { actor: CastMember }) {
       .toUpperCase() || "NA";
 
   return (
-    <div className="w-24 sm:w-28 shrink-0 flex flex-col items-center text-center group snap-start">
-      <div className="relative h-18 w-18 sm:h-20 sm:w-20 rounded-full p-[1.5px] bg-gradient-to-b from-white/20 via-white/5 to-transparent group-hover:from-[#01b4e4]/70 transition-all duration-300 shadow-lg mb-2">
+    <div className="w-20 sm:w-24 md:w-28 shrink-0 min-w-0 flex flex-col items-center text-center group snap-start">
+      <div className="relative h-16 w-16 sm:h-18 sm:w-18 md:h-20 md:w-20 rounded-full p-[1.5px] bg-gradient-to-b from-white/20 via-white/5 to-transparent group-hover:from-[#01b4e4]/70 transition-all duration-300 shadow-lg mb-2">
         <div className="h-full w-full rounded-full overflow-hidden bg-black/60">
           {actor.profileUrl && !imgError ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -1087,13 +1108,13 @@ function CastPortraitCard({ actor }: { actor: CastMember }) {
         </div>
       </div>
       <span
-        className="text-xs font-semibold text-white line-clamp-1 group-hover:text-gray-200 transition-colors w-full"
+        className="text-[11px] sm:text-xs font-semibold text-white line-clamp-1 group-hover:text-gray-200 transition-colors w-full"
         title={actor.name}
       >
         {actor.name}
       </span>
       <span
-        className="text-[11px] text-gray-400 line-clamp-1 mt-0.5 w-full"
+        className="text-[10px] sm:text-[11px] text-gray-400 line-clamp-1 mt-0.5 w-full"
         title={actor.character}
       >
         {actor.character ? `as ${actor.character}` : "Cast"}
