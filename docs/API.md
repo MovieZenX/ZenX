@@ -25,8 +25,8 @@ TMDB_IMAGE_BASE_URL="https://image.tmdb.org/t/p"
 | `getNowPlayingMovies()` | `GET /movie/now_playing` | In theaters & latest releases | 1 hour (3600s) |
 | `searchMedia(q, page, type)` | `GET /search/{multi\|movie\|tv}` | Catalog search with pagination | 5 minutes (300s) |
 | `getMediaByProvider(providerId, page, type, region)` | `GET /discover/{movie\|tv}` | Titles available on watch provider | 1 hour (3600s) |
-| `getMovieDetails(id)` | `GET /movie/{id}?append_to_response=credits,similar` | Full movie details, cast, similar | 24 hours (86400s) |
-| `getTvDetails(id)` | `GET /tv/{id}?append_to_response=credits,similar` | Full TV details, seasons, cast, similar | 24 hours (86400s) |
+| `getMovieDetails(id)` | `GET /movie/{id}?append_to_response=credits,similar,images,videos` | Full movie details, cast, similar, logos, trailers | 24 hours (86400s) |
+| `getTvDetails(id)` | `GET /tv/{id}?append_to_response=credits,similar,images,videos` | Full TV details, seasons, cast, similar, logos, trailers | 24 hours (86400s) |
 | `getTvSeason(id, season)` | `GET /tv/{id}/season/{season}` | TV season episodes breakdown | 24 hours (86400s) |
 | `getGenreMap()` | `GET /genre/{movie\|tv}/list` | Genre names indexed by ID | 7 days (604800s) |
 

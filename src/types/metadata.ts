@@ -63,6 +63,7 @@ export interface MediaDetail extends MediaItem {
   numberOfSeasons?: number;
   numberOfEpisodes?: number;
   seasons?: SeasonItem[];
+  trailerKey?: string | null;
 }
 
 export interface PaginatedResults<T> {

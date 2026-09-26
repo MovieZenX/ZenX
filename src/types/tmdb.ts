@@ -99,6 +99,23 @@ export interface TMDBImages {
   logos?: TMDBLogoImage[];
 }
 
+export interface TMDBVideo {
+  id: string;
+  iso_639_1?: string;
+  iso_3166_1?: string;
+  key: string;
+  name: string;
+  site: string;
+  size?: number;
+  type: string;
+  official?: boolean;
+  published_at?: string;
+}
+
+export interface TMDBVideos {
+  results: TMDBVideo[];
+}
+
 export interface TMDBMovieDetail extends TMDBRawItem {
   tagline: string | null;
   runtime: number | null;
@@ -110,6 +127,7 @@ export interface TMDBMovieDetail extends TMDBRawItem {
   similar?: TMDBPaginatedResponse<TMDBRawItem>;
   recommendations?: TMDBPaginatedResponse<TMDBRawItem>;
   images?: TMDBImages;
+  videos?: TMDBVideos;
 }
 
 export interface TMDBTvDetail extends TMDBRawItem {
@@ -124,4 +142,6 @@ export interface TMDBTvDetail extends TMDBRawItem {
   similar?: TMDBPaginatedResponse<TMDBRawItem>;
   recommendations?: TMDBPaginatedResponse<TMDBRawItem>;
   images?: TMDBImages;
+  videos?: TMDBVideos;
 }
+

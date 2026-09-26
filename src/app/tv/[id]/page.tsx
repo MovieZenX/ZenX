@@ -3,12 +3,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTvDetails, getTvSeason } from "@/lib/metadata";
 import { Container } from "@/components/ui/container";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { CastList } from "@/components/media/cast-list";
 import { TvEpisodesViewer } from "@/components/media/tv-episodes-viewer";
 import { ContentCard } from "@/components/media/content-card";
 import { ContentRow } from "@/components/media/content-row";
+import { BackgroundTrailer } from "@/components/media/background-trailer";
+import { PosterTiltCard } from "@/components/media/poster-tilt-card";
 
 export const revalidate = 86400; // 24 hours ISR cache
 
@@ -71,97 +71,70 @@ export default async function TvDetailPage({
   const initialSeason = await getTvSeason(tv.id, initialSeasonNumber);
 
   return (
-    <div className="flex flex-col min-h-screen">
-      {/* Backdrop Header Section */}
+    <div className="relative flex flex-col min-h-screen bg-black overflow-x-hidden">
+      {/* Full-Page Immersive Atmospheric Backdrop & Background Trailer Canvas */}
+      <BackgroundTrailer
+        backdropUrl={tv.backdropUrl}
+        trailerKey={tv.trailerKey}
+        title={tv.title}
+      />
+
+      {/* Hero Header Information Section */}
       <section
-        className="relative min-h-[55vh] sm:min-h-[68vh] max-h-[820px] 2xl:max-h-[920px] w-full flex flex-col justify-end overflow-hidden pt-24 sm:pt-32"
+        className="relative z-10 w-full flex flex-col justify-end pt-28 sm:pt-36 pb-12 sm:pb-16"
         aria-label={`TV Show Details: ${tv.title}`}
       >
-        {/* Backdrop Image Container */}
-        <div className="absolute inset-0 z-0">
-          {tv.backdropUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={tv.backdropUrl}
-              alt={tv.title}
-              className="h-full w-full object-cover object-center"
-            />
-          ) : (
-            <div className="h-full w-full bg-gradient-to-br from-gray-900/40 via-surface to-background" />
-          )}
-
-          {/* Cinematic Vignettes */}
-          <div className="absolute inset-0 vignette-left z-10" />
-          <div className="absolute inset-0 vignette-bottom z-10" />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-black/60 z-10" />
-        </div>
-
         {/* Hero Information */}
-        <Container size="wide" className="relative z-20 pb-12 sm:pb-16">
+        <Container size="wide" className="relative z-10">
           <div className="flex flex-col md:flex-row gap-8 2xl:gap-10 items-start">
-            {/* 2:3 Poster Card */}
-            {tv.posterUrl ? (
-              <div className="w-48 sm:w-56 lg:w-64 xl:w-72 2xl:w-80 shrink-0 rounded-2xl overflow-hidden border border-white/10 shadow-2xl shadow-black/80 bg-surface-card hidden sm:block">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={tv.posterUrl}
-                  alt={tv.title}
-                  className="h-full w-full object-cover"
-                />
-              </div>
-            ) : null}
+            {/* 2:3 3D Tilt Poster Card (uiverse.io/kennyotsu/witty-deer-12) */}
+            <PosterTiltCard
+              posterUrl={tv.posterUrl}
+              title={tv.title}
+              className="w-48 sm:w-56 lg:w-64 xl:w-72 2xl:w-80"
+            />
 
             <div className="flex-1 space-y-4 2xl:space-y-5 max-w-3xl 2xl:max-w-4xl">
               {/* Metadata Badges */}
               <div className="flex flex-wrap items-center gap-2">
-                <Badge variant="accent" size="md">
+                <span className="px-3 py-1 rounded-full bg-black/75 backdrop-blur-md border border-white/15 text-xs font-semibold text-white shadow-sm">
                   TV Series
-                </Badge>
+                </span>
 
                 {tv.rating > 0 && (
-                  <Badge variant="rating" size="md">
-                    <span>★</span>
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/75 backdrop-blur-md border border-amber-400/30 text-amber-300 font-semibold text-xs shadow-sm">
+                    <span className="text-[11px]">★</span>
                     <span>{tv.rating}</span>
-                  </Badge>
-                )}
-
-                {tv.voteCount > 0 && (
-                  <span className="text-xs text-gray-400">
-                    ({tv.voteCount.toLocaleString()} votes)
-                  </span>
+                    {tv.voteCount > 0 && (
+                      <span className="text-white/50 text-[11px] font-normal ml-0.5 font-mono">
+                        ({tv.voteCount.toLocaleString()} votes)
+                      </span>
+                    )}
+                  </div>
                 )}
 
                 {tv.releaseYear && (
-                  <span className="text-xs text-gray-300 font-medium">
+                  <span className="px-3 py-1 rounded-full bg-black/75 backdrop-blur-md border border-white/15 text-xs text-white/90 font-mono shadow-sm">
                     {tv.releaseYear}
                   </span>
                 )}
 
                 {tv.duration && (
-                  <>
-                    <span className="text-gray-500">•</span>
-                    <span className="text-xs text-gray-300 font-medium">
-                      {tv.duration}
-                    </span>
-                  </>
+                  <span className="px-3 py-1 rounded-full bg-black/75 backdrop-blur-md border border-white/15 text-xs text-white/90 font-mono shadow-sm">
+                    {tv.duration}
+                  </span>
                 )}
 
                 {tv.numberOfEpisodes ? (
-                  <>
-                    <span className="text-gray-500">•</span>
-                    <span className="text-xs text-gray-300 font-medium">
-                      {tv.numberOfEpisodes} Episodes
-                    </span>
-                  </>
+                  <span className="px-3 py-1 rounded-full bg-black/75 backdrop-blur-md border border-white/15 text-xs text-white/90 font-mono shadow-sm">
+                    {tv.numberOfEpisodes} Episodes
+                  </span>
                 ) : null}
 
                 {tv.status && (
-                  <>
-                    <span className="text-gray-500">•</span>
-                    <Badge variant="secondary" size="sm">
-                      {tv.status}
-                    </Badge>
-                  </>
+                  <span className="px-3 py-1 rounded-full bg-black/75 backdrop-blur-md border border-emerald-500/30 text-xs text-emerald-400 font-medium shadow-sm">
+                    {tv.status}
+                  </span>
                 )}
               </div>
 
@@ -179,44 +152,45 @@ export default async function TvDetailPage({
 
               {/* Genres */}
               {tv.genres.length > 0 && (
-                <div className="flex flex-wrap gap-1.5">
+                <div className="flex flex-wrap gap-2 pt-1">
                   {tv.genres.map((g) => (
-                    <Badge key={g} variant="outline" size="sm">
+                    <span
+                      key={g}
+                      className="px-3.5 py-1 rounded-full bg-black/60 backdrop-blur-md hover:bg-black/80 border border-white/15 text-xs text-white/80 font-medium transition-colors cursor-default shadow-sm"
+                    >
                       {g}
-                    </Badge>
+                    </span>
                   ))}
                 </div>
               )}
 
               {/* Overview */}
               {tv.overview ? (
-                <p className="text-sm sm:text-base 2xl:text-lg text-gray-300 leading-relaxed drop-shadow">
+                <p className="text-sm sm:text-base 2xl:text-lg text-gray-200 leading-relaxed drop-shadow-md">
                   {tv.overview}
                 </p>
               ) : null}
 
               {/* Call to Actions */}
-              <div className="flex flex-wrap items-center gap-3 pt-2">
-                <Link href={`/watch/${tv.id}?type=tv&season=1&episode=1`}>
-                  <Button
-                    variant="primary"
-                    size="lg"
-                    leftIcon={
-                      <div className="flex h-5 w-5 items-center justify-center rounded-md bg-black text-white shrink-0 shadow-sm">
-                        <svg className="h-2.5 w-2.5 fill-current ml-0.5" viewBox="0 0 24 24">
-                          <path d="M8 5v14l11-7z" />
-                        </svg>
-                      </div>
-                    }
-                  >
-                    Watch Now
-                  </Button>
+              <div className="flex flex-wrap items-center gap-3 pt-3">
+                <Link
+                  href={`/watch/${tv.id}?type=tv&season=1&episode=1`}
+                  className="inline-flex items-center gap-2.5 px-7 h-11 sm:h-12 rounded-full bg-white/[0.12] hover:bg-white/[0.22] active:scale-[0.98] border border-white/25 text-white font-semibold text-sm sm:text-base backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] transition-all duration-150 cursor-pointer"
+                >
+                  <svg className="h-4 w-4 fill-white shrink-0" viewBox="0 0 24 24">
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                  <span>Watch Now</span>
                 </Link>
 
-                <Link href="/">
-                  <Button variant="outline" size="lg">
-                    ← Back to Catalog
-                  </Button>
+                <Link
+                  href="/"
+                  className="inline-flex items-center gap-2 px-6 h-11 sm:h-12 rounded-full bg-white/[0.06] hover:bg-white/[0.14] active:scale-[0.98] border border-white/15 text-white/90 font-medium text-sm sm:text-base backdrop-blur-md transition-all duration-150 cursor-pointer"
+                >
+                  <svg className="h-4 w-4 stroke-current fill-none" viewBox="0 0 24 24" strokeWidth="2">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                  </svg>
+                  <span>Back to Catalog</span>
                 </Link>
               </div>
             </div>
@@ -225,7 +199,7 @@ export default async function TvDetailPage({
       </section>
 
       {/* Main Details Body */}
-      <Container size="wide" className="space-y-12 2xl:space-y-16 pb-20 pt-6">
+      <Container size="wide" className="relative z-10 space-y-12 2xl:space-y-16 pb-24 pt-6">
         {/* Interactive Seasons & Episodes Section */}
         {tv.seasons && tv.seasons.length > 0 && (
           <TvEpisodesViewer

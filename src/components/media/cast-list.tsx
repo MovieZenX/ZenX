@@ -34,25 +34,27 @@ export function CastList({
             className="w-24 sm:w-28 shrink-0 flex flex-col items-center text-center group snap-start"
           >
             {/* Circular Profile Avatar */}
-            <div className="h-20 w-20 sm:h-24 sm:w-24 rounded-full overflow-hidden border border-white/10 bg-surface-card mb-2 group-hover:border-white/30 transition-colors shadow-md">
-              {actor.profileUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={actor.profileUrl}
-                  alt={actor.name}
-                  loading="lazy"
-                  className="h-full w-full object-cover object-top transition-transform duration-300 group-hover:scale-105"
-                />
-              ) : (
-                <div className="flex h-full w-full items-center justify-center bg-white/[0.05] text-xs text-gray-400 font-bold">
-                  {actor.name
-                    .split(" ")
-                    .map((n) => n[0])
-                    .join("")
-                    .slice(0, 2)
-                    .toUpperCase() || "NA"}
-                </div>
-              )}
+            <div className="relative h-20 w-20 sm:h-24 sm:w-24 rounded-full p-[1.5px] bg-gradient-to-b from-white/20 via-white/5 to-transparent group-hover:from-white/40 transition-all duration-300 shadow-lg mb-2.5">
+              <div className="h-full w-full rounded-full overflow-hidden bg-black/40">
+                {actor.profileUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={actor.profileUrl}
+                    alt={actor.name}
+                    loading="lazy"
+                    className="h-full w-full object-cover object-top transition-transform duration-300 group-hover:scale-105"
+                  />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center bg-white/[0.05] text-xs text-gray-400 font-bold">
+                    {actor.name
+                      .split(" ")
+                      .map((n) => n[0])
+                      .join("")
+                      .slice(0, 2)
+                      .toUpperCase() || "NA"}
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Actor Name & Character Role */}

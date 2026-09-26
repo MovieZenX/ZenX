@@ -2,8 +2,6 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { SeasonItem, EpisodeItem } from "@/types/metadata";
@@ -98,59 +96,64 @@ export function TvEpisodesViewer({
           </p>
         </div>
 
-        {/* Season Selector Tabs/Pills */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 max-w-full">
-          {seasons.map((s) => (
-            <button
-              key={s.id}
-              type="button"
-              onClick={() => handleSelectSeason(s.seasonNumber)}
-              className={`rounded-lg px-3.5 py-1.5 text-xs font-semibold shrink-0 transition-all duration-200 cursor-pointer ${
-                selectedSeasonNumber === s.seasonNumber
-                  ? "bg-white text-black"
-                  : "bg-white/[0.05] hover:bg-white/[0.1] text-gray-300 hover:text-white border border-white/[0.08]"
-              }`}
-              aria-label={`Select ${s.name || `Season ${s.seasonNumber}`}`}
-            >
-              {s.name || `Season ${s.seasonNumber}`}
-            </button>
-          ))}
+        {/* Season Selector Segmented Capsule Bar */}
+        <div className="inline-flex items-center p-1 rounded-full bg-white/[0.04] border border-white/[0.08] backdrop-blur-md gap-1 overflow-x-auto max-w-full scrollbar-none">
+          {seasons.map((s) => {
+            const isSelected = selectedSeasonNumber === s.seasonNumber;
+            return (
+              <button
+                key={s.id}
+                type="button"
+                onClick={() => handleSelectSeason(s.seasonNumber)}
+                className={`rounded-full px-4 py-1.5 text-xs font-semibold shrink-0 transition-all duration-150 cursor-pointer ${
+                  isSelected
+                    ? "bg-white/[0.15] text-white border border-white/25 shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]"
+                    : "text-white/60 hover:text-white hover:bg-white/[0.06] border border-transparent"
+                }`}
+                aria-label={`Select ${s.name || `Season ${s.seasonNumber}`}`}
+              >
+                {s.name || `Season ${s.seasonNumber}`}
+              </button>
+            );
+          })}
         </div>
       </div>
 
       {/* Active Season Overview Card */}
       {activeSeason && (
-        <div className="flex flex-col sm:flex-row gap-4 items-start bg-surface-card/60 p-4 rounded-xl border border-white/[0.06]">
-          {activeSeason.posterUrl ? (
-            <div className="w-20 aspect-[2/3] shrink-0 rounded-lg overflow-hidden border border-white/10 hidden sm:block">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={activeSeason.posterUrl}
-                alt={activeSeason.name}
-                className="h-full w-full object-cover"
-              />
-            </div>
-          ) : null}
-
-          <div className="flex-1 space-y-1">
-            <div className="flex flex-wrap items-center gap-2">
-              <h3 className="text-base font-bold text-white">
-                {activeSeason.name}
-              </h3>
-              <Badge variant="accent" size="sm">
-                {activeSeason.episodeCount} Episodes
-              </Badge>
-              {activeSeason.airDate && (
-                <span className="text-xs text-gray-400 font-medium">
-                  Premiered {activeSeason.airDate.slice(0, 4)}
-                </span>
-              )}
-            </div>
-            {activeSeason.overview ? (
-              <p className="text-xs sm:text-sm text-gray-300 leading-relaxed pt-1">
-                {activeSeason.overview}
-              </p>
+        <div className="relative overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.02] p-5 sm:p-6 backdrop-blur-sm shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
+          <div className="flex flex-col sm:flex-row gap-5 items-start">
+            {activeSeason.posterUrl ? (
+              <div className="w-20 sm:w-24 aspect-[2/3] shrink-0 rounded-xl overflow-hidden border border-white/15 shadow-md hidden sm:block">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={activeSeason.posterUrl}
+                  alt={activeSeason.name}
+                  className="h-full w-full object-cover"
+                />
+              </div>
             ) : null}
+
+            <div className="flex-1 space-y-2">
+              <div className="flex flex-wrap items-center gap-2.5">
+                <h3 className="text-lg font-bold text-white tracking-tight">
+                  {activeSeason.name}
+                </h3>
+                <span className="px-2.5 py-0.5 rounded-full bg-white/[0.08] border border-white/10 text-xs font-semibold text-white/90">
+                  {activeSeason.episodeCount} Episodes
+                </span>
+                {activeSeason.airDate && (
+                  <span className="text-xs text-white/50 font-mono">
+                    Premiered {activeSeason.airDate.slice(0, 4)}
+                  </span>
+                )}
+              </div>
+              {activeSeason.overview ? (
+                <p className="text-xs sm:text-sm text-gray-300/80 leading-relaxed max-w-4xl">
+                  {activeSeason.overview}
+                </p>
+              ) : null}
+            </div>
           </div>
         </div>
       )}
@@ -159,12 +162,13 @@ export function TvEpisodesViewer({
       {isLoading && (
         <div className="space-y-3">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="flex gap-4 p-4 rounded-xl bg-white/[0.03] border border-white/[0.06]">
-              <Skeleton className="w-28 sm:w-44 aspect-video rounded-lg shrink-0" />
-              <div className="flex-1 space-y-2">
-                <Skeleton className="h-4 w-1/3 rounded" />
-                <Skeleton className="h-3 w-1/4 rounded" />
+            <div key={i} className="flex flex-col sm:flex-row gap-4 p-4 rounded-2xl bg-white/[0.02] border border-white/[0.06]">
+              <Skeleton className="w-full sm:w-52 md:w-60 aspect-video rounded-xl shrink-0" />
+              <div className="flex-1 space-y-2.5">
+                <Skeleton className="h-5 w-1/3 rounded-md" />
+                <Skeleton className="h-3 w-1/5 rounded" />
                 <Skeleton className="h-3 w-4/5 rounded" />
+                <Skeleton className="h-3 w-3/5 rounded" />
               </div>
             </div>
           ))}
@@ -173,7 +177,7 @@ export function TvEpisodesViewer({
 
       {/* Error State with Retry */}
       {!isLoading && error && (
-        <div className="p-6 text-center rounded-xl bg-red-950/20 border border-red-500/20 space-y-3">
+        <div className="p-6 text-center rounded-2xl bg-red-950/20 border border-red-500/20 space-y-3">
           <p className="text-sm text-red-300">{error}</p>
           <Button
             variant="secondary"
@@ -189,88 +193,103 @@ export function TvEpisodesViewer({
       {!isLoading && !error && episodes.length > 0 && (
         <div className="space-y-3">
           {episodes.map((ep) => (
-            <Card
+            <Link
               key={ep.id}
-              className="p-3 sm:p-4 flex flex-col sm:flex-row gap-4 items-start border-white/[0.06] hover:border-white/[0.12] transition-colors"
+              href={`/watch/${tvId}?type=tv&season=${ep.seasonNumber}&episode=${ep.episodeNumber}`}
+              className="group relative flex flex-col sm:flex-row gap-4 sm:gap-5 p-3.5 sm:p-4 rounded-2xl bg-white/[0.02] hover:bg-white/[0.05] border border-white/[0.07] hover:border-white/[0.15] transition-all duration-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] cursor-pointer"
+              aria-label={`Watch Episode ${ep.episodeNumber}: ${ep.name}`}
             >
               {/* Episode Still / Thumbnail */}
-              <div className="relative w-full sm:w-44 lg:w-52 aspect-video rounded-lg overflow-hidden shrink-0 bg-surface border border-white/10 group">
+              <div className="relative w-full sm:w-52 md:w-60 aspect-video rounded-xl overflow-hidden shrink-0 bg-white/[0.03] border border-white/10">
+                {/* Episode Index Pill */}
+                <div className="absolute top-2.5 left-2.5 z-10 px-2 py-0.5 rounded-md bg-black/75 backdrop-blur-sm border border-white/15 text-[11px] font-mono font-bold text-white/90">
+                  EP {ep.episodeNumber < 10 ? `0${ep.episodeNumber}` : ep.episodeNumber}
+                </div>
+
                 {ep.stillUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={ep.stillUrl}
                     alt={ep.name}
                     loading="lazy"
-                    className="h-full w-full object-cover"
+                    className="h-full w-full object-cover transform-gpu group-hover:scale-[1.03] transition-transform duration-300 ease-out"
                   />
                 ) : (
-                  <div className="flex h-full w-full items-center justify-center bg-white/[0.04] text-gray-500 text-xs font-bold">
-                    Episode {ep.episodeNumber}
+                  <div className="flex h-full w-full items-center justify-center bg-white/[0.03] text-gray-500 text-xs font-bold font-mono">
+                    EP {ep.episodeNumber}
                   </div>
                 )}
 
-                {/* Quick Play Watch Link Overlay */}
-                <Link
-                  href={`/watch/${tvId}?type=tv&season=${ep.seasonNumber}&episode=${ep.episodeNumber}`}
-                  className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
-                  aria-label={`Watch Episode ${ep.episodeNumber}: ${ep.name}`}
-                >
-                  <div className="h-10 w-10 rounded-full bg-white text-black flex items-center justify-center">
-                    <svg className="h-5 w-5 fill-current ml-0.5" viewBox="0 0 24 24">
+                {/* Translucent Frosted Glass Play Overlay */}
+                <div className="absolute inset-0 bg-black/35 opacity-0 group-hover:opacity-100 transition-opacity duration-150 flex items-center justify-center">
+                  <div className="h-10 w-10 sm:h-11 sm:w-11 rounded-full bg-white/20 backdrop-blur-md border border-white/40 text-white flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform duration-200">
+                    <svg className="h-4 w-4 fill-white ml-0.5" viewBox="0 0 24 24">
                       <path d="M8 5v14l11-7z" />
                     </svg>
                   </div>
-                </Link>
+                </div>
               </div>
 
               {/* Episode Information */}
-              <div className="flex-1 min-w-0 space-y-1.5">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <h4 className="text-sm sm:text-base font-bold text-white leading-tight">
-                    <span className="text-gray-400 font-mono mr-1.5">
-                      {ep.episodeNumber < 10 ? `0${ep.episodeNumber}` : ep.episodeNumber}.
-                    </span>
-                    {ep.name}
-                  </h4>
-
-                  <div className="flex items-center gap-2 text-xs">
-                    {ep.duration && (
-                      <span className="text-gray-400 font-medium">
-                        {ep.duration}
+              <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5">
+                <div className="space-y-1.5">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <h4 className="text-sm sm:text-base font-bold text-white group-hover:text-white transition-colors leading-snug">
+                      <span className="text-gray-400 font-mono mr-1.5 text-xs sm:text-sm">
+                        {ep.episodeNumber < 10 ? `0${ep.episodeNumber}` : ep.episodeNumber}.
                       </span>
-                    )}
-                    {ep.voteAverage > 0 && (
-                      <Badge variant="rating" size="sm">
-                        ★ {ep.voteAverage}
-                      </Badge>
-                    )}
+                      {ep.name}
+                    </h4>
+
+                    <div className="flex items-center gap-2 text-xs">
+                      {ep.duration && (
+                        <span className="px-2 py-0.5 rounded-full bg-white/[0.05] border border-white/10 text-white/70 text-[11px] font-mono">
+                          {ep.duration}
+                        </span>
+                      )}
+                      {ep.voteAverage > 0 && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-400/10 border border-amber-400/20 text-amber-300 font-semibold text-[11px]">
+                          ★ {ep.voteAverage}
+                        </span>
+                      )}
+                    </div>
                   </div>
+
+                  {ep.airDate && (
+                    <p className="text-[11px] text-white/40 font-mono">
+                      Aired {ep.airDate}
+                    </p>
+                  )}
+
+                  {ep.overview ? (
+                    <p className="text-xs sm:text-sm text-gray-300/80 line-clamp-2 sm:line-clamp-3 leading-relaxed pt-0.5">
+                      {ep.overview}
+                    </p>
+                  ) : (
+                    <p className="text-xs text-gray-500 italic pt-0.5">
+                      No episode synopsis available.
+                    </p>
+                  )}
                 </div>
 
-                {ep.airDate && (
-                  <p className="text-[11px] text-gray-400">
-                    Aired {ep.airDate}
-                  </p>
-                )}
-
-                {ep.overview ? (
-                  <p className="text-xs sm:text-sm text-gray-300 line-clamp-2 sm:line-clamp-3 leading-relaxed pt-0.5">
-                    {ep.overview}
-                  </p>
-                ) : (
-                  <p className="text-xs text-gray-500 italic">
-                    No episode synopsis available.
-                  </p>
-                )}
+                {/* Interactive Play Episode Indicator */}
+                <div className="pt-2 sm:pt-0">
+                  <span className="inline-flex items-center gap-1.5 text-xs font-medium text-white/50 group-hover:text-white transition-colors">
+                    <span>Watch Episode</span>
+                    <svg className="h-3 w-3 stroke-current fill-none transform-gpu group-hover:translate-x-0.5 transition-transform" viewBox="0 0 24 24" strokeWidth="2.5">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                    </svg>
+                  </span>
+                </div>
               </div>
-            </Card>
+            </Link>
           ))}
         </div>
       )}
 
       {/* Empty Episodes State */}
       {!isLoading && !error && episodes.length === 0 && (
-        <div className="p-8 text-center bg-white/[0.02] border border-white/[0.06] rounded-xl">
+        <div className="p-8 text-center bg-white/[0.02] border border-white/[0.06] rounded-2xl">
           <p className="text-sm text-gray-400">
             No episode details are currently available for this season.
           </p>

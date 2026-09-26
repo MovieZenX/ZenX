@@ -245,6 +245,7 @@ export function Hero({
 
         {/* Multi-directional vignette gradient overlays */}
         <div className="absolute inset-0 vignette-top z-20 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/60 to-transparent z-20 pointer-events-none" />
         <div className="absolute inset-0 vignette-left z-20 pointer-events-none" />
         <div className="absolute inset-0 vignette-bottom z-20 pointer-events-none" />
       </div>

@@ -6,6 +6,7 @@ import type {
   TMDBEpisode,
   TMDBCastMember,
   TMDBImages,
+  TMDBVideos,
 } from "@/types/tmdb";
 import type {
   MediaItem,
@@ -136,6 +137,46 @@ export function extractBestLogo(images?: TMDBImages): string | null {
 }
 
 /**
+ * Extracts the optimal YouTube trailer key from TMDB videos response.
+ * Prefers official trailers, then any trailers, then official teasers, then any teasers.
+ */
+export function extractBestTrailer(videos?: TMDBVideos): string | null {
+  if (!videos?.results || !Array.isArray(videos.results) || videos.results.length === 0) {
+    return null;
+  }
+
+  // Filter for valid YouTube entries
+  const ytVideos = videos.results.filter(
+    (v) =>
+      v &&
+      v.site === "YouTube" &&
+      typeof v.key === "string" &&
+      v.key.trim().length > 0
+  );
+
+  if (ytVideos.length === 0) return null;
+
+  // 1. Official Trailer
+  const officialTrailer = ytVideos.find((v) => v.type === "Trailer" && v.official === true);
+  if (officialTrailer) return officialTrailer.key;
+
+  // 2. Any Trailer
+  const anyTrailer = ytVideos.find((v) => v.type === "Trailer");
+  if (anyTrailer) return anyTrailer.key;
+
+  // 3. Official Teaser
+  const officialTeaser = ytVideos.find((v) => v.type === "Teaser" && v.official === true);
+  if (officialTeaser) return officialTeaser.key;
+
+  // 4. Any Teaser
+  const anyTeaser = ytVideos.find((v) => v.type === "Teaser");
+  if (anyTeaser) return anyTeaser.key;
+
+  // 5. Fallback to first available video
+  return ytVideos[0]?.key || null;
+}
+
+/**
  * Normalizes full movie details into MediaDetail.
  */
 export function normalizeMovieDetail(raw: TMDBMovieDetail): MediaDetail {
@@ -146,10 +187,12 @@ export function normalizeMovieDetail(raw: TMDBMovieDetail): MediaDetail {
     .slice(0, 10)
     .map((item) => normalizeTMDBItem(item, "movie"));
   const logoUrl = extractBestLogo(raw.images);
+  const trailerKey = extractBestTrailer(raw.videos);
 
   return {
     ...base,
     logoUrl,
+    trailerKey,
     genres: genres.length > 0 ? genres : base.genres,
     tagline: raw.tagline || null,
     status: raw.status || "Released",
@@ -186,10 +229,12 @@ export function normalizeTvDetail(raw: TMDBTvDetail): MediaDetail {
   const seasonCount = raw.number_of_seasons || seasons.length;
   const duration = seasonCount === 1 ? "1 Season" : `${seasonCount} Seasons`;
   const logoUrl = extractBestLogo(raw.images);
+  const trailerKey = extractBestTrailer(raw.videos);
 
   return {
     ...base,
     logoUrl,
+    trailerKey,
     genres: genres.length > 0 ? genres : base.genres,
     tagline: raw.tagline || null,
     status: raw.status || "Returning Series",

@@ -16,7 +16,6 @@ import {
 } from "./normalize";
 
 const BASE_URL = serverEnv.TMDB_BASE_URL || "https://api.themoviedb.org/3";
-const API_KEY = serverEnv.TMDB_API_KEY;
 
 /**
  * Generic server-side fetch wrapper for TMDB with Next.js ISR/Data Cache.
@@ -27,13 +26,14 @@ async function tmdbFetch<T>(
   params: Record<string, string | number | undefined> = {},
   revalidateSeconds: number = 3600
 ): Promise<T | null> {
-  if (!API_KEY) {
+  const apiKey = process.env.TMDB_API_KEY || serverEnv.TMDB_API_KEY;
+  if (!apiKey) {
     console.warn("[TMDB] Missing TMDB_API_KEY in environment variables.");
     return null;
   }
 
   const searchParams = new URLSearchParams();
-  searchParams.set("api_key", API_KEY);
+  searchParams.set("api_key", apiKey);
   searchParams.set("language", "en-US");
 
   for (const [key, val] of Object.entries(params)) {
@@ -236,7 +236,7 @@ export async function searchMedia(
 export async function getMovieDetails(id: string | number): Promise<MediaDetail | null> {
   const raw = await tmdbFetch<TMDBMovieDetail>(
     `/movie/${id}`,
-    { append_to_response: "credits,similar,images" },
+    { append_to_response: "credits,similar,images,videos" },
     86400
   );
 
@@ -250,7 +250,7 @@ export async function getMovieDetails(id: string | number): Promise<MediaDetail 
 export async function getTvDetails(id: string | number): Promise<MediaDetail | null> {
   const raw = await tmdbFetch<TMDBTvDetail>(
     `/tv/${id}`,
-    { append_to_response: "credits,similar,images" },
+    { append_to_response: "credits,similar,images,videos" },
     86400
   );
 

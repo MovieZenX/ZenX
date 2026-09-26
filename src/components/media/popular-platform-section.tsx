@@ -79,26 +79,25 @@ export function PopularPlatformSection({
 }: PopularPlatformSectionProps) {
   const [selectedPlatformId, setSelectedPlatformId] = useState(initialPlatformId);
   const [selectedType, setSelectedType] = useState<"tv" | "movie">(initialType);
-  const [items, setItems] = useState<MediaItem[]>(initialItems);
-  const [isLoading, setIsLoading] = useState(initialItems.length === 0);
+  const [fetchedCache, setFetchedCache] = useState<Record<string, MediaItem[]>>({});
+  const [retryingKey, setRetryingKey] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const [fetchTrigger, setFetchTrigger] = useState(0);
 
-  // In-memory cache for loaded platform items across user selections
-  const cacheRef = useRef<Record<string, MediaItem[]>>({
-    [`${initialPlatformId}-${initialType}`]: initialItems,
-  });
+  const initialKey = `${initialPlatformId}-${initialType}`;
+  const currentKey = `${selectedPlatformId}-${selectedType}`;
 
-  // Keep cache and displayed items synced if server-provided initialItems updates
-  useEffect(() => {
-    if (initialItems && initialItems.length > 0) {
-      cacheRef.current[`${initialPlatformId}-${initialType}`] = initialItems;
-      if (selectedPlatformId === initialPlatformId && selectedType === initialType) {
-        setItems(initialItems);
-        setIsLoading(false);
-      }
-    }
-  }, [initialItems, initialPlatformId, initialType, selectedPlatformId, selectedType]);
+  // Check if viewing default initial platform with server-provided items
+  const isDefaultInitial =
+    currentKey === initialKey && initialItems.length > 0 && retryingKey !== currentKey;
+
+  // Cached results for current platform + type (if fetched)
+  const cached = fetchedCache[currentKey];
+
+  // Derived loading state: true when data is not yet in cache or default props
+  const isLoading = !isDefaultInitial && cached === undefined;
+
+  // Derived items to display
+  const items = isDefaultInitial ? initialItems : (cached ?? []);
 
   const currentPlatform =
     POPULAR_PLATFORMS.find((p) => p.id === selectedPlatformId) || POPULAR_PLATFORMS[0]!;
@@ -112,20 +111,19 @@ export function PopularPlatformSection({
     });
   }, []);
 
-  // Fetch when platform, type, or retry trigger changes
+  // Fetch when platform or type changes (unless already cached or default has initialItems)
   useEffect(() => {
-    const cacheKey = `${selectedPlatformId}-${selectedType}`;
-    const cached = cacheRef.current[cacheKey];
+    // If viewing default initial with items and not retrying, nothing to fetch
+    if (isDefaultInitial) {
+      return;
+    }
 
-    // If already in cache and has items, show immediately without loading delay
-    if (cached && cached.length > 0) {
-      setItems(cached);
-      setIsLoading(false);
+    // If already in fetchedCache, nothing to fetch
+    if (cached !== undefined) {
       return;
     }
 
     let cancelled = false;
-    setIsLoading(true);
 
     const fetchItems = async () => {
       try {
@@ -137,38 +135,21 @@ export function PopularPlatformSection({
         const results = json.results || [];
 
         if (!cancelled) {
-          if (results.length > 0) {
-            cacheRef.current[cacheKey] = results;
-            setItems(results);
-          } else if (
-            selectedPlatformId === initialPlatformId &&
-            selectedType === initialType &&
-            initialItems.length > 0
-          ) {
-            // Fall back to server provided initialItems
-            setItems(initialItems);
-          } else {
-            setItems([]);
-          }
+          setFetchedCache((prev) => ({
+            ...prev,
+            [currentKey]: results,
+          }));
+          setRetryingKey((prev) => (prev === currentKey ? null : prev));
         }
       } catch (err) {
         console.error("[PopularPlatformSection] Fetch error:", (err as Error).message);
         if (!cancelled) {
-          // If default platform failed, fall back to initialItems
-          if (
-            selectedPlatformId === initialPlatformId &&
-            selectedType === initialType &&
-            initialItems.length > 0
-          ) {
-            setItems(initialItems);
-          } else if (cached && cached.length > 0) {
-            setItems(cached);
-          } else {
-            setItems([]);
-          }
+          setFetchedCache((prev) => ({
+            ...prev,
+            [currentKey]: [],
+          }));
+          setRetryingKey((prev) => (prev === currentKey ? null : prev));
         }
-      } finally {
-        if (!cancelled) setIsLoading(false);
       }
     };
 
@@ -178,13 +159,11 @@ export function PopularPlatformSection({
       cancelled = true;
     };
   }, [
+    currentKey,
     currentPlatform.providerId,
-    selectedPlatformId,
     selectedType,
-    initialPlatformId,
-    initialType,
-    initialItems,
-    fetchTrigger,
+    isDefaultInitial,
+    cached,
   ]);
 
   return (
@@ -343,7 +322,14 @@ export function PopularPlatformSection({
               </p>
               <button
                 type="button"
-                onClick={() => setFetchTrigger((prev) => prev + 1)}
+                onClick={() => {
+                  setRetryingKey(currentKey);
+                  setFetchedCache((prev) => {
+                    const next = { ...prev };
+                    delete next[currentKey];
+                    return next;
+                  });
+                }}
                 className="px-4 py-1.5 text-xs font-medium rounded-full bg-white/10 hover:bg-white/20 text-white/80 hover:text-white border border-white/15 transition-colors cursor-pointer"
               >
                 Reload Platform

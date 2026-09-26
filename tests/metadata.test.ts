@@ -8,8 +8,9 @@ import {
   normalizeMovieDetail,
   normalizeTvDetail,
   normalizeTvSeason,
+  extractBestTrailer,
 } from "../src/lib/metadata/normalize";
-import type { TMDBRawItem, TMDBMovieDetail, TMDBTvDetail, TMDBSeasonDetail } from "../src/types/tmdb";
+import type { TMDBRawItem, TMDBMovieDetail, TMDBTvDetail, TMDBSeasonDetail, TMDBVideos } from "../src/types/tmdb";
 
 describe("Metadata Normalization Utilities", () => {
   describe("buildImageUrl", () => {
@@ -235,6 +236,36 @@ describe("Metadata Normalization Utilities", () => {
       assert.equal(season.episodes?.length, 1);
       assert.equal(season.episodes?.[0]?.name, "Winter Is Coming");
       assert.equal(season.episodes?.[0]?.duration, "1h 2m");
+    });
+  });
+
+  describe("extractBestTrailer", () => {
+    it("returns null when videos is empty or undefined", () => {
+      assert.equal(extractBestTrailer(undefined), null);
+      assert.equal(extractBestTrailer({ results: [] }), null);
+    });
+
+    it("prefers official YouTube trailer over teaser or non-official", () => {
+      const videos: TMDBVideos = {
+        results: [
+          { id: "1", key: "clip123", site: "YouTube", name: "Clip", type: "Clip", official: false },
+          { id: "2", key: "teaser123", site: "YouTube", name: "Teaser", type: "Teaser", official: true },
+          { id: "3", key: "officialTrailer123", site: "YouTube", name: "Main Trailer", type: "Trailer", official: true },
+          { id: "4", key: "fanTrailer", site: "YouTube", name: "Fan Trailer", type: "Trailer", official: false },
+        ],
+      };
+
+      assert.equal(extractBestTrailer(videos), "officialTrailer123");
+    });
+
+    it("ignores non-YouTube videos", () => {
+      const videos: TMDBVideos = {
+        results: [
+          { id: "1", key: "vimeo123", site: "Vimeo", name: "Trailer", type: "Trailer", official: true },
+        ],
+      };
+
+      assert.equal(extractBestTrailer(videos), null);
     });
   });
 });
