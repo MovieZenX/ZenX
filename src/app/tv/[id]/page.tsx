@@ -74,7 +74,7 @@ export default async function TvDetailPage({
     <div className="flex flex-col min-h-screen">
       {/* Backdrop Header Section */}
       <section
-        className="relative min-h-[60vh] sm:min-h-[72vh] w-full flex flex-col justify-end overflow-hidden pt-24 sm:pt-32"
+        className="relative min-h-[55vh] sm:min-h-[68vh] max-h-[820px] 2xl:max-h-[920px] w-full flex flex-col justify-end overflow-hidden pt-24 sm:pt-32"
         aria-label={`TV Show Details: ${tv.title}`}
       >
         {/* Backdrop Image Container */}
@@ -97,11 +97,11 @@ export default async function TvDetailPage({
         </div>
 
         {/* Hero Information */}
-        <Container className="relative z-20 pb-12 sm:pb-16">
-          <div className="flex flex-col md:flex-row gap-8 items-start">
+        <Container size="wide" className="relative z-20 pb-12 sm:pb-16">
+          <div className="flex flex-col md:flex-row gap-8 2xl:gap-10 items-start">
             {/* 2:3 Poster Card */}
             {tv.posterUrl ? (
-              <div className="w-48 sm:w-56 lg:w-64 shrink-0 rounded-2xl overflow-hidden border border-white/10 shadow-2xl shadow-black/80 bg-surface-card hidden sm:block">
+              <div className="w-48 sm:w-56 lg:w-64 xl:w-72 2xl:w-80 shrink-0 rounded-2xl overflow-hidden border border-white/10 shadow-2xl shadow-black/80 bg-surface-card hidden sm:block">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={tv.posterUrl}
@@ -111,7 +111,7 @@ export default async function TvDetailPage({
               </div>
             ) : null}
 
-            <div className="flex-1 space-y-4 max-w-3xl">
+            <div className="flex-1 space-y-4 2xl:space-y-5 max-w-3xl 2xl:max-w-4xl">
               {/* Metadata Badges */}
               <div className="flex flex-wrap items-center gap-2">
                 <Badge variant="accent" size="md">
@@ -167,11 +167,11 @@ export default async function TvDetailPage({
 
               {/* Title & Tagline */}
               <div>
-                <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white leading-tight drop-shadow-md">
+                <h1 className="text-3xl sm:text-5xl 2xl:text-6xl font-extrabold tracking-tight text-white leading-tight drop-shadow-md">
                   {tv.title}
                 </h1>
                 {tv.tagline ? (
-                  <p className="mt-1 text-sm sm:text-base italic text-gray-400">
+                  <p className="mt-1 text-sm sm:text-base 2xl:text-lg italic text-gray-400">
                     &ldquo;{tv.tagline}&rdquo;
                   </p>
                 ) : null}
@@ -190,7 +190,7 @@ export default async function TvDetailPage({
 
               {/* Overview */}
               {tv.overview ? (
-                <p className="text-sm sm:text-base text-gray-300 leading-relaxed drop-shadow">
+                <p className="text-sm sm:text-base 2xl:text-lg text-gray-300 leading-relaxed drop-shadow">
                   {tv.overview}
                 </p>
               ) : null}
@@ -202,9 +202,11 @@ export default async function TvDetailPage({
                     variant="primary"
                     size="lg"
                     leftIcon={
-                      <svg className="h-5 w-5 fill-current" viewBox="0 0 24 24">
-                        <path d="M8 5v14l11-7z" />
-                      </svg>
+                      <div className="flex h-5 w-5 items-center justify-center rounded-md bg-black text-white shrink-0 shadow-sm">
+                        <svg className="h-2.5 w-2.5 fill-current ml-0.5" viewBox="0 0 24 24">
+                          <path d="M8 5v14l11-7z" />
+                        </svg>
+                      </div>
                     }
                   >
                     Watch Now
@@ -223,7 +225,7 @@ export default async function TvDetailPage({
       </section>
 
       {/* Main Details Body */}
-      <Container className="space-y-12 pb-20 pt-6">
+      <Container size="wide" className="space-y-12 2xl:space-y-16 pb-20 pt-6">
         {/* Interactive Seasons & Episodes Section */}
         {tv.seasons && tv.seasons.length > 0 && (
           <TvEpisodesViewer

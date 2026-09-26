@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 import { ContentCard } from "./content-card";
 import { CardSkeleton } from "@/components/ui/skeleton";
 import type { MediaItem } from "@/types/metadata";
@@ -81,7 +82,23 @@ export function PopularPlatformSection({
   const [items, setItems] = useState<MediaItem[]>(initialItems);
   const [isLoading, setIsLoading] = useState(initialItems.length === 0);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const isInitialMount = useRef(true);
+  const [fetchTrigger, setFetchTrigger] = useState(0);
+
+  // In-memory cache for loaded platform items across user selections
+  const cacheRef = useRef<Record<string, MediaItem[]>>({
+    [`${initialPlatformId}-${initialType}`]: initialItems,
+  });
+
+  // Keep cache and displayed items synced if server-provided initialItems updates
+  useEffect(() => {
+    if (initialItems && initialItems.length > 0) {
+      cacheRef.current[`${initialPlatformId}-${initialType}`] = initialItems;
+      if (selectedPlatformId === initialPlatformId && selectedType === initialType) {
+        setItems(initialItems);
+        setIsLoading(false);
+      }
+    }
+  }, [initialItems, initialPlatformId, initialType, selectedPlatformId, selectedType]);
 
   const currentPlatform =
     POPULAR_PLATFORMS.find((p) => p.id === selectedPlatformId) || POPULAR_PLATFORMS[0]!;
@@ -95,13 +112,17 @@ export function PopularPlatformSection({
     });
   }, []);
 
-  // Fetch when platform or type changes
+  // Fetch when platform, type, or retry trigger changes
   useEffect(() => {
-    if (isInitialMount.current && initialItems.length > 0) {
-      isInitialMount.current = false;
+    const cacheKey = `${selectedPlatformId}-${selectedType}`;
+    const cached = cacheRef.current[cacheKey];
+
+    // If already in cache and has items, show immediately without loading delay
+    if (cached && cached.length > 0) {
+      setItems(cached);
+      setIsLoading(false);
       return;
     }
-    isInitialMount.current = false;
 
     let cancelled = false;
     setIsLoading(true);
@@ -111,14 +132,41 @@ export function PopularPlatformSection({
         const res = await fetch(
           `/api/metadata/search?provider=${currentPlatform.providerId}&type=${selectedType}&page=1`
         );
-        if (!res.ok) throw new Error("Failed to load platform items");
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const json = await res.json();
+        const results = json.results || [];
+
         if (!cancelled) {
-          setItems(json.results || []);
+          if (results.length > 0) {
+            cacheRef.current[cacheKey] = results;
+            setItems(results);
+          } else if (
+            selectedPlatformId === initialPlatformId &&
+            selectedType === initialType &&
+            initialItems.length > 0
+          ) {
+            // Fall back to server provided initialItems
+            setItems(initialItems);
+          } else {
+            setItems([]);
+          }
         }
       } catch (err) {
         console.error("[PopularPlatformSection] Fetch error:", (err as Error).message);
-        if (!cancelled) setItems([]);
+        if (!cancelled) {
+          // If default platform failed, fall back to initialItems
+          if (
+            selectedPlatformId === initialPlatformId &&
+            selectedType === initialType &&
+            initialItems.length > 0
+          ) {
+            setItems(initialItems);
+          } else if (cached && cached.length > 0) {
+            setItems(cached);
+          } else {
+            setItems([]);
+          }
+        }
       } finally {
         if (!cancelled) setIsLoading(false);
       }
@@ -129,7 +177,15 @@ export function PopularPlatformSection({
     return () => {
       cancelled = true;
     };
-  }, [currentPlatform.providerId, selectedType, initialItems.length]);
+  }, [
+    currentPlatform.providerId,
+    selectedPlatformId,
+    selectedType,
+    initialPlatformId,
+    initialType,
+    initialItems,
+    fetchTrigger,
+  ]);
 
   return (
     <section
@@ -154,7 +210,10 @@ export function PopularPlatformSection({
                 alt={currentPlatform.name}
                 width={120}
                 height={30}
-                className="h-5 sm:h-6 w-auto object-contain filter drop-shadow"
+                className={cn(
+                  "h-5 sm:h-6 w-auto object-contain filter drop-shadow",
+                  currentPlatform.id === "apple-tv" && "invert brightness-200"
+                )}
                 unoptimized
               />
             </div>
@@ -169,7 +228,7 @@ export function PopularPlatformSection({
               value={selectedPlatformId}
               onChange={(e) => setSelectedPlatformId(e.target.value)}
               aria-label="Select streaming platform"
-              className="appearance-none rounded-full bg-white/10 hover:bg-white/15 border border-white/15 px-3.5 py-1.5 pr-8 text-xs font-semibold text-white cursor-pointer focus:outline-none focus:ring-1 focus:ring-white/30 transition-colors"
+              className="appearance-none rounded-full glass-invisible px-3.5 py-1.5 pr-8 text-xs font-semibold text-white cursor-pointer focus:outline-none focus:ring-1 focus:ring-white/30 transition-colors"
             >
               {POPULAR_PLATFORMS.map((p) => (
                 <option key={p.id} value={p.id} className="bg-neutral-900 text-white">
@@ -190,7 +249,7 @@ export function PopularPlatformSection({
               value={selectedType}
               onChange={(e) => setSelectedType(e.target.value as "tv" | "movie")}
               aria-label="Select content type"
-              className="appearance-none rounded-full bg-white/10 hover:bg-white/15 border border-white/15 px-3.5 py-1.5 pr-8 text-xs font-semibold text-white cursor-pointer focus:outline-none focus:ring-1 focus:ring-white/30 transition-colors"
+              className="appearance-none rounded-full glass-invisible px-3.5 py-1.5 pr-8 text-xs font-semibold text-white cursor-pointer focus:outline-none focus:ring-1 focus:ring-white/30 transition-colors"
             >
               <option value="tv" className="bg-neutral-900 text-white">
                 Series
@@ -222,7 +281,7 @@ export function PopularPlatformSection({
               type="button"
               onClick={() => scroll("left")}
               aria-label="Previous titles"
-              className="flex h-7 w-7 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white/70 hover:bg-white/15 hover:text-white transition-colors cursor-pointer"
+              className="flex h-7 w-7 items-center justify-center rounded-full glass-invisible text-white/70 hover:text-white transition-all cursor-pointer"
             >
               <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M15 19l-7-7 7-7" />
@@ -232,7 +291,7 @@ export function PopularPlatformSection({
               type="button"
               onClick={() => scroll("right")}
               aria-label="Next titles"
-              className="flex h-7 w-7 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white/70 hover:bg-white/15 hover:text-white transition-colors cursor-pointer"
+              className="flex h-7 w-7 items-center justify-center rounded-full glass-invisible text-white/70 hover:text-white transition-all cursor-pointer"
             >
               <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M9 5l7 7-7 7" />
@@ -246,12 +305,12 @@ export function PopularPlatformSection({
       <div className="relative -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
         <div
           ref={scrollRef}
-          className="flex items-center gap-6 sm:gap-8 md:gap-9 overflow-x-auto no-scrollbar scroll-smooth py-3 px-1 pl-7 sm:pl-9 md:pl-11"
+          className="flex items-center gap-4 sm:gap-5 md:gap-6 overflow-x-auto no-scrollbar scroll-smooth py-3 px-1 scroll-pl-1"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
           {isLoading ? (
             Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="w-36 sm:w-44 md:w-52 shrink-0">
+              <div key={i} className="w-48 sm:w-56 md:w-64 shrink-0">
                 <CardSkeleton />
               </div>
             ))
@@ -261,7 +320,7 @@ export function PopularPlatformSection({
               return (
                 <div
                   key={`${item.contentType}-${item.id}`}
-                  className="shrink-0 w-36 sm:w-44 md:w-52 snap-start select-none"
+                  className="shrink-0 w-48 sm:w-56 md:w-64 snap-start select-none"
                 >
                   <ContentCard
                     id={item.id}
@@ -272,14 +331,23 @@ export function PopularPlatformSection({
                     rating={item.rating}
                     quality={item.quality}
                     rank={rank}
-                    rankColor="blue"
+                    rankColor="white"
                   />
                 </div>
               );
             })
           ) : (
-            <div className="w-full py-8 text-center text-xs text-white/50">
-              No titles currently available on this platform.
+            <div className="w-full py-10 flex flex-col items-center justify-center text-center px-4">
+              <p className="text-xs text-white/50 mb-2.5">
+                No titles currently available on this platform.
+              </p>
+              <button
+                type="button"
+                onClick={() => setFetchTrigger((prev) => prev + 1)}
+                className="px-4 py-1.5 text-xs font-medium rounded-full bg-white/10 hover:bg-white/20 text-white/80 hover:text-white border border-white/15 transition-colors cursor-pointer"
+              >
+                Reload Platform
+              </button>
             </div>
           )}
         </div>

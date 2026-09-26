@@ -6,14 +6,15 @@ export interface ContainerProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 const sizeMap = {
-  sm: "max-w-4xl",
-  default: "max-w-7xl",
-  wide: "max-w-[1400px]",
-  full: "max-w-full",
+  sm: "max-w-md mx-auto",
+  default: "w-full",
+  wide: "w-full",
+  full: "w-full",
 };
 
 /**
  * Standardized responsive page container.
+ * True full-width edge-to-edge layout spreading completely from left to right.
  */
 export function Container({
   className,
@@ -24,7 +25,7 @@ export function Container({
   return (
     <div
       className={cn(
-        "mx-auto w-full px-4 sm:px-6 lg:px-8",
+        "w-full px-4 sm:px-6 md:px-8",
         sizeMap[size],
         className
       )}

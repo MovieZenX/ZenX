@@ -125,6 +125,23 @@ body {
   transform: translateY(-2px);
 }
 
+/* ─── Utility: Invisible Glassmorphism (Crystal Translucent) ─────── */
+
+.glass-invisible {
+  background-color: rgba(255, 255, 255, 0.015);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.06);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-invisible:hover {
+  background-color: rgba(255, 255, 255, 0.045);
+  border-color: rgba(255, 255, 255, 0.20);
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.14), 0 8px 30px rgba(0, 0, 0, 0.45);
+}
+
 
 /* ─── Utility: Vignette gradients for cinematic hero ────────────── */
 
@@ -132,8 +149,10 @@ body {
   background: linear-gradient(
     to bottom,
     transparent 0%,
-    rgba(0, 0, 0, 0.4) 50%,
-    rgba(0, 0, 0, 0.95) 85%,
+    transparent 50%,
+    rgba(0, 0, 0, 0.18) 65%,
+    rgba(0, 0, 0, 0.65) 82%,
+    rgba(0, 0, 0, 0.95) 94%,
     var(--color-background) 100%
   );
 }
@@ -141,10 +160,19 @@ body {
 .vignette-left {
   background: linear-gradient(
     to right,
-    var(--color-background) 0%,
-    rgba(0, 0, 0, 0.85) 35%,
-    rgba(0, 0, 0, 0.4) 70%,
-    transparent 100%
+    rgba(0, 0, 0, 0.84) 0%,
+    rgba(0, 0, 0, 0.60) 25%,
+    rgba(0, 0, 0, 0.20) 50%,
+    transparent 75%
+  );
+}
+
+.vignette-top {
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.70) 0%,
+    rgba(0, 0, 0, 0.35) 15%,
+    transparent 35%
   );
 }
 
@@ -186,18 +214,22 @@ body {
   animation: glass-content-reveal 550ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* ─── Primeshows.org Signature Numbering System ─────────────────── */
+/* ─── Signature Stream Numbering System (Obsidian Glass + Frosted Outline) ─── */
 
 .stroke-text-blue {
-  -webkit-text-stroke: 2.5px #3b82f6;
-  color: transparent;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  -webkit-text-stroke: 2.2px rgba(186, 215, 255, 0.85);
+  color: #070709;
+  paint-order: stroke fill;
+  transition: -webkit-text-stroke-color 0.15s ease;
+  filter: drop-shadow(0 4px 16px rgba(0, 0, 0, 0.95));
 }
 
 .stroke-text-white {
-  -webkit-text-stroke: 2.5px rgba(255, 255, 255, 0.88);
-  color: transparent;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  -webkit-text-stroke: 2.5px rgba(255, 255, 255, 0.75);
+  color: #070709;
+  paint-order: stroke fill;
+  transition: -webkit-text-stroke-color 0.15s ease;
+  filter: drop-shadow(0 4px 16px rgba(0, 0, 0, 0.95));
 }
 
 @media (min-width: 640px) {
@@ -210,14 +242,63 @@ body {
 }
 
 .group:hover .stroke-text-blue {
-  -webkit-text-stroke-color: #60a5fa;
-  filter: drop-shadow(0 0 16px rgba(59, 130, 246, 0.45));
+  -webkit-text-stroke-color: rgba(230, 240, 255, 0.95);
 }
 
 .group:hover .stroke-text-white {
-  -webkit-text-stroke-color: #ffffff;
-  filter: drop-shadow(0 0 16px rgba(255, 255, 255, 0.35));
+  -webkit-text-stroke-color: rgba(255, 255, 255, 0.95);
 }
+
+/* ─── Clean Professional Buttons & Badges (No 3D, No Glow) ─────── */
+
+/* Flat Clean Primary Button */
+.btn-clean-primary {
+  background-color: #ffffff;
+  color: #000000;
+  font-weight: 600;
+  transition: background-color 0.15s ease, opacity 0.15s ease;
+}
+
+.btn-clean-primary:hover {
+  background-color: #e5e5e5;
+}
+
+.btn-clean-primary:active {
+  background-color: #d4d4d4;
+}
+
+/* Flat Clean Secondary / Translucent Button */
+.btn-clean-secondary {
+  background-color: rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.btn-clean-secondary:hover {
+  background-color: rgba(255, 255, 255, 0.26);
+  border-color: rgba(255, 255, 255, 0.24);
+}
+
+.btn-clean-secondary:active {
+  background-color: rgba(255, 255, 255, 0.12);
+}
+
+/* Flat Clean Badges */
+.badge-clean {
+  background-color: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #e5e5e5;
+}
+
+.badge-clean-rating {
+  background-color: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+}
+
 
 
 

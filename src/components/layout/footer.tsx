@@ -9,7 +9,7 @@ export function Footer() {
 
   return (
     <footer className="mt-auto border-t border-white/[0.08] bg-surface-card/60 backdrop-blur-md">
-      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+      <div className="w-full px-4 py-12 sm:px-6 md:px-8">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-4 lg:gap-12">
           {/* Brand Col */}
           <div className="space-y-4 md:col-span-2">

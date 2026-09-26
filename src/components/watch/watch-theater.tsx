@@ -44,17 +44,30 @@ export function WatchTheater({
   const [loadingSeason, setLoadingSeason] = useState<boolean>(false);
   const playerRef = useRef<HTMLDivElement>(null);
 
-  // Sync state with props when navigating via router
-  useEffect(() => {
+  // Sync state with props during render without triggering cascading effect renders
+  const [prevProps, setPrevProps] = useState({
+    season: initialSeasonNumber,
+    episode: initialEpisodeNumber,
+  });
+
+  if (
+    prevProps.season !== initialSeasonNumber ||
+    prevProps.episode !== initialEpisodeNumber
+  ) {
+    setPrevProps({
+      season: initialSeasonNumber,
+      episode: initialEpisodeNumber,
+    });
     setSeasonNum(initialSeasonNumber);
     setEpisodeNum(initialEpisodeNumber);
-    if (initialSeasonData) {
-      setSeasonsCache((prev) => ({
-        ...prev,
-        [initialSeasonData.seasonNumber]: initialSeasonData,
-      }));
-    }
-  }, [initialSeasonNumber, initialEpisodeNumber, initialSeasonData]);
+  }
+
+  if (initialSeasonData && !seasonsCache[initialSeasonData.seasonNumber]) {
+    setSeasonsCache((prev) => ({
+      ...prev,
+      [initialSeasonData.seasonNumber]: initialSeasonData,
+    }));
+  }
 
   // Fetch season data on demand when switching seasons in the TV playlist
   useEffect(() => {
@@ -177,8 +190,8 @@ export function WatchTheater({
     >
       <div
         className={cn(
-          "mx-auto transition-all duration-300 px-4 sm:px-6 lg:px-8",
-          cinemaMode ? "max-w-[100vw] px-2 sm:px-4" : "max-w-7xl"
+          "w-full transition-all duration-300 px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12",
+          cinemaMode && "max-w-[100vw] px-2 sm:px-4"
         )}
       >
         {/* Top Control & Breadcrumb Header */}
@@ -187,10 +200,10 @@ export function WatchTheater({
             <div className="flex items-center gap-3">
               <Link
                 href={detailHref}
-                className="inline-flex items-center gap-2 rounded-xl bg-white/5 border border-white/10 px-3 py-1.5 text-xs font-medium text-gray-300 hover:bg-white/10 hover:text-white transition-colors"
+                className="btn-clean-secondary inline-flex items-center gap-2 rounded-lg px-3.5 py-1.5 text-xs font-medium text-gray-200 transition-colors cursor-pointer"
                 title={`Back to ${media.title} details`}
               >
-                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
                 <span>Back to Details</span>
@@ -206,7 +219,7 @@ export function WatchTheater({
                   </Badge>
                 )}
                 {media.quality && (
-                  <Badge variant="secondary" size="sm">
+                  <Badge variant="quality" size="sm">
                     {media.quality}
                   </Badge>
                 )}
@@ -219,7 +232,7 @@ export function WatchTheater({
               <button
                 type="button"
                 onClick={() => setCinemaMode(!cinemaMode)}
-                className="inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-gray-300 hover:bg-white/10 hover:text-white transition-colors cursor-pointer"
+                className="btn-clean-secondary inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-gray-200 transition-colors cursor-pointer"
                 title="Expand Theater View"
               >
                 <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -237,7 +250,7 @@ export function WatchTheater({
               <button
                 type="button"
                 onClick={handleReload}
-                className="inline-flex items-center justify-center h-8 w-8 rounded-xl border border-white/10 bg-white/5 text-gray-300 hover:bg-white/10 hover:text-white transition-colors cursor-pointer"
+                className="btn-clean-secondary inline-flex items-center justify-center h-8 w-8 rounded-lg text-gray-200 transition-colors cursor-pointer"
                 title="Reload Stream"
                 aria-label="Reload Stream"
               >
@@ -255,7 +268,7 @@ export function WatchTheater({
               <button
                 type="button"
                 onClick={handleCopyLink}
-                className="inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-gray-300 hover:bg-white/10 hover:text-white transition-colors cursor-pointer"
+                className="btn-clean-secondary inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-gray-200 transition-colors cursor-pointer"
                 title="Copy stream link"
               >
                 {copied ? (
@@ -319,18 +332,18 @@ export function WatchTheater({
         </div>
 
         {/* Sub-Player Utility & Server Dock */}
-        <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-white/[0.08] bg-surface-card p-3 sm:px-4">
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/[0.12] bg-surface-card p-3 sm:px-4 shadow-[0_4px_20px_rgba(0,0,0,0.5)]">
           {/* Left: Server Switcher */}
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold text-gray-400">Server:</span>
-            <div className="inline-flex rounded-lg bg-white/5 p-0.5 border border-white/10">
+          <div className="flex items-center gap-2.5">
+            <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Server:</span>
+            <div className="inline-flex rounded-xl bg-black/60 p-1 border border-white/10 shadow-inner">
               <button
                 type="button"
                 onClick={() => setServer("vidfast")}
                 className={cn(
-                  "rounded-md px-2.5 py-1 text-xs font-semibold transition-colors cursor-pointer",
+                  "rounded-md px-3 py-1 text-xs font-semibold transition-colors cursor-pointer",
                   server === "vidfast"
-                    ? "bg-white text-black"
+                    ? "btn-clean-primary"
                     : "text-gray-400 hover:text-white"
                 )}
               >
@@ -340,9 +353,9 @@ export function WatchTheater({
                 type="button"
                 onClick={() => setServer("backup")}
                 className={cn(
-                  "rounded-md px-2.5 py-1 text-xs font-semibold transition-colors cursor-pointer",
+                  "rounded-md px-3 py-1 text-xs font-semibold transition-colors cursor-pointer",
                   server === "backup"
-                    ? "bg-white text-black"
+                    ? "btn-clean-primary"
                     : "text-gray-400 hover:text-white"
                 )}
               >
@@ -359,10 +372,10 @@ export function WatchTheater({
                 onClick={() => handleSelectEpisode(episodeNum - 1)}
                 disabled={!hasPrevEpisode}
                 className={cn(
-                  "inline-flex items-center gap-1.5 rounded-lg border border-white/10 px-3 py-1 text-xs font-semibold transition-colors",
+                  "inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors",
                   hasPrevEpisode
-                    ? "bg-white/5 text-white hover:bg-white/15 cursor-pointer"
-                    : "bg-white/[0.02] text-gray-600 border-white/[0.04] cursor-not-allowed"
+                    ? "btn-clean-secondary cursor-pointer"
+                    : "bg-white/5 text-gray-600 border border-white/5 cursor-not-allowed"
                 )}
               >
                 <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -371,7 +384,7 @@ export function WatchTheater({
                 <span>Prev Ep</span>
               </button>
 
-              <span className="text-xs font-mono text-gray-300 font-semibold px-1">
+              <span className="text-xs font-mono text-amber-400 font-semibold px-2 py-1 rounded bg-white/10 border border-white/15">
                 S{seasonNum} : E{episodeNum}
               </span>
 
@@ -380,10 +393,10 @@ export function WatchTheater({
                 onClick={() => handleSelectEpisode(episodeNum + 1)}
                 disabled={!hasNextEpisode}
                 className={cn(
-                  "inline-flex items-center gap-1.5 rounded-lg px-3 py-1 text-xs font-semibold transition-colors",
+                  "inline-flex items-center gap-1.5 rounded-lg px-3.5 py-1.5 text-xs font-semibold transition-colors",
                   hasNextEpisode
-                    ? "bg-white text-black hover:bg-gray-200 cursor-pointer"
-                    : "bg-white/10 text-gray-500 cursor-not-allowed"
+                    ? "btn-clean-primary cursor-pointer"
+                    : "bg-white/5 text-gray-600 border border-white/5 cursor-not-allowed"
                 )}
               >
                 <span>Next Ep</span>
@@ -406,7 +419,7 @@ export function WatchTheater({
           <div className={cn("space-y-6", isTv ? "lg:col-span-8" : "lg:col-span-12")}>
             {/* Title & Key Metrics */}
             <div className="space-y-2">
-              <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white leading-tight">
+              <h1 className="text-2xl sm:text-3xl 2xl:text-4xl font-extrabold tracking-tight text-white leading-tight">
                 {isTv
                   ? `${media.title} — Season ${seasonNum}, Episode ${episodeNum}`
                   : media.title}

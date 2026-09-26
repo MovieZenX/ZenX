@@ -20,6 +20,7 @@ import { SectionHeading } from "@/components/ui/section-heading";
 import { Card } from "@/components/ui/card";
 import { ErrorState } from "@/components/ui/error-state";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export const revalidate = 3600; // 1 hour ISR revalidation
 
@@ -263,7 +264,13 @@ export default async function HomePage() {
             isNumbered={true}
           >
             {trendingList.map((item, index) => (
-              <div key={`trend-${item.id}`} className="w-40 sm:w-48 lg:w-56 shrink-0 snap-start">
+              <div
+                key={`trend-${item.id}`}
+                className={cn(
+                  index < 10 ? "w-48 sm:w-56 md:w-64 lg:w-72" : "w-40 sm:w-48 lg:w-56",
+                  "shrink-0 snap-start"
+                )}
+              >
                 <ContentCard
                   id={item.id}
                   title={item.title}
@@ -273,7 +280,7 @@ export default async function HomePage() {
                   rating={item.rating}
                   quality={item.quality}
                   rank={index < 10 ? index + 1 : undefined}
-                  rankColor="blue"
+                  rankColor="white"
                 />
               </div>
             ))}

@@ -148,7 +148,7 @@ export function StreamingPlatforms({ className }: StreamingPlatformsProps) {
           <h2 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-white">
             Streaming Platforms
           </h2>
-          <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-white/10 text-white/70 border border-white/10">
+          <span className="hidden sm:inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-medium text-white/60 glass-invisible">
             Official Networks
           </span>
         </div>
@@ -159,7 +159,7 @@ export function StreamingPlatforms({ className }: StreamingPlatformsProps) {
             type="button"
             onClick={() => scroll("left")}
             aria-label="Previous platforms"
-            className="flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white/70 hover:bg-white/15 hover:text-white transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-white"
+            className="flex h-8 w-8 items-center justify-center rounded-full glass-invisible text-white/70 hover:text-white transition-all cursor-pointer focus-visible:outline-2 focus-visible:outline-white"
           >
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M15 19l-7-7 7-7" />
@@ -169,7 +169,7 @@ export function StreamingPlatforms({ className }: StreamingPlatformsProps) {
             type="button"
             onClick={() => scroll("right")}
             aria-label="Next platforms"
-            className="flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white/70 hover:bg-white/15 hover:text-white transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-white"
+            className="flex h-8 w-8 items-center justify-center rounded-full glass-invisible text-white/70 hover:text-white transition-all cursor-pointer focus-visible:outline-2 focus-visible:outline-white"
           >
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M9 5l7 7-7 7" />
@@ -179,7 +179,7 @@ export function StreamingPlatforms({ className }: StreamingPlatformsProps) {
       </div>
 
       {/* Horizontal Scrolling Card Track */}
-      <div className="relative -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
+      <div className="relative">
         <div
           ref={scrollContainerRef}
           tabIndex={0}
@@ -201,14 +201,13 @@ export function StreamingPlatforms({ className }: StreamingPlatformsProps) {
                 aria-label={`Browse ${platform.name} catalog`}
                 className={cn(
                   "group relative shrink-0 w-36 sm:w-48 md:w-56 h-20 sm:h-24 md:h-28 rounded-2xl overflow-hidden",
-                  "flex items-center justify-center p-4",
-                  "bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 hover:border-white/25",
-                  "backdrop-blur-sm shadow-md hover:shadow-xl transition-all duration-300",
-                  "hover:scale-[1.03] active:scale-95 focus-visible:outline-2 focus-visible:outline-white"
+                  "flex items-center justify-center p-4 sm:p-5",
+                  "glass-invisible",
+                  "hover:scale-[1.02] active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-white"
                 )}
               >
-                {/* Subtle Hover Sheen */}
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-white/[0.02] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                {/* Ultra Subtle Specular Sheen on Hover */}
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/[0.04] via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
                 {/* Logo Image with Fallback */}
                 <div className="relative w-full h-full flex items-center justify-center pointer-events-none">
@@ -218,7 +217,10 @@ export function StreamingPlatforms({ className }: StreamingPlatformsProps) {
                       alt={platform.name}
                       width={180}
                       height={60}
-                      className="max-h-8 sm:max-h-11 md:max-h-13 max-w-[82%] w-auto object-contain filter drop-shadow-md group-hover:scale-105 transition-transform duration-300"
+                      className={cn(
+                        "max-h-8 sm:max-h-11 md:max-h-13 max-w-[82%] w-auto object-contain filter drop-shadow-md group-hover:scale-105 transition-transform duration-300",
+                        platform.id === "apple-tv" && "invert brightness-200"
+                      )}
                       onError={() => handleLogoError(platform.id)}
                       unoptimized
                     />

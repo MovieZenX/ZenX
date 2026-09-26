@@ -104,10 +104,10 @@ export function Hero({
   const isTallLogo = currentRatio !== undefined && currentRatio < 2.0;
 
   const logoSizeClass = isWideLogo
-    ? "h-9 sm:h-12 md:h-14 lg:h-16 max-w-[240px] sm:max-w-[320px] md:max-w-[380px] lg:max-w-[440px]"
+    ? "h-9 sm:h-12 md:h-14 lg:h-16 2xl:h-20 max-w-[240px] sm:max-w-[320px] md:max-w-[380px] lg:max-w-[440px] 2xl:max-w-[540px]"
     : isTallLogo
-    ? "h-11 sm:h-14 md:h-17 lg:h-20 max-w-[150px] sm:max-w-[200px] md:max-w-[240px] lg:max-w-[280px]"
-    : "h-10 sm:h-13 md:h-16 lg:h-18 max-w-[190px] sm:max-w-[260px] md:max-w-[320px] lg:max-w-[380px]";
+    ? "h-11 sm:h-14 md:h-17 lg:h-20 2xl:h-24 max-w-[150px] sm:max-w-[200px] md:max-w-[240px] lg:max-w-[280px] 2xl:max-w-[340px]"
+    : "h-10 sm:h-13 md:h-16 lg:h-18 2xl:h-22 max-w-[190px] sm:max-w-[260px] md:max-w-[320px] lg:max-w-[380px] 2xl:max-w-[460px]";
 
   const handlePrev = useCallback(() => {
     setSlideKey((k) => k + 1);
@@ -197,7 +197,7 @@ export function Hero({
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
       className={cn(
-        "relative min-h-[72vh] sm:min-h-[78vh] lg:min-h-[85vh] w-full flex flex-col justify-end overflow-hidden outline-none select-none",
+        "relative h-[88vh] sm:h-[92vh] min-h-[580px] sm:min-h-[640px] lg:min-h-[700px] max-h-[880px] 2xl:max-h-[980px] 3xl:max-h-[1080px] w-full flex flex-col justify-end overflow-hidden outline-none select-none",
         className
       )}
     >
@@ -220,7 +220,8 @@ export function Hero({
                 <img
                   src={slide.backdropUrl}
                   alt={slide.title}
-                  className="h-full w-full object-cover object-center"
+                  className="h-full w-full object-cover object-[center_top] sm:object-[center_12%] filter brightness-105"
+                  loading="eager"
                 />
               ) : (
                 <div className="h-full w-full bg-gradient-to-br from-gray-900/40 via-surface to-background" />
@@ -243,17 +244,17 @@ export function Hero({
         </div>
 
         {/* Multi-directional vignette gradient overlays */}
+        <div className="absolute inset-0 vignette-top z-20 pointer-events-none" />
         <div className="absolute inset-0 vignette-left z-20 pointer-events-none" />
         <div className="absolute inset-0 vignette-bottom z-20 pointer-events-none" />
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-black/50 z-20 pointer-events-none" />
       </div>
 
       {/* Hero Content Information Container */}
-      <div className="relative z-30 mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 pb-8 sm:pb-12 pt-20 sm:pt-28 flex flex-col sm:flex-row sm:items-end justify-between gap-5 sm:gap-6">
+      <div className="relative z-30 w-full px-4 sm:px-6 md:px-8 pb-8 sm:pb-12 lg:pb-14 pt-24 sm:pt-32 flex flex-col sm:flex-row sm:items-end justify-between gap-6 sm:gap-8">
         {/* Active Slide Content with Glassmorphic Reveal */}
         <div
           key={`content-${currentSlide.id}-${slideKey}`}
-          className="max-w-xl lg:max-w-2xl space-y-3 sm:space-y-3.5 animate-glass-content"
+          className="max-w-md sm:max-w-lg lg:max-w-xl space-y-3 sm:space-y-3.5 animate-glass-content"
         >
           {/* Official TMDB Logo or Fallback Title Heading */}
           {currentSlide.logoUrl && !isLogoFailed ? (
@@ -287,49 +288,50 @@ export function Hero({
             </h1>
           )}
 
-          {/* Clean Cinematic Typographic Metadata (Matching the Logo) */}
-          <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs text-gray-300 font-medium">
+          {/* Clean Flat Typographic Metadata */}
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5 text-xs text-gray-300 font-medium max-w-md sm:max-w-lg">
             {currentSlide.rating !== undefined && currentSlide.rating > 0 && (
-              <span className="inline-flex items-center gap-1 font-semibold text-white">
-                <span className="text-[11px]">★</span>
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-white/10 border border-white/15 text-xs font-semibold text-white select-none">
+                <span className="text-amber-400">★</span>
                 <span>{currentSlide.rating.toFixed(1)}</span>
+              </span>
+            )}
+
+            <span className="px-2 py-0.5 rounded bg-white/10 border border-white/15 text-[11px] font-semibold text-neutral-300 select-none uppercase tracking-wide">
+              {currentSlide.contentType === "tv" ? "TV Series" : "Movie"}
+            </span>
+
+            {currentSlide.quality && (
+              <span className="px-2 py-0.5 rounded bg-white/10 border border-white/15 text-[11px] font-mono font-semibold text-neutral-300 select-none">
+                {currentSlide.quality}
               </span>
             )}
 
             {currentSlide.releaseYear && (
               <>
-                <span className="text-white/25 text-[10px]">·</span>
-                <span className="text-gray-300">{currentSlide.releaseYear}</span>
+                <span className="text-white/20 text-[10px]">·</span>
+                <span className="text-gray-300 font-semibold">{currentSlide.releaseYear}</span>
               </>
             )}
 
             {currentSlide.duration && (
               <>
-                <span className="text-white/25 text-[10px]">·</span>
+                <span className="text-white/20 text-[10px]">·</span>
                 <span className="text-gray-300">{currentSlide.duration}</span>
               </>
             )}
 
-            {currentSlide.quality && (
-              <>
-                <span className="text-white/25 text-[10px]">·</span>
-                <span className="px-1.5 py-0.5 rounded-[4px] text-[10px] font-semibold tracking-wider text-white border border-white/25 bg-white/[0.08] backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] select-none">
-                  {currentSlide.quality}
-                </span>
-              </>
-            )}
-
             {currentSlide.ageRating && (
-              <span className="px-1.5 py-0.5 rounded-[4px] text-[10px] font-semibold tracking-wider text-gray-200 border border-white/20 bg-white/[0.04] backdrop-blur-md select-none">
+              <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold tracking-wider text-gray-300 border border-white/15 bg-white/5 select-none">
                 {currentSlide.ageRating}
               </span>
             )}
 
             {currentSlide.genres && currentSlide.genres.length > 0 && (
               <>
-                <span className="text-white/25 text-[10px]">·</span>
+                <span className="text-white/20 text-[10px]">·</span>
                 <span className="text-gray-400 font-normal">
-                  {currentSlide.genres.slice(0, 3).join(", ")}
+                  {currentSlide.genres.slice(0, 2).join(", ")}
                 </span>
               </>
             )}
@@ -337,19 +339,19 @@ export function Hero({
 
           {/* Overview / Description */}
           {currentSlide.overview?.trim() ? (
-            <p className="line-clamp-2 sm:line-clamp-3 text-xs sm:text-sm text-gray-300/85 leading-relaxed max-w-lg sm:max-w-xl drop-shadow">
+            <p className="line-clamp-2 sm:line-clamp-3 text-xs sm:text-sm text-gray-300/85 leading-relaxed max-w-md sm:max-w-lg">
               {currentSlide.overview}
             </p>
           ) : null}
 
-          {/* Call to Actions - Proportional Frosted Glass Buttons */}
-          <div className="flex flex-wrap items-center gap-2.5 pt-1.5">
-            <Link href={watchHref}>
+          {/* Call to Actions - Clean Invisible Glassmorphism Pills (No Glow) */}
+          <div className="flex flex-wrap items-center gap-3 pt-2">
+            <Link href={watchHref} className="focus-visible:outline-none">
               <button
                 type="button"
-                className="inline-flex items-center justify-center gap-1.5 h-8.5 sm:h-9 px-4 sm:px-4.5 rounded-full bg-white text-black font-semibold text-[11.5px] sm:text-xs hover:bg-white/90 active:scale-[0.98] transition-all duration-200 cursor-pointer shadow-[0_4px_18px_rgba(255,255,255,0.22),inset_0_1px_1px_rgba(255,255,255,0.9)] hover:scale-[1.02]"
+                className="inline-flex items-center justify-center gap-2.5 h-11 sm:h-12 2xl:h-13 px-6 sm:px-7 2xl:px-8 rounded-full bg-white/[0.12] hover:bg-white/[0.22] active:bg-white/[0.08] text-white font-semibold text-xs sm:text-sm 2xl:text-base backdrop-blur-xl border border-white/25 hover:border-white/40 shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] transition-all duration-200 cursor-pointer select-none"
               >
-                <svg className="h-3.5 w-3.5 fill-current" viewBox="0 0 24 24">
+                <svg className="h-4 w-4 fill-white shrink-0 ml-0.5" viewBox="0 0 24 24">
                   <path d="M8 5v14l11-7z" />
                 </svg>
                 <span>Watch Now</span>
@@ -361,16 +363,16 @@ export function Hero({
                 type="button"
                 onClick={() => onWatchlistToggle(currentSlide.id)}
                 className={cn(
-                  "inline-flex items-center justify-center gap-1.5 h-8.5 sm:h-9 px-3.5 sm:px-4 rounded-full backdrop-blur-xl border transition-all duration-200 text-[11.5px] sm:text-xs font-medium cursor-pointer active:scale-[0.98] hover:scale-[1.02]",
+                  "inline-flex items-center justify-center gap-2 h-11 sm:h-12 2xl:h-13 px-5 sm:px-6 2xl:px-7 rounded-full text-xs sm:text-sm 2xl:text-base font-medium backdrop-blur-xl transition-all duration-200 cursor-pointer select-none",
                   isInWatchlist
-                    ? "bg-gradient-to-b from-white/[0.28] via-white/[0.16] to-white/[0.08] border-white/40 text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.45),0_4px_16px_rgba(0,0,0,0.3)]"
-                    : "bg-gradient-to-b from-white/[0.18] via-white/[0.08] to-white/[0.03] hover:from-white/[0.24] hover:to-white/[0.06] border-white/20 hover:border-white/35 text-white/90 hover:text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.35),0_4px_14px_rgba(0,0,0,0.3)]"
+                    ? "bg-amber-400/20 text-amber-300 border border-amber-400/35 hover:bg-amber-400/30"
+                    : "bg-white/[0.06] hover:bg-white/[0.14] text-white border border-white/15 hover:border-white/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.15)]"
                 )}
               >
                 <svg
-                  className="h-3.5 w-3.5"
-                  fill={isInWatchlist ? "currentColor" : "none"}
+                  className="h-4 w-4 shrink-0"
                   viewBox="0 0 24 24"
+                  fill={isInWatchlist ? "currentColor" : "none"}
                   stroke="currentColor"
                 >
                   <path
@@ -384,12 +386,12 @@ export function Hero({
               </button>
             )}
 
-            <Link href={detailHref}>
+            <Link href={detailHref} className="focus-visible:outline-none">
               <button
                 type="button"
-                className="inline-flex items-center justify-center gap-1.5 h-8.5 sm:h-9 px-3.5 sm:px-4 rounded-full bg-gradient-to-b from-white/[0.20] via-white/[0.10] to-white/[0.04] hover:from-white/[0.28] hover:to-white/[0.08] backdrop-blur-xl border border-white/25 hover:border-white/40 text-white font-medium text-[11.5px] sm:text-xs active:scale-[0.98] hover:scale-[1.02] transition-all duration-200 cursor-pointer shadow-[inset_0_1px_1px_rgba(255,255,255,0.35),0_4px_14px_rgba(0,0,0,0.3)]"
+                className="inline-flex items-center justify-center gap-2 h-11 sm:h-12 2xl:h-13 px-5 sm:px-6 2xl:px-7 rounded-full bg-white/[0.06] hover:bg-white/[0.14] active:bg-white/[0.04] text-white/90 hover:text-white font-medium text-xs sm:text-sm 2xl:text-base backdrop-blur-xl border border-white/15 hover:border-white/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.15)] transition-all duration-200 cursor-pointer select-none"
               >
-                <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"

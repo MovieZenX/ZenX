@@ -85,8 +85,8 @@ export function ContentRow({
             onClick={() => scroll("left")}
             disabled={!canScrollLeft}
             className={cn(
-              "flex h-7.5 w-7.5 items-center justify-center rounded-full border border-white/20 bg-gradient-to-b from-white/[0.18] via-white/[0.08] to-white/[0.03] text-white transition-all duration-200 cursor-pointer shadow-[inset_0_1px_0_rgba(255,255,255,0.3)] backdrop-blur-md",
-              "hover:from-white/[0.28] hover:to-white/[0.10] hover:border-white/35 active:scale-95",
+              "flex h-7.5 w-7.5 items-center justify-center rounded-full glass-invisible text-white/70 transition-all duration-200 cursor-pointer",
+              "hover:text-white hover:border-white/25 active:scale-95",
               "disabled:opacity-20 disabled:cursor-not-allowed disabled:hover:scale-100"
             )}
             aria-label="Scroll left"
@@ -101,8 +101,8 @@ export function ContentRow({
             onClick={() => scroll("right")}
             disabled={!canScrollRight}
             className={cn(
-              "flex h-7.5 w-7.5 items-center justify-center rounded-full border border-white/20 bg-gradient-to-b from-white/[0.18] via-white/[0.08] to-white/[0.03] text-white transition-all duration-200 cursor-pointer shadow-[inset_0_1px_0_rgba(255,255,255,0.3)] backdrop-blur-md",
-              "hover:from-white/[0.28] hover:to-white/[0.10] hover:border-white/35 active:scale-95",
+              "flex h-7.5 w-7.5 items-center justify-center rounded-full glass-invisible text-white/70 transition-all duration-200 cursor-pointer",
+              "hover:text-white hover:border-white/25 active:scale-95",
               "disabled:opacity-20 disabled:cursor-not-allowed disabled:hover:scale-100"
             )}
             aria-label="Scroll right"
@@ -118,9 +118,9 @@ export function ContentRow({
       <div
         ref={scrollRef}
         className={cn(
-          "scrollbar-hide flex overflow-x-auto pb-4 pt-1 snap-x snap-mandatory scroll-smooth",
+          "scrollbar-hide flex overflow-x-auto pb-4 pt-1 snap-x snap-mandatory scroll-smooth scroll-pl-1 px-1",
           isNumbered
-            ? "gap-6 sm:gap-8 md:gap-9 pl-7 sm:pl-9 md:pl-11"
+            ? "gap-4 sm:gap-5 md:gap-6"
             : "gap-4"
         )}
       >
