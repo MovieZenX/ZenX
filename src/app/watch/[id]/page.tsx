@@ -104,7 +104,7 @@ export default async function WatchPage({
   }
 
   return (
-    <main className="min-h-screen bg-black">
+    <main className="min-h-screen bg-black" suppressHydrationWarning>
       {/* Primary Watch Theater with Player, Controls, and Episode Playlist */}
       <WatchTheater
         media={media}
