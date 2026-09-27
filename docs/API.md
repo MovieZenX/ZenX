@@ -40,6 +40,7 @@ TMDB_IMAGE_BASE_URL="https://image.tmdb.org/t/p"
   - `watch_region` (string, optional, default: `"US"`): Watch provider region
   - `type` (`"all"` \| `"movie"` \| `"tv"`, optional, default: `"all"`): Filter media type
   - `page` (number, optional, default: `1`): Results page
+  - `pageSize` (number, optional, default: `24`): Results per page (defaulted to 24 for clean 6/4/3/2 column grid alignment)
 - **Response Format**:
   ```json
   {

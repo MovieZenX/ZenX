@@ -33,13 +33,19 @@ Interactive platform and series/movies switcher section positioned directly belo
 
 ### Search Flow
 
-1. User enters a query.
-2. Frontend validates the query.
-3. Search API request is sent.
-4. Loading state is displayed.
-5. Results are displayed.
-6. Empty state is displayed when no results exist.
-7. API errors are shown using a user-friendly error state.
+1. User enters a query or selects a discovery category/genre/platform.
+2. Frontend validates the query and syncs parameters with URL (`q`, `type`, `provider`, `page`).
+3. Search API request is sent with debounce.
+4. Loading state skeleton is displayed.
+5. Results are displayed in the user's preferred layout (**Grid View** or **Detailed List View**).
+6. In-result dynamic genre filters and sorting options (relevance, rating, release year, alphabetical).
+7. Empty state with fallback trending recommendations is displayed when no direct results exist.
+8. API errors are shown using a user-friendly error state.
+
+### Discovery & Features
+- **Pre-Search Discovery**: Server-hydrated trending spotlight titles, streaming service filters (Netflix, Disney+, Prime, Apple TV+, Max, Paramount+, Hulu, Crunchyroll), curated genre atmosphere cards, and recent search history saved in `localStorage`.
+- **Keyboard Shortcuts**: `/` focuses search bar, `Escape` clears.
+- **Detailed View**: Rich cards showing full synopsis, TMDB rating with vote count, genre chips, quality badges, and instant "Watch Now" action.
 
 ---
 

@@ -187,12 +187,94 @@ export async function getNowPlayingMovies(): Promise<MediaItem[]> {
 }
 
 /**
+ * Helper to fetch a custom page size (e.g. 24 items) from a TMDB endpoint
+ * that natively returns 20 items per page.
+ */
+async function fetchTmdbWithCustomPageSize<T extends TMDBRawItem>(
+  fetchPage: (tmdbPage: number) => Promise<TMDBPaginatedResponse<T> | null>,
+  uiPage: number,
+  pageSize: number = 24,
+  filterFn?: (item: T) => boolean
+): Promise<{
+  results: T[];
+  page: number;
+  totalPages: number;
+  totalResults: number;
+}> {
+  const TMDB_PER_PAGE = 20;
+  const startIndex = (uiPage - 1) * pageSize;
+  const endIndex = startIndex + pageSize;
+
+  const startTmdbPage = Math.floor(startIndex / TMDB_PER_PAGE) + 1;
+  const endTmdbPage = Math.floor((endIndex - 1) / TMDB_PER_PAGE) + 1;
+
+  if (startTmdbPage > 500) {
+    return { results: [], page: uiPage, totalPages: 0, totalResults: 0 };
+  }
+
+  const cappedEndPage = Math.min(endTmdbPage, 500);
+
+  // Fetch needed TMDB pages in parallel
+  const [firstRes, secondRes] = await Promise.all([
+    fetchPage(startTmdbPage),
+    startTmdbPage < cappedEndPage ? fetchPage(cappedEndPage) : Promise.resolve(null),
+  ]);
+
+  if (!firstRes?.results) {
+    return { results: [], page: uiPage, totalPages: 0, totalResults: 0 };
+  }
+
+  const raw1 = firstRes.results || [];
+  const raw2 = secondRes?.results || [];
+  let combined = [...raw1, ...raw2];
+
+  if (filterFn) {
+    combined = combined.filter(filterFn);
+  }
+
+  const sliceOffsetStart = startIndex - (startTmdbPage - 1) * TMDB_PER_PAGE;
+  const sliceOffsetEnd = sliceOffsetStart + pageSize;
+
+  // If filtered items are fewer than requested and TMDB has more pages, fetch next page
+  let currentFetchPage = cappedEndPage;
+  while (
+    combined.length < sliceOffsetEnd &&
+    currentFetchPage < Math.min(firstRes.total_pages || 0, 500)
+  ) {
+    currentFetchPage++;
+    const nextRes = await fetchPage(currentFetchPage);
+    if (!nextRes?.results?.length) break;
+    const nextFiltered = filterFn
+      ? nextRes.results.filter(filterFn)
+      : nextRes.results;
+    combined.push(...nextFiltered);
+  }
+
+  const pageResults = combined.slice(sliceOffsetStart, sliceOffsetEnd);
+  const totalResults = firstRes.total_results || 0;
+  const maxAccessibleItems = Math.min(totalResults, 500 * TMDB_PER_PAGE);
+  const totalPages = Math.min(
+    Math.ceil(totalResults / pageSize),
+    Math.ceil(maxAccessibleItems / pageSize)
+  );
+
+  return {
+    results: pageResults,
+    page: uiPage,
+    totalPages,
+    totalResults,
+  };
+}
+
+/**
  * Search movies and/or TV shows with query and pagination.
+ * Supports custom page sizes (defaults to 24 for a complete 6-column grid).
  */
 export async function searchMedia(
   query: string,
   page: number = 1,
-  type: "all" | "movie" | "tv" = "all"
+  type: "all" | "movie" | "tv" = "all",
+  pageSize: number = 24
 ): Promise<PaginatedResults<MediaItem>> {
   const trimmed = query.trim();
   if (!trimmed) {
@@ -204,29 +286,31 @@ export async function searchMedia(
   if (type === "movie") endpoint = "/search/movie";
   if (type === "tv") endpoint = "/search/tv";
 
-  const data = await tmdbFetch<TMDBPaginatedResponse<TMDBRawItem>>(
-    endpoint,
-    { query: trimmed, page, include_adult: "false" },
-    300 // 5 minute cache for searches
-  );
-
-  if (!data?.results) {
-    return { page: 1, results: [], totalPages: 0, totalResults: 0 };
-  }
-
-  const results = data.results
-    .filter((i) => {
+  const customRes = await fetchTmdbWithCustomPageSize<TMDBRawItem>(
+    (tmdbPage) =>
+      tmdbFetch<TMDBPaginatedResponse<TMDBRawItem>>(
+        endpoint,
+        { query: trimmed, page: tmdbPage, include_adult: "false" },
+        300 // 5 minute cache for searches
+      ),
+    page,
+    pageSize,
+    (item) => {
       if (type === "movie") return true;
       if (type === "tv") return true;
-      return i.media_type === "movie" || i.media_type === "tv";
-    })
-    .map((item) => normalizeTMDBItem(item, type === "all" ? undefined : type, genreMap));
+      return item.media_type === "movie" || item.media_type === "tv";
+    }
+  );
+
+  const results = customRes.results.map((item) =>
+    normalizeTMDBItem(item, type === "all" ? undefined : type, genreMap)
+  );
 
   return {
-    page: data.page,
+    page: customRes.page,
     results,
-    totalPages: Math.min(data.total_pages, 500),
-    totalResults: data.total_results,
+    totalPages: customRes.totalPages,
+    totalResults: customRes.totalResults,
   };
 }
 
@@ -282,92 +366,102 @@ export async function getMediaByProvider(
   providerId: string | number,
   page: number = 1,
   type: "all" | "movie" | "tv" = "all",
-  watchRegion: string = "US"
+  watchRegion: string = "US",
+  pageSize: number = 24
 ): Promise<PaginatedResults<MediaItem>> {
   const genreMap = await getGenreMap();
 
   if (type === "movie") {
-    const data = await tmdbFetch<TMDBPaginatedResponse<TMDBRawItem>>(
-      "/discover/movie",
-      {
-        with_watch_providers: providerId,
-        watch_region: watchRegion,
-        sort_by: "popularity.desc",
-        page,
-        include_adult: "false",
-      },
-      3600
+    const customRes = await fetchTmdbWithCustomPageSize<TMDBRawItem>(
+      (tmdbPage) =>
+        tmdbFetch<TMDBPaginatedResponse<TMDBRawItem>>(
+          "/discover/movie",
+          {
+            with_watch_providers: providerId,
+            watch_region: watchRegion,
+            sort_by: "popularity.desc",
+            page: tmdbPage,
+            include_adult: "false",
+          },
+          3600
+        ),
+      page,
+      pageSize
     );
 
-    if (!data?.results) {
-      return { page: 1, results: [], totalPages: 0, totalResults: 0 };
-    }
-
     return {
-      page: data.page,
-      results: data.results.map((item) => normalizeTMDBItem(item, "movie", genreMap)),
-      totalPages: Math.min(data.total_pages, 500),
-      totalResults: data.total_results,
+      page: customRes.page,
+      results: customRes.results.map((item) => normalizeTMDBItem(item, "movie", genreMap)),
+      totalPages: customRes.totalPages,
+      totalResults: customRes.totalResults,
     };
   }
 
   if (type === "tv") {
-    const data = await tmdbFetch<TMDBPaginatedResponse<TMDBRawItem>>(
-      "/discover/tv",
-      {
-        with_watch_providers: providerId,
-        watch_region: watchRegion,
-        sort_by: "popularity.desc",
-        page,
-        include_adult: "false",
-      },
-      3600
+    const customRes = await fetchTmdbWithCustomPageSize<TMDBRawItem>(
+      (tmdbPage) =>
+        tmdbFetch<TMDBPaginatedResponse<TMDBRawItem>>(
+          "/discover/tv",
+          {
+            with_watch_providers: providerId,
+            watch_region: watchRegion,
+            sort_by: "popularity.desc",
+            page: tmdbPage,
+            include_adult: "false",
+          },
+          3600
+        ),
+      page,
+      pageSize
     );
 
-    if (!data?.results) {
-      return { page: 1, results: [], totalPages: 0, totalResults: 0 };
-    }
-
     return {
-      page: data.page,
-      results: data.results.map((item) => normalizeTMDBItem(item, "tv", genreMap)),
-      totalPages: Math.min(data.total_pages, 500),
-      totalResults: data.total_results,
+      page: customRes.page,
+      results: customRes.results.map((item) => normalizeTMDBItem(item, "tv", genreMap)),
+      totalPages: customRes.totalPages,
+      totalResults: customRes.totalResults,
     };
   }
 
-  // type === "all": fetch both movie and tv and interleave
-  const [movieData, tvData] = await Promise.all([
-    tmdbFetch<TMDBPaginatedResponse<TMDBRawItem>>(
-      "/discover/movie",
-      {
-        with_watch_providers: providerId,
-        watch_region: watchRegion,
-        sort_by: "popularity.desc",
-        page,
-        include_adult: "false",
-      },
-      3600
+  // type === "all": fetch half movies and half tv shows to form 24 items interleaved
+  const halfPageSize = Math.max(1, Math.floor(pageSize / 2));
+  const [movieRes, tvRes] = await Promise.all([
+    fetchTmdbWithCustomPageSize<TMDBRawItem>(
+      (tmdbPage) =>
+        tmdbFetch<TMDBPaginatedResponse<TMDBRawItem>>(
+          "/discover/movie",
+          {
+            with_watch_providers: providerId,
+            watch_region: watchRegion,
+            sort_by: "popularity.desc",
+            page: tmdbPage,
+            include_adult: "false",
+          },
+          3600
+        ),
+      page,
+      halfPageSize
     ),
-    tmdbFetch<TMDBPaginatedResponse<TMDBRawItem>>(
-      "/discover/tv",
-      {
-        with_watch_providers: providerId,
-        watch_region: watchRegion,
-        sort_by: "popularity.desc",
-        page,
-        include_adult: "false",
-      },
-      3600
+    fetchTmdbWithCustomPageSize<TMDBRawItem>(
+      (tmdbPage) =>
+        tmdbFetch<TMDBPaginatedResponse<TMDBRawItem>>(
+          "/discover/tv",
+          {
+            with_watch_providers: providerId,
+            watch_region: watchRegion,
+            sort_by: "popularity.desc",
+            page: tmdbPage,
+            include_adult: "false",
+          },
+          3600
+        ),
+      page,
+      halfPageSize
     ),
   ]);
 
-  const movies = (movieData?.results || []).map((i) =>
-    normalizeTMDBItem(i, "movie", genreMap)
-  );
-  const tvs = (tvData?.results || []).map((i) =>
-    normalizeTMDBItem(i, "tv", genreMap)
-  );
+  const movies = movieRes.results.map((i) => normalizeTMDBItem(i, "movie", genreMap));
+  const tvs = tvRes.results.map((i) => normalizeTMDBItem(i, "tv", genreMap));
 
   const combined: MediaItem[] = [];
   const maxLen = Math.max(movies.length, tvs.length);
@@ -378,13 +472,13 @@ export async function getMediaByProvider(
     if (tv) combined.push(tv);
   }
 
-  const totalPages = Math.max(movieData?.total_pages || 0, tvData?.total_pages || 0);
-  const totalResults = (movieData?.total_results || 0) + (tvData?.total_results || 0);
+  const totalPages = Math.max(movieRes.totalPages, tvRes.totalPages);
+  const totalResults = movieRes.totalResults + tvRes.totalResults;
 
   return {
     page,
-    results: combined,
-    totalPages: Math.min(totalPages, 500),
+    results: combined.slice(0, pageSize),
+    totalPages,
     totalResults,
   };
 }

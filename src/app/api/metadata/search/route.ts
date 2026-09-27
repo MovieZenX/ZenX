@@ -39,6 +39,10 @@ export async function GET(request: NextRequest) {
     const pageNum = parseInt(pageParam, 10);
     const page = Number.isInteger(pageNum) ? Math.min(500, Math.max(1, pageNum)) : 1;
 
+    // Default to 24 items per page for a full, balanced 6-column grid
+    const pageSizeParam = searchParams.get("pageSize");
+    const pageSize = pageSizeParam ? Math.min(50, Math.max(1, parseInt(pageSizeParam, 10) || 24)) : 24;
+
     let data;
     if (trimmedProvider) {
       const providerId = parseInt(trimmedProvider, 10);
@@ -50,11 +54,11 @@ export async function GET(request: NextRequest) {
           totalResults: 0,
         });
       }
-      data = await getMediaByProvider(providerId, page, type, watchRegion);
+      data = await getMediaByProvider(providerId, page, type, watchRegion, pageSize);
     } else {
       // Sanitize query: limit length to 100 characters to avoid excessive payloads
       const sanitizedQuery = trimmedQuery.slice(0, 100);
-      data = await searchMedia(sanitizedQuery, page, type);
+      data = await searchMedia(sanitizedQuery, page, type, pageSize);
     }
 
     return NextResponse.json(data, {

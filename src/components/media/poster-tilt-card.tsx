@@ -27,40 +27,40 @@ export function PosterTiltCard({
 
   return (
     <div
-      className={`tilt-card-container group hidden sm:block relative shrink-0 aspect-[2/3] ${className}`}
+      className={`tilt-card-container group relative shrink-0 aspect-[2/3] ${className}`}
       aria-label={`${title} Poster`}
     >
       <div className="tilt-canvas">
         {/* 25 Invisible 3D Tracking cells (5x5 grid from uiverse.io witty-deer-12) */}
-        <div className="tilt-tracker tilt-tr-1" />
-        <div className="tilt-tracker tilt-tr-2" />
-        <div className="tilt-tracker tilt-tr-3" />
-        <div className="tilt-tracker tilt-tr-4" />
-        <div className="tilt-tracker tilt-tr-5" />
+        <div className="tilt-tracker tilt-tr-1 pointer-events-none sm:pointer-events-auto" />
+        <div className="tilt-tracker tilt-tr-2 pointer-events-none sm:pointer-events-auto" />
+        <div className="tilt-tracker tilt-tr-3 pointer-events-none sm:pointer-events-auto" />
+        <div className="tilt-tracker tilt-tr-4 pointer-events-none sm:pointer-events-auto" />
+        <div className="tilt-tracker tilt-tr-5 pointer-events-none sm:pointer-events-auto" />
 
-        <div className="tilt-tracker tilt-tr-6" />
-        <div className="tilt-tracker tilt-tr-7" />
-        <div className="tilt-tracker tilt-tr-8" />
-        <div className="tilt-tracker tilt-tr-9" />
-        <div className="tilt-tracker tilt-tr-10" />
+        <div className="tilt-tracker tilt-tr-6 pointer-events-none sm:pointer-events-auto" />
+        <div className="tilt-tracker tilt-tr-7 pointer-events-none sm:pointer-events-auto" />
+        <div className="tilt-tracker tilt-tr-8 pointer-events-none sm:pointer-events-auto" />
+        <div className="tilt-tracker tilt-tr-9 pointer-events-none sm:pointer-events-auto" />
+        <div className="tilt-tracker tilt-tr-10 pointer-events-none sm:pointer-events-auto" />
 
-        <div className="tilt-tracker tilt-tr-11" />
-        <div className="tilt-tracker tilt-tr-12" />
-        <div className="tilt-tracker tilt-tr-13" />
-        <div className="tilt-tracker tilt-tr-14" />
-        <div className="tilt-tracker tilt-tr-15" />
+        <div className="tilt-tracker tilt-tr-11 pointer-events-none sm:pointer-events-auto" />
+        <div className="tilt-tracker tilt-tr-12 pointer-events-none sm:pointer-events-auto" />
+        <div className="tilt-tracker tilt-tr-13 pointer-events-none sm:pointer-events-auto" />
+        <div className="tilt-tracker tilt-tr-14 pointer-events-none sm:pointer-events-auto" />
+        <div className="tilt-tracker tilt-tr-15 pointer-events-none sm:pointer-events-auto" />
 
-        <div className="tilt-tracker tilt-tr-16" />
-        <div className="tilt-tracker tilt-tr-17" />
-        <div className="tilt-tracker tilt-tr-18" />
-        <div className="tilt-tracker tilt-tr-19" />
-        <div className="tilt-tracker tilt-tr-20" />
+        <div className="tilt-tracker tilt-tr-16 pointer-events-none sm:pointer-events-auto" />
+        <div className="tilt-tracker tilt-tr-17 pointer-events-none sm:pointer-events-auto" />
+        <div className="tilt-tracker tilt-tr-18 pointer-events-none sm:pointer-events-auto" />
+        <div className="tilt-tracker tilt-tr-19 pointer-events-none sm:pointer-events-auto" />
+        <div className="tilt-tracker tilt-tr-20 pointer-events-none sm:pointer-events-auto" />
 
-        <div className="tilt-tracker tilt-tr-21" />
-        <div className="tilt-tracker tilt-tr-22" />
-        <div className="tilt-tracker tilt-tr-23" />
-        <div className="tilt-tracker tilt-tr-24" />
-        <div className="tilt-tracker tilt-tr-25" />
+        <div className="tilt-tracker tilt-tr-21 pointer-events-none sm:pointer-events-auto" />
+        <div className="tilt-tracker tilt-tr-22 pointer-events-none sm:pointer-events-auto" />
+        <div className="tilt-tracker tilt-tr-23 pointer-events-none sm:pointer-events-auto" />
+        <div className="tilt-tracker tilt-tr-24 pointer-events-none sm:pointer-events-auto" />
+        <div className="tilt-tracker tilt-tr-25 pointer-events-none sm:pointer-events-auto" />
 
         {/* 3D Tilted Card Body */}
         <div className="tilt-card-body relative rounded-2xl p-[1px] bg-gradient-to-b from-white/25 via-white/10 to-transparent shadow-2xl shadow-black/90">

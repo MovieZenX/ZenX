@@ -1,9 +1,8 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
-import Link from "next/link";
 import { Container } from "@/components/ui/container";
 import { RegisterForm } from "./register-form";
-import { ROUTES } from "@/config";
+import { MidnightSkyBackground } from "@/components/auth/midnight-sky-background";
 
 export const metadata: Metadata = {
   title: "Create Account",
@@ -12,38 +11,14 @@ export const metadata: Metadata = {
 
 export default function RegisterPage() {
   return (
-    <main className="min-h-[calc(100vh-140px)] flex items-center justify-center py-12 px-4 sm:px-6">
-      <Container size="sm" className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <Link
-            href={ROUTES.HOME}
-            className="inline-flex items-center gap-2.5 text-2xl font-extrabold tracking-tight text-white mb-3 group"
-          >
-            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-white shadow-md shadow-white/5 group-hover:scale-105 transition-transform">
-              <svg className="h-5 w-5 text-black fill-current ml-0.5" viewBox="0 0 24 24">
-                <path d="M8 5v14l11-7z" />
-              </svg>
-            </span>
-            <span className="bg-gradient-to-r from-white via-gray-100 to-gray-300 bg-clip-text text-transparent">
-              StreamVault
-            </span>
-          </Link>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
-            Create an account
-          </h1>
-          <p className="mt-2 text-sm text-gray-400">
-            Start streaming your favorite movies and TV series
-          </p>
-        </div>
+    <main className="relative min-h-[calc(100dvh-4rem)] flex flex-col justify-center items-center pt-24 sm:pt-28 pb-16 px-4 sm:px-6 overflow-hidden">
+      {/* Animated Midnight Sky Background with Twinkling Stars, Meteors & Moon (uiverse.io/kiranmayee-abbireddy/average-insect-70) */}
+      <MidnightSkyBackground />
 
+      <Container size="sm" className="relative z-10 w-full max-w-md flex flex-col items-center my-auto">
         <Suspense
           fallback={
-            <div className="rounded-2xl border border-white/10 bg-surface-card p-6 sm:p-8 animate-pulse space-y-4">
-              <div className="h-10 bg-white/5 rounded-xl" />
-              <div className="h-10 bg-white/5 rounded-xl" />
-              <div className="h-10 bg-white/5 rounded-xl" />
-              <div className="h-11 bg-white/20 rounded-xl" />
-            </div>
+            <div className="w-full max-w-[420px] h-[580px] rounded-[28px] border border-white/10 bg-zinc-900/60 p-8 animate-pulse space-y-4" />
           }
         >
           <RegisterForm />

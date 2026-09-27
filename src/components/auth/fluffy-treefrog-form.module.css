@@ -1,0 +1,253 @@
+.cardContainer {
+  --login-box-color: #161616;
+  --input-color: #272727;
+  --button-color: #303030;
+  --footer-color: rgba(255, 255, 255, 0.65);
+
+  position: relative;
+  overflow: hidden;
+  border-radius: 28px;
+  background: var(--login-box-color);
+  padding: 2px;
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto;
+  box-shadow:
+    0 4px 8px rgba(0, 0, 0, 0.3),
+    0 12px 28px rgba(0, 0, 0, 0.45),
+    0 0 16px rgba(255, 255, 255, 0.08);
+}
+
+/* Rotating conic-gradient border beam from uiverse.io/Priyanshu02020/fluffy-treefrog-31 */
+.cardContainer::before {
+  content: "";
+  position: absolute;
+  inset: -120px;
+  z-index: 1;
+  background: conic-gradient(
+    from 45deg,
+    transparent 75%,
+    #ffffff,
+    transparent 100%
+  );
+  animation: spin 4s ease-in-out infinite;
+}
+
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.loginBox {
+  position: relative;
+  z-index: 2;
+  background: var(--login-box-color);
+  border-radius: 26px;
+  padding: 30px 26px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow:
+    inset 0 40px 60px -8px rgba(255, 255, 255, 0.12),
+    inset 4px 0 12px -6px rgba(255, 255, 255, 0.12),
+    inset 0 0 12px -4px rgba(255, 255, 255, 0.12);
+}
+
+.logoWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.logo {
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.22),
+    rgba(0, 0, 0, 0.3)
+  );
+  box-shadow:
+    8px 8px 16px rgba(0, 0, 0, 0.35),
+    -8px -8px 16px rgba(255, 255, 255, 0.06);
+  border-radius: 18px;
+  border: 2px solid #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  transition: transform 0.2s ease;
+}
+
+.logo:hover {
+  transform: scale(1.05);
+}
+
+.header {
+  width: 100%;
+  text-align: center;
+  font-size: 22px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+  margin-bottom: 4px;
+  display: block;
+}
+
+.subHeader {
+  width: 100%;
+  text-align: center;
+  font-size: 13px;
+  color: var(--footer-color);
+  margin-bottom: 18px;
+  display: block;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.inputLabel {
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.inputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid transparent;
+  border-radius: 13px;
+  background: var(--input-color);
+  color: #ffffff;
+  outline: none;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.input:focus {
+  border-color: #ffffff;
+  background: #2e2e2e;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.12);
+}
+
+.inputWithIcon {
+  padding-left: 38px;
+}
+
+.inputIcon {
+  position: absolute;
+  left: 12px;
+  pointer-events: none;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.button {
+  width: 100%;
+  height: 42px;
+  border: none;
+  border-radius: 21px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  background: var(--button-color);
+  color: #ffffff;
+  transition: all 0.3s ease;
+  box-shadow:
+    inset 0px 3px 6px -4px rgba(255, 255, 255, 0.6),
+    inset 0px -3px 6px -2px rgba(0, 0, 0, 0.8);
+  margin-top: 6px;
+}
+
+.button:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.25);
+  box-shadow:
+    inset 0px 3px 6px rgba(255, 255, 255, 0.6),
+    inset 0px -3px 6px rgba(0, 0, 0, 0.8),
+    0px 0px 10px rgba(255, 255, 255, 0.12);
+}
+
+.button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.footer {
+  width: 100%;
+  text-align: center;
+  color: var(--footer-color);
+  font-size: 12px;
+  margin-top: 16px;
+  line-height: 1.6;
+}
+
+.link {
+  position: relative;
+  color: #ffffff;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 0;
+  border-radius: 6px;
+  height: 1px;
+  background: currentColor;
+  transition: width 0.3s ease;
+}
+
+.link:hover::after {
+  width: 100%;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 480px) {
+  .cardContainer {
+    max-width: 100%;
+    border-radius: 24px;
+  }
+
+  .loginBox {
+    padding: 22px 18px;
+    border-radius: 22px;
+  }
+
+  .header {
+    font-size: 20px;
+  }
+
+  .subHeader {
+    font-size: 12px;
+    margin-bottom: 14px;
+  }
+
+  .logo {
+    width: 52px;
+    height: 52px;
+    border-radius: 15px;
+  }
+}

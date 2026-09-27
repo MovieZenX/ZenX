@@ -278,7 +278,7 @@ export function BackgroundTrailer({
       {/* Floating Simple Monochrome Trailer & Sound Controller (Bottom-Right) */}
       {hasTrailer && (
         <div
-          className="fixed bottom-6 right-6 sm:bottom-8 sm:right-8 z-40 pointer-events-auto flex items-center gap-1.5 p-1.5 bg-black/85 hover:bg-black/95 backdrop-blur-xl border border-white/15 hover:border-white/25 rounded-full shadow-2xl transition-all duration-200"
+          className="absolute top-20 right-4 sm:fixed sm:top-auto sm:bottom-8 sm:right-8 z-40 pointer-events-auto flex items-center gap-1.5 p-1.5 bg-black/85 hover:bg-black/95 backdrop-blur-xl border border-white/15 hover:border-white/25 rounded-full shadow-2xl transition-all duration-200"
           role="toolbar"
           aria-label="Trailer controls"
         >
