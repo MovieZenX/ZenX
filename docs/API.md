@@ -23,6 +23,11 @@ TMDB_IMAGE_BASE_URL="https://image.tmdb.org/t/p"
 | `getPopularMovies(page)` | `GET /movie/popular` | Most popular movies | 1 hour (3600s) |
 | `getPopularTv(page)` | `GET /tv/popular` | Top TV shows | 1 hour (3600s) |
 | `getNowPlayingMovies()` | `GET /movie/now_playing` | In theaters & latest releases | 1 hour (3600s) |
+| `getTopRatedMovies(page)` | `GET /movie/top_rated` | All-time highest rated movies | 1 hour (3600s) |
+| `getTopRatedTv(page)` | `GET /tv/top_rated` | All-time critically acclaimed TV shows | 1 hour (3600s) |
+| `getUpcomingMovies(page)` | `GET /movie/upcoming` | Upcoming theatrical & streaming releases | 1 hour (3600s) |
+| `getOnTheAirTv(page)` | `GET /tv/on_the_air` | Current TV shows airing new episodes | 1 hour (3600s) |
+| `getDiscoverGenreMedia(type, genreIds, sort)` | `GET /discover/{movie\|tv}` | Titles discovered by genre with custom sorting | 1 hour (3600s) |
 | `searchMedia(q, page, type)` | `GET /search/{multi\|movie\|tv}` | Catalog search with pagination | 5 minutes (300s) |
 | `getMediaByProvider(providerId, page, type, region)` | `GET /discover/{movie\|tv}` | Titles available on watch provider | 1 hour (3600s) |
 | `getMovieDetails(id)` | `GET /movie/{id}?append_to_response=credits,similar,images,videos` | Full movie details, cast, similar, logos, trailers | 24 hours (86400s) |

@@ -187,6 +187,92 @@ export async function getNowPlayingMovies(): Promise<MediaItem[]> {
 }
 
 /**
+ * Get all-time top rated movies.
+ */
+export async function getTopRatedMovies(page: number = 1): Promise<MediaItem[]> {
+  const genreMap = await getGenreMap();
+  const data = await tmdbFetch<TMDBPaginatedResponse<TMDBRawItem>>(
+    "/movie/top_rated",
+    { page },
+    3600
+  );
+
+  if (!data?.results) return [];
+  return data.results.map((item) => normalizeTMDBItem(item, "movie", genreMap));
+}
+
+/**
+ * Get all-time top rated TV shows.
+ */
+export async function getTopRatedTv(page: number = 1): Promise<MediaItem[]> {
+  const genreMap = await getGenreMap();
+  const data = await tmdbFetch<TMDBPaginatedResponse<TMDBRawItem>>(
+    "/tv/top_rated",
+    { page },
+    3600
+  );
+
+  if (!data?.results) return [];
+  return data.results.map((item) => normalizeTMDBItem(item, "tv", genreMap));
+}
+
+/**
+ * Get upcoming movies.
+ */
+export async function getUpcomingMovies(page: number = 1): Promise<MediaItem[]> {
+  const genreMap = await getGenreMap();
+  const data = await tmdbFetch<TMDBPaginatedResponse<TMDBRawItem>>(
+    "/movie/upcoming",
+    { page },
+    3600
+  );
+
+  if (!data?.results) return [];
+  return data.results.map((item) => normalizeTMDBItem(item, "movie", genreMap));
+}
+
+/**
+ * Get currently airing / on the air TV shows.
+ */
+export async function getOnTheAirTv(page: number = 1): Promise<MediaItem[]> {
+  const genreMap = await getGenreMap();
+  const data = await tmdbFetch<TMDBPaginatedResponse<TMDBRawItem>>(
+    "/tv/on_the_air",
+    { page },
+    3600
+  );
+
+  if (!data?.results) return [];
+  return data.results.map((item) => normalizeTMDBItem(item, "tv", genreMap));
+}
+
+/**
+ * Discover titles by genre from TMDB with custom sort.
+ */
+export async function getDiscoverGenreMedia(
+  type: "movie" | "tv",
+  genreIds: string | number,
+  sortBy: string = "popularity.desc",
+  page: number = 1
+): Promise<MediaItem[]> {
+  const genreMap = await getGenreMap();
+  const data = await tmdbFetch<TMDBPaginatedResponse<TMDBRawItem>>(
+    `/discover/${type}`,
+    {
+      with_genres: genreIds,
+      sort_by: sortBy,
+      page,
+      include_adult: "false",
+    },
+    3600
+  );
+
+  if (!data?.results) return [];
+  return data.results.map((item) => normalizeTMDBItem(item, type, genreMap));
+}
+
+
+/**
  * Helper to fetch a custom page size (e.g. 24 items) from a TMDB endpoint
  * that natively returns 20 items per page.
  */

@@ -5,6 +5,11 @@ import {
   getPopularMovies,
   getPopularTv,
   getNowPlayingMovies,
+  getTopRatedMovies,
+  getTopRatedTv,
+  getUpcomingMovies,
+  getOnTheAirTv,
+  getDiscoverGenreMedia,
   getMovieDetails,
   getTvDetails,
   getMediaByProvider,
@@ -124,19 +129,33 @@ function extractGenreItems(
 }
 
 export default async function HomePage() {
-  // Fault-tolerant parallel fetching for all core homepage sections
+  // Fault-tolerant parallel fetching for all core and curated homepage sections
   const [
     trendingResult,
     popularMoviesResult,
     popularTvResult,
     nowPlayingResult,
     popularPlatformResult,
+    topRatedMoviesResult,
+    topRatedTvResult,
+    upcomingMoviesResult,
+    onTheAirTvResult,
+    animeResult,
+    sciFiResult,
+    crimeMysteryResult,
   ] = await Promise.allSettled([
     getTrendingAll("day"),
     getPopularMovies(),
     getPopularTv(),
     getNowPlayingMovies(),
     getMediaByProvider(8, 1, "tv"),
+    getTopRatedMovies(),
+    getTopRatedTv(),
+    getUpcomingMovies(),
+    getOnTheAirTv(),
+    getDiscoverGenreMedia("movie", "16", "popularity.desc"),
+    getDiscoverGenreMedia("movie", "878", "popularity.desc"),
+    getDiscoverGenreMedia("tv", "80,9648", "popularity.desc"),
   ]);
 
   const trending = trendingResult.status === "fulfilled" ? trendingResult.value : [];
@@ -145,12 +164,21 @@ export default async function HomePage() {
   const nowPlaying = nowPlayingResult.status === "fulfilled" ? nowPlayingResult.value : [];
   const initialPopularItems =
     popularPlatformResult.status === "fulfilled" ? popularPlatformResult.value.results : [];
+  const topRatedMovies = topRatedMoviesResult.status === "fulfilled" ? topRatedMoviesResult.value : [];
+  const topRatedTv = topRatedTvResult.status === "fulfilled" ? topRatedTvResult.value : [];
+  const upcomingMovies = upcomingMoviesResult.status === "fulfilled" ? upcomingMoviesResult.value : [];
+  const onTheAirTv = onTheAirTvResult.status === "fulfilled" ? onTheAirTvResult.value : [];
+  const animeItems = animeResult.status === "fulfilled" ? animeResult.value : [];
+  const sciFiItems = sciFiResult.status === "fulfilled" ? sciFiResult.value : [];
+  const crimeMysteryItems = crimeMysteryResult.status === "fulfilled" ? crimeMysteryResult.value : [];
 
   const hasContent =
     trending.length > 0 ||
     popularMovies.length > 0 ||
     popularTv.length > 0 ||
-    nowPlaying.length > 0;
+    nowPlaying.length > 0 ||
+    topRatedMovies.length > 0 ||
+    topRatedTv.length > 0;
 
   // Graceful fallback if entire TMDB service or credentials fail
   if (!hasContent) {
@@ -173,7 +201,7 @@ export default async function HomePage() {
 
   // Select at least 5 top candidates with backdrops for the dynamic hero slidebar
   const candidateMap = new Map<string, MediaItem>();
-  for (const item of [...trending, ...popularMovies, ...popularTv]) {
+  for (const item of [...trending, ...popularMovies, ...popularTv, ...topRatedMovies]) {
     if (item.backdropUrl && !candidateMap.has(item.id)) {
       candidateMap.set(item.id, item);
       if (candidateMap.size >= 5) break;
@@ -230,7 +258,7 @@ export default async function HomePage() {
 
   // Synthesize genre spotlights from loaded metadata (zero redundant API calls)
   const actionSpotlight = extractGenreItems(
-    [trending, popularMovies, popularTv, nowPlaying],
+    [trending, popularMovies, popularTv, nowPlaying, topRatedMovies],
     ["Action", "Adventure"],
     12
   );
@@ -312,7 +340,32 @@ export default async function HomePage() {
           </ContentRow>
         )}
 
-        {/* 4. Popular TV Shows */}
+        {/* 4. All-Time Top Rated Movies */}
+        {topRatedMovies.length > 0 && (
+          <ContentRow
+            title="All-Time Top Rated Masterpieces"
+            subtitle="Universally acclaimed cinematic classics with the highest audience and critic scores."
+            badge="Masterpieces"
+            actionHref="/search?type=movie"
+            actionLabel="Explore Top Movies"
+          >
+            {topRatedMovies.map((item) => (
+              <div key={`topm-${item.id}`} className="w-40 sm:w-48 lg:w-56 shrink-0 snap-start">
+                <ContentCard
+                  id={item.id}
+                  title={item.title}
+                  posterUrl={item.posterUrl}
+                  contentType={item.contentType}
+                  releaseYear={item.releaseYear}
+                  rating={item.rating}
+                  quality={item.quality}
+                />
+              </div>
+            ))}
+          </ContentRow>
+        )}
+
+        {/* 5. Trending TV Series */}
         {popularTv.length > 0 && (
           <ContentRow
             title="Trending TV Series"
@@ -337,12 +390,37 @@ export default async function HomePage() {
           </ContentRow>
         )}
 
-        {/* 5. Latest / Now Playing */}
+        {/* 6. Critically Acclaimed TV Series */}
+        {topRatedTv.length > 0 && (
+          <ContentRow
+            title="Critically Acclaimed TV Series"
+            subtitle="Legendary television masterpieces with all-time highest viewer ratings."
+            badge="Hall of Fame"
+            actionHref="/search?type=tv"
+            actionLabel="Explore Series"
+          >
+            {topRatedTv.map((item) => (
+              <div key={`toptv-${item.id}`} className="w-40 sm:w-48 lg:w-56 shrink-0 snap-start">
+                <ContentCard
+                  id={item.id}
+                  title={item.title}
+                  posterUrl={item.posterUrl}
+                  contentType={item.contentType}
+                  releaseYear={item.releaseYear}
+                  rating={item.rating}
+                  quality={item.quality}
+                />
+              </div>
+            ))}
+          </ContentRow>
+        )}
+
+        {/* 7. Latest / Now Playing */}
         {nowPlaying.length > 0 && (
           <ContentRow
             title="Now In Theaters & Recent Releases"
             subtitle="Fresh arrivals currently playing and newly available."
-            badge="New"
+            badge="In Theaters"
             actionHref="/search"
             actionLabel="Browse Recent"
           >
@@ -362,7 +440,132 @@ export default async function HomePage() {
           </ContentRow>
         )}
 
-        {/* 6. Genre-Based Section: Action & Adventure Spotlight */}
+        {/* 8. Upcoming & Highly Anticipated Blockbusters */}
+        {upcomingMovies.length > 0 && (
+          <ContentRow
+            title="Upcoming & Highly Anticipated"
+            subtitle="Upcoming theatrical blockbusters and streaming premieres to put on your radar."
+            badge="Coming Soon"
+            actionHref="/search?type=movie"
+            actionLabel="Explore Upcoming"
+          >
+            {upcomingMovies.map((item) => (
+              <div key={`upc-${item.id}`} className="w-40 sm:w-48 lg:w-56 shrink-0 snap-start">
+                <ContentCard
+                  id={item.id}
+                  title={item.title}
+                  posterUrl={item.posterUrl}
+                  contentType={item.contentType}
+                  releaseYear={item.releaseYear}
+                  rating={item.rating}
+                  quality={item.quality}
+                />
+              </div>
+            ))}
+          </ContentRow>
+        )}
+
+        {/* 9. On The Air / Fresh Episodes This Week */}
+        {onTheAirTv.length > 0 && (
+          <ContentRow
+            title="Fresh Episodes Airing This Week"
+            subtitle="Current hit television series broadcasting brand-new episodes."
+            badge="On The Air"
+            actionHref="/search?type=tv"
+            actionLabel="Airing Series"
+          >
+            {onTheAirTv.map((item) => (
+              <div key={`ota-${item.id}`} className="w-40 sm:w-48 lg:w-56 shrink-0 snap-start">
+                <ContentCard
+                  id={item.id}
+                  title={item.title}
+                  posterUrl={item.posterUrl}
+                  contentType={item.contentType}
+                  releaseYear={item.releaseYear}
+                  rating={item.rating}
+                  quality={item.quality}
+                />
+              </div>
+            ))}
+          </ContentRow>
+        )}
+
+        {/* 10. Anime & Animated Universes */}
+        {animeItems.length > 0 && (
+          <ContentRow
+            title="Anime & Animated Universes"
+            subtitle="Visually stunning anime masterpieces, animated epics, and illustrated sagas."
+            badge="Anime"
+            actionHref="/search?q=animation&type=movie"
+            actionLabel="More Anime"
+          >
+            {animeItems.map((item) => (
+              <div key={`anime-${item.id}`} className="w-40 sm:w-48 lg:w-56 shrink-0 snap-start">
+                <ContentCard
+                  id={item.id}
+                  title={item.title}
+                  posterUrl={item.posterUrl}
+                  contentType={item.contentType}
+                  releaseYear={item.releaseYear}
+                  rating={item.rating}
+                  quality={item.quality}
+                />
+              </div>
+            ))}
+          </ContentRow>
+        )}
+
+        {/* 11. Mind-Bending Sci-Fi & Cyberpunk Expeditions */}
+        {sciFiItems.length > 0 && (
+          <ContentRow
+            title="Mind-Bending Sci-Fi & Outer Worlds"
+            subtitle="Futuristic civilizations, time loops, artificial intelligence, and cosmic frontiers."
+            badge="Sci-Fi"
+            actionHref="/search?q=sci-fi&type=movie"
+            actionLabel="More Sci-Fi"
+          >
+            {sciFiItems.map((item) => (
+              <div key={`scifi-${item.id}`} className="w-40 sm:w-48 lg:w-56 shrink-0 snap-start">
+                <ContentCard
+                  id={item.id}
+                  title={item.title}
+                  posterUrl={item.posterUrl}
+                  contentType={item.contentType}
+                  releaseYear={item.releaseYear}
+                  rating={item.rating}
+                  quality={item.quality}
+                />
+              </div>
+            ))}
+          </ContentRow>
+        )}
+
+        {/* 12. Binge-Worthy Crime, Noir & Thrillers */}
+        {crimeMysteryItems.length > 0 && (
+          <ContentRow
+            title="Binge-Worthy Crime, Mystery & Thrillers"
+            subtitle="Gripping whodunits, forensic detectives, and suspenseful criminal underworlds."
+            badge="Mystery"
+            actionHref="/search?q=crime&type=tv"
+            actionLabel="More Thrillers"
+          >
+            {crimeMysteryItems.map((item) => (
+              <div key={`crime-${item.id}`} className="w-40 sm:w-48 lg:w-56 shrink-0 snap-start">
+                <ContentCard
+                  id={item.id}
+                  title={item.title}
+                  posterUrl={item.posterUrl}
+                  contentType={item.contentType}
+                  releaseYear={item.releaseYear}
+                  rating={item.rating}
+                  quality={item.quality}
+                />
+              </div>
+            ))}
+          </ContentRow>
+        )}
+
+        {/* 13. Genre-Based Section: Action & Adventure Spotlight */}
         {actionSpotlight.length >= 4 && (
           <ContentRow
             title="Action & Adventure Spotlight"
@@ -387,7 +590,7 @@ export default async function HomePage() {
           </ContentRow>
         )}
 
-        {/* 7. Explore by Genre Category Grid */}
+        {/* 14. Explore by Genre Category Grid */}
         <section className="py-2" aria-labelledby="explore-genre-heading">
           <SectionHeading
             id="explore-genre-heading"
