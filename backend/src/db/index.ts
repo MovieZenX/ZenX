@@ -1,8 +1,12 @@
 import path from "node:path";
+import fs from "node:fs";
 import { PrismaClient } from "@prisma/client";
 
 if (!process.env.DATABASE_URL) {
-  process.env.DATABASE_URL = `file:${path.resolve(__dirname, "../../prisma/dev.db")}`;
+  const envPath = path.resolve(__dirname, "../../.env");
+  if (fs.existsSync(envPath) && typeof process.loadEnvFile === "function") {
+    process.loadEnvFile(envPath);
+  }
 }
 
 /**
