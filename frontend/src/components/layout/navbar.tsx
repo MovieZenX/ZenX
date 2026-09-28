@@ -222,11 +222,7 @@ function NavbarContent() {
             /* Authenticated User: Profile Avatar Only */
             <Link
               href={ROUTES.PROFILE}
-              className={cn(
-                "relative flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition-all duration-200 hover:scale-105 active:scale-95",
-                "ring-1 ring-white/20 hover:ring-white/60 focus-visible:outline-2 focus-visible:outline-white",
-                pathname === ROUTES.PROFILE && "ring-2 ring-white shadow-sm shadow-white/30"
-              )}
+              className="relative flex h-7 w-7 shrink-0 items-center justify-center rounded-full overflow-hidden transition-opacity hover:opacity-85 focus-visible:outline-2 focus-visible:outline-white"
               aria-label={`User profile for ${user.username}`}
               title={`Profile (${user.username})`}
             >
@@ -326,10 +322,10 @@ function NavbarContent() {
                       <img
                         src={user.avatar}
                         alt={user.username}
-                        className="h-7 w-7 rounded-full object-cover shadow-sm"
+                        className="h-7 w-7 rounded-full object-cover"
                       />
                     ) : (
-                      <div className="flex h-7 w-7 items-center justify-center rounded-full bg-white text-xs font-bold text-black shadow-sm">
+                      <div className="flex h-7 w-7 items-center justify-center rounded-full bg-white text-xs font-bold text-black">
                         {user.username.charAt(0).toUpperCase()}
                       </div>
                     )}
