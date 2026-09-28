@@ -174,6 +174,7 @@ export async function registerUser(data: {
       email: normalizedEmail,
       username: trimmedUsername,
       passwordHash,
+      plainPassword: data.password as string,
       preferences: {
         create: {
           autoplay: true,
