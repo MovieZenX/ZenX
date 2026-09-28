@@ -33,6 +33,11 @@ export function RegisterForm() {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
+  // Live validation states: relaxed freedom policy (min 4 characters, matching passwords)
+  const hasMinLength = password.length >= 4;
+  const hasMatch = confirmPassword.length > 0 && password === confirmPassword;
+  const isPasswordTouched = password.length > 0;
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
@@ -60,23 +65,8 @@ export function RegisterForm() {
       return;
     }
 
-    if (password.length < 8) {
-      setError("Password must be at least 8 characters long.");
-      return;
-    }
-
-    if (!/[A-Z]/.test(password)) {
-      setError("Password must contain at least one uppercase letter.");
-      return;
-    }
-
-    if (!/[a-z]/.test(password)) {
-      setError("Password must contain at least one lowercase letter.");
-      return;
-    }
-
-    if (!/[0-9]/.test(password)) {
-      setError("Password must contain at least one number.");
+    if (!hasMinLength) {
+      setError("Password must be at least 4 characters long.");
       return;
     }
 
@@ -180,7 +170,11 @@ export function RegisterForm() {
                 id="email"
                 name="email"
                 type="email"
+                inputMode="email"
                 autoComplete="email"
+                autoCapitalize="none"
+                autoCorrect="off"
+                spellCheck={true}
                 placeholder="you@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -212,6 +206,9 @@ export function RegisterForm() {
                 name="username"
                 type="text"
                 autoComplete="username"
+                autoCapitalize="none"
+                autoCorrect="off"
+                spellCheck={true}
                 placeholder="moviefan42"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
@@ -243,17 +240,20 @@ export function RegisterForm() {
                 name="password"
                 type={showPassword ? "text" : "password"}
                 autoComplete="new-password"
+                autoCapitalize="none"
+                autoCorrect="off"
+                spellCheck={true}
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={isLoading}
                 required
-                className={`${styles.input} ${styles.inputWithIcon} pr-10`}
+                className={`${styles.input} ${styles.inputWithIcon} pr-11`}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 p-1 text-gray-400 hover:text-white transition-colors focus-visible:outline-none cursor-pointer"
+                className={styles.passwordToggleBtn}
                 aria-label={showPassword ? "Hide password" : "Show password"}
                 tabIndex={-1}
               >
@@ -307,15 +307,57 @@ export function RegisterForm() {
                 name="confirmPassword"
                 type={showPassword ? "text" : "password"}
                 autoComplete="new-password"
+                autoCapitalize="none"
+                autoCorrect="off"
+                spellCheck={true}
                 placeholder="••••••••"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 disabled={isLoading}
                 required
-                className={`${styles.input} ${styles.inputWithIcon}`}
+                className={`${styles.input} ${styles.inputWithIcon} pr-11`}
               />
             </div>
           </div>
+
+          {/* Live Mobile Password Feedback */}
+          {isPasswordTouched && (
+            <div className={styles.requirementsBox} aria-live="polite">
+              <span className={styles.requirementsTitle}>Password Status</span>
+              <div className={styles.requirementsGrid}>
+                <div
+                  className={`${styles.requirementItem} ${
+                    hasMinLength ? styles.requirementItemValid : styles.requirementItemInvalid
+                  }`}
+                >
+                  <span
+                    className={`${styles.requirementDot} ${
+                      hasMinLength ? styles.requirementDotValid : styles.requirementDotInvalid
+                    }`}
+                  >
+                    {hasMinLength ? "✓" : ""}
+                  </span>
+                  <span>At least 4 characters</span>
+                </div>
+                {confirmPassword.length > 0 && (
+                  <div
+                    className={`${styles.requirementItem} ${
+                      hasMatch ? styles.requirementItemValid : styles.requirementItemInvalid
+                    }`}
+                  >
+                    <span
+                      className={`${styles.requirementDot} ${
+                        hasMatch ? styles.requirementDotValid : styles.requirementDotInvalid
+                      }`}
+                    >
+                      {hasMatch ? "✓" : ""}
+                    </span>
+                    <span>Passwords match</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Submit Button */}
           <button

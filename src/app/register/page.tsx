@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 export default function RegisterPage() {
   return (
-    <main className="relative min-h-[calc(100dvh-4rem)] flex flex-col justify-center items-center pt-24 sm:pt-28 pb-16 px-4 sm:px-6 overflow-hidden">
+    <main className="relative min-h-[100dvh] flex flex-col justify-start sm:justify-center items-center pt-20 sm:pt-28 pb-12 sm:pb-16 px-3 sm:px-6 overflow-x-hidden">
       {/* Animated Midnight Sky Background with Twinkling Stars, Meteors & Moon (uiverse.io/kiranmayee-abbireddy/average-insect-70) */}
       <MidnightSkyBackground />
 

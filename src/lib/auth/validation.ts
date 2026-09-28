@@ -52,26 +52,17 @@ export function validateUsername(username: unknown): ValidationResult {
 }
 
 /**
- * Validates password strength (minimum 8 characters, at least 1 letter and 1 number).
+ * Validates password (relaxed freedom policy: minimum 4 characters).
  */
 export function validatePassword(password: unknown): ValidationResult {
   if (typeof password !== "string" || !password) {
     return { isValid: false, error: "Password is required." };
   }
-  if (password.length < 8) {
-    return { isValid: false, error: "Password must be at least 8 characters long." };
+  if (password.length < 4) {
+    return { isValid: false, error: "Password must be at least 4 characters long." };
   }
   if (password.length > 128) {
     return { isValid: false, error: "Password cannot exceed 128 characters." };
-  }
-  if (!/[A-Z]/.test(password)) {
-    return { isValid: false, error: "Password must contain at least one uppercase letter." };
-  }
-  if (!/[a-z]/.test(password)) {
-    return { isValid: false, error: "Password must contain at least one lowercase letter." };
-  }
-  if (!/[0-9]/.test(password)) {
-    return { isValid: false, error: "Password must contain at least one number." };
   }
   return { isValid: true };
 }

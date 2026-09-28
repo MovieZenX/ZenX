@@ -275,10 +275,10 @@ export function BackgroundTrailer({
         </div>
       </div>
 
-      {/* Floating Simple Monochrome Trailer & Sound Controller (Bottom-Right) */}
+      {/* Floating Simple Monochrome Trailer & Sound Controller (Fixed Bottom-Right on all viewports) */}
       {hasTrailer && (
         <div
-          className="absolute top-20 right-4 sm:fixed sm:top-auto sm:bottom-8 sm:right-8 z-40 pointer-events-auto flex items-center gap-1.5 p-1.5 bg-black/85 hover:bg-black/95 backdrop-blur-xl border border-white/15 hover:border-white/25 rounded-full shadow-2xl transition-all duration-200"
+          className="fixed bottom-5 right-3.5 sm:bottom-8 sm:right-8 z-40 pointer-events-auto flex items-center gap-1.5 p-1.5 bg-black/85 hover:bg-black/95 backdrop-blur-xl border border-white/15 hover:border-white/25 rounded-full shadow-2xl transition-all duration-200 touch-manipulation"
           role="toolbar"
           aria-label="Trailer controls"
         >
@@ -287,7 +287,7 @@ export function BackgroundTrailer({
             type="button"
             onClick={toggleTrailer}
             aria-label={showTrailer ? "Turn background trailer OFF" : "Turn background trailer ON"}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all active:scale-95 cursor-pointer ${
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all active:scale-95 cursor-pointer touch-manipulation ${
               showTrailer
                 ? "bg-white/20 text-white border border-white/30 shadow-sm"
                 : "bg-white/[0.04] text-white/40 hover:text-white/70 border border-transparent"
@@ -317,7 +317,7 @@ export function BackgroundTrailer({
               type="button"
               onClick={toggleMute}
               aria-label={isMuted ? "Unmute trailer audio" : "Mute trailer audio"}
-              className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-medium transition-all active:scale-95 cursor-pointer ${
+              className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-medium transition-all active:scale-95 cursor-pointer touch-manipulation ${
                 !isMuted
                   ? "bg-white/20 text-white border border-white/30"
                   : "bg-white/[0.04] text-white/70 hover:text-white border border-white/10"
@@ -344,7 +344,7 @@ export function BackgroundTrailer({
                       d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"
                     />
                   </svg>
-                  <span className="hidden sm:inline">Unmute</span>
+                  <span className="text-[11px] sm:text-xs">Unmute</span>
                 </>
               ) : (
                 <>
@@ -361,7 +361,7 @@ export function BackgroundTrailer({
                       d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"
                     />
                   </svg>
-                  <span className="hidden sm:inline font-medium">Sound On</span>
+                  <span className="text-[11px] sm:text-xs font-medium">Sound On</span>
                 </>
               )}
             </button>

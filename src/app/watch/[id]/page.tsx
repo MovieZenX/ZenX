@@ -2,8 +2,6 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getMovieDetails, getTvDetails, getTvSeason } from "@/lib/metadata";
 import { WatchTheater } from "@/components/watch/watch-theater";
-import { ContentRow } from "@/components/media/content-row";
-import { ContentCard } from "@/components/media/content-card";
 
 export const revalidate = 3600; // 1 hour ISR cache
 
@@ -105,7 +103,7 @@ export default async function WatchPage({
 
   return (
     <main className="min-h-screen bg-black" suppressHydrationWarning>
-      {/* Primary Watch Theater with Player, Controls, and Episode Playlist */}
+      {/* Primary Watch Theater with Player, Controls, Episode Playlist, Details, and Recommendations */}
       <WatchTheater
         media={media}
         initialSeasonNumber={sNum}
@@ -113,35 +111,6 @@ export default async function WatchPage({
         initialSeasonData={initialSeasonData}
         type={contentType}
       />
-
-      {/* Recommended "More Like This" Section */}
-      {media.similar && media.similar.length > 0 && (
-        <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-20 pt-4 border-t border-white/[0.08]">
-          <ContentRow
-            title="More Like This"
-            subtitle={`Recommended titles similar to ${media.title}`}
-            actionHref={`/search?q=${encodeURIComponent(media.genres[0] || media.title)}`}
-            actionLabel="View More"
-          >
-            {media.similar.map((item) => (
-              <div
-                key={item.id}
-                className="w-32 sm:w-40 md:w-44 lg:w-48 xl:w-52 shrink-0 snap-start"
-              >
-                <ContentCard
-                  id={item.id}
-                  title={item.title}
-                  posterUrl={item.posterUrl}
-                  contentType={item.contentType}
-                  releaseYear={item.releaseYear}
-                  rating={item.rating}
-                  quality={item.quality}
-                />
-              </div>
-            ))}
-          </ContentRow>
-        </section>
-      )}
     </main>
   );
 }

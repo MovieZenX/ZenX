@@ -264,7 +264,7 @@ function NavbarContent() {
                 href={ROUTES.LOGIN}
                 className="rounded-full px-2.5 h-7 flex items-center justify-center text-[10.5px] font-medium text-white/70 hover:text-white hover:bg-white/10 transition-colors"
               >
-                Sign In
+                Login
               </Link>
               <Link
                 href={ROUTES.REGISTER}
@@ -279,12 +279,12 @@ function NavbarContent() {
           <button
             type="button"
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="flex h-7 w-7 items-center justify-center rounded-full text-white/70 hover:bg-white/10 hover:text-white md:hidden cursor-pointer focus-visible:outline-2 focus-visible:outline-white transition-colors"
+            className="flex h-8 w-8 items-center justify-center rounded-full text-white/80 hover:bg-white/10 hover:text-white md:hidden cursor-pointer focus-visible:outline-2 focus-visible:outline-white transition-colors touch-manipulation"
             aria-label={mobileOpen ? "Close navigation menu" : "Open navigation menu"}
             aria-expanded={mobileOpen}
           >
             <svg
-              className="h-3.5 w-3.5 transition-transform duration-200"
+              className="h-4 w-4 transition-transform duration-200"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -301,7 +301,7 @@ function NavbarContent() {
 
       {/* Mobile Drawer Dropdown Pill */}
       {mobileOpen && (
-        <div className="pointer-events-auto mt-2 w-full max-w-sm rounded-2xl border border-white/10 bg-black/70 backdrop-blur-xl shadow-xl p-3 md:hidden animate-in fade-in slide-in-from-top-2 duration-200">
+        <div className="pointer-events-auto mt-2 w-full max-w-sm rounded-2xl border border-white/10 bg-black/85 backdrop-blur-2xl shadow-2xl p-3 md:hidden animate-in fade-in slide-in-from-top-2 duration-200">
           <ul className="flex flex-col gap-1">
             {NAV_LINKS.map((link) => {
               const active = isLinkActive(link);
@@ -311,14 +311,14 @@ function NavbarContent() {
                     href={link.href}
                     onClick={() => setMobileOpen(false)}
                     className={cn(
-                      "flex items-center justify-between rounded-xl px-3 py-2 text-xs font-medium transition-colors",
+                      "flex items-center justify-between rounded-xl px-3.5 py-2.5 text-sm font-medium transition-colors touch-manipulation",
                       active
                         ? "bg-white/15 text-white font-semibold"
-                        : "text-white/70 hover:bg-white/10 hover:text-white"
+                        : "text-white/70 hover:bg-white/10 hover:text-white active:bg-white/15"
                     )}
                   >
                     <span>{link.label}</span>
-                    {active && <span className="h-1 w-1 rounded-full bg-white shadow-sm" />}
+                    {active && <span className="h-1.5 w-1.5 rounded-full bg-white shadow-sm" />}
                   </Link>
                 </li>
               );
@@ -331,18 +331,18 @@ function NavbarContent() {
                     href={ROUTES.PROFILE}
                     onClick={() => setMobileOpen(false)}
                     className={cn(
-                      "flex items-center gap-2.5 rounded-xl px-3.5 py-1.5 text-xs font-medium transition-colors",
+                      "flex items-center gap-2.5 rounded-xl px-3.5 py-2 text-sm font-medium transition-colors touch-manipulation",
                       pathname === ROUTES.PROFILE
                         ? "bg-white/20 text-white font-semibold"
                         : "text-gray-300 hover:bg-white/10 hover:text-white"
                     )}
                   >
-                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-white text-xs font-bold text-black">
+                    <div className="flex h-7 w-7 items-center justify-center rounded-full bg-white text-xs font-bold text-black shadow-sm">
                       {user.username.charAt(0).toUpperCase()}
                     </div>
                     <div>
-                      <div className="text-white text-xs font-medium">{user.username}</div>
-                      <div className="text-[10px] text-gray-400">{user.email}</div>
+                      <div className="text-white text-sm font-medium">{user.username}</div>
+                      <div className="text-[11px] text-gray-400">{user.email}</div>
                     </div>
                   </Link>
                   <button
@@ -351,9 +351,9 @@ function NavbarContent() {
                       setMobileOpen(false);
                       logout();
                     }}
-                    className="flex w-full items-center gap-2 rounded-xl px-3.5 py-1.5 text-xs font-medium text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors cursor-pointer"
+                    className="flex w-full items-center gap-2 rounded-xl px-3.5 py-2 text-sm font-medium text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors cursor-pointer touch-manipulation"
                   >
-                    <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                     </svg>
                     <span>Sign Out</span>
@@ -364,14 +364,14 @@ function NavbarContent() {
                   <Link
                     href={ROUTES.LOGIN}
                     onClick={() => setMobileOpen(false)}
-                    className="flex items-center justify-center rounded-full border border-white/15 bg-white/5 py-1.5 text-center text-xs font-medium text-white hover:bg-white/10 transition-colors"
+                    className="flex items-center justify-center rounded-full border border-white/15 bg-white/5 py-2 text-center text-xs font-medium text-white hover:bg-white/10 active:bg-white/15 transition-colors touch-manipulation"
                   >
-                    Sign In
+                    Login
                   </Link>
                   <Link
                     href={ROUTES.REGISTER}
                     onClick={() => setMobileOpen(false)}
-                    className="flex items-center justify-center rounded-full bg-white py-1.5 text-center text-xs font-semibold text-black hover:bg-gray-200 transition-colors"
+                    className="flex items-center justify-center rounded-full bg-white py-2 text-center text-xs font-semibold text-black hover:bg-gray-200 active:bg-gray-300 transition-colors touch-manipulation"
                   >
                     Sign Up
                   </Link>

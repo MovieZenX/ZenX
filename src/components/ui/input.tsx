@@ -29,10 +29,11 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             disabled={disabled}
             value={value}
             className={cn(
-              "w-full rounded-xl bg-white/[0.05] border border-white/[0.1] px-4 py-2.5 text-sm text-foreground",
+              "w-full rounded-xl bg-white/[0.05] border border-white/[0.1] px-4 py-2.5 text-base sm:text-sm text-foreground",
               "placeholder:text-gray-500",
-              "transition-colors duration-150",
+              "transition-colors duration-150 touch-manipulation",
               "focus:border-white/40 focus:bg-white/[0.08] focus:outline-none focus:ring-2 focus:ring-white/15",
+              "[&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden [&::-ms-clear]:hidden",
               "disabled:opacity-50 disabled:cursor-not-allowed",
               leftIcon ? "pl-10" : undefined,
               rightIcon || (onClear && value) ? "pr-10" : undefined,

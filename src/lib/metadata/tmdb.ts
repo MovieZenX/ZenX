@@ -353,8 +353,162 @@ async function fetchTmdbWithCustomPageSize<T extends TMDBRawItem>(
 }
 
 /**
- * Search movies and/or TV shows with query and pagination.
- * Supports custom page sizes (defaults to 24 for a complete 6-column grid).
+ * Known common user shorthand and franchise alias mappings.
+ */
+const FRANCHISE_ALIASES: Record<string, string> = {
+  "dune 2": "Dune: Part Two",
+  "dune part 2": "Dune: Part Two",
+  "avatar 2": "Avatar: The Way of Water",
+  "top gun 2": "Top Gun: Maverick",
+  "deadpool 3": "Deadpool Wolverine",
+  "gladiator 2": "Gladiator II",
+  "inside out 2": "Inside Out 2",
+  "spiderman": "Spider-Man",
+  "spiderman 2": "Spider-Man 2",
+  "spiderman 3": "Spider-Man 3",
+  "batman 2": "The Dark Knight",
+  "batman 3": "The Dark Knight Rises",
+  "fast and furious 7": "Furious 7",
+  "fast and furious 8": "The Fate of the Furious",
+  "fast and furious 9": "F9",
+  "fast and furious 10": "Fast X",
+  "fast 9": "F9",
+  "fast 10": "Fast X",
+  "john wick 4": "John Wick: Chapter 4",
+  "mission impossible 7": "Mission: Impossible - Dead Reckoning",
+  "avengers 3": "Avengers: Infinity War",
+  "avengers 4": "Avengers: Endgame",
+};
+
+/** Common search typos mapped directly to standard search queries */
+const COMMON_CORRECTIONS: Record<string, string> = {
+  oppenhiemer: "oppenheimer",
+  openheimer: "oppenheimer",
+  interstelar: "interstellar",
+  inceptoin: "inception",
+  avengrs: "avengers",
+  deadpol: "deadpool",
+  spiderman: "spider-man",
+  gladiater: "gladiator",
+  "braking bad": "breaking bad",
+  "breking bad": "breaking bad",
+  "peaky blinder": "peaky blinders",
+  "shutter iland": "shutter island",
+  "stranger thing": "stranger things",
+  "game of throne": "game of thrones",
+};
+
+const POPULAR_SEARCH_TARGETS = [
+  "oppenheimer",
+  "interstellar",
+  "inception",
+  "avengers",
+  "deadpool",
+  "spider-man",
+  "batman",
+  "superman",
+  "gladiator",
+  "breaking bad",
+  "stranger things",
+  "game of thrones",
+  "shutter island",
+  "pulp fiction",
+  "the dark knight",
+  "peaky blinders",
+  "better call saul",
+  "succession",
+  "the boys",
+  "rick and morty",
+  "dune",
+  "avatar",
+  "matrix",
+  "john wick",
+  "jurassic park",
+  "star wars",
+  "harry potter",
+  "lord of the rings",
+  "fight club",
+  "forrest gump",
+  "shawshank redemption",
+  "squid game",
+  "black mirror",
+  "the last of us",
+  "severance",
+  "the bear",
+  "nolan",
+  "christopher nolan",
+  "quentin tarantino",
+  "tarantino",
+  "cillian murphy",
+  "leonardo dicaprio",
+  "tom cruise",
+  "robert downey jr",
+  "keanu reeves",
+  "christian bale",
+  "brad pitt",
+  "ryan reynolds",
+  "margot robbie",
+  "timothee chalamet",
+  "zendaya",
+];
+
+function levenshteinDistance(a: string, b: string): number {
+  const m = a.length;
+  const n = b.length;
+  if (m === 0) return n;
+  if (n === 0) return m;
+
+  let prevRow = Array.from({ length: n + 1 }, (_, i) => i);
+  let currRow = new Array<number>(n + 1).fill(0);
+
+  for (let i = 1; i <= m; i++) {
+    currRow[0] = i;
+    const aChar = a.charAt(i - 1);
+    for (let j = 1; j <= n; j++) {
+      const bChar = b.charAt(j - 1);
+      const cost = aChar === bChar ? 0 : 1;
+      const prevVal = prevRow[j] ?? 0;
+      const currVal = currRow[j - 1] ?? 0;
+      const diagVal = prevRow[j - 1] ?? 0;
+      currRow[j] = Math.min(prevVal + 1, currVal + 1, diagVal + cost);
+    }
+    const temp = prevRow;
+    prevRow = currRow;
+    currRow = temp;
+  }
+
+  return prevRow[n] ?? 0;
+}
+
+function findFuzzyCorrection(query: string): string | null {
+  const q = query.toLowerCase().trim();
+  if (COMMON_CORRECTIONS[q]) return COMMON_CORRECTIONS[q];
+  if (q.length < 4) return null;
+
+  let bestMatch: string | null = null;
+  let bestDistance = Infinity;
+
+  for (const target of POPULAR_SEARCH_TARGETS) {
+    const dist = levenshteinDistance(q, target);
+    const maxAllowed = q.length <= 6 ? 1 : 2;
+    if (dist <= maxAllowed && dist < bestDistance) {
+      bestDistance = dist;
+      bestMatch = target;
+    }
+  }
+
+  return bestMatch;
+}
+
+interface TMDBCreditsResponse {
+  cast?: (TMDBRawItem & { character?: string })[];
+  crew?: (TMDBRawItem & { job?: string; department?: string })[];
+}
+
+/**
+ * Professional multi-strategy search for movies, TV series, actors, and directors.
+ * Supports alias resolution, release year extraction, actor/director filmography discovery,
+ * typo tolerance, and intelligent multi-signal relevance scoring.
  */
 export async function searchMedia(
   query: string,
@@ -368,35 +522,260 @@ export async function searchMedia(
   }
 
   const genreMap = await getGenreMap();
+
+  // 1. Resolve franchise aliases & common typos (e.g. "dune 2" -> "Dune: Part Two", "interstelar" -> "interstellar")
+  const lowerQuery = trimmed.toLowerCase();
+  const resolvedQuery = FRANCHISE_ALIASES[lowerQuery] || COMMON_CORRECTIONS[lowerQuery] || trimmed;
+
+  // 2. Extract potential 4-digit release year (e.g. "Batman 2022" -> query "Batman", year 2022)
+  const yearMatch = resolvedQuery.match(/^(.+?)\s+((?:19|20)\d{2})$/);
+  const cleanQuery = yearMatch && yearMatch[1] ? yearMatch[1].trim() : resolvedQuery;
+  const targetYear = yearMatch && yearMatch[2] ? parseInt(yearMatch[2], 10) : undefined;
+  let effectiveQuery = cleanQuery;
+
   let endpoint = "/search/multi";
   if (type === "movie") endpoint = "/search/movie";
   if (type === "tv") endpoint = "/search/tv";
 
-  const customRes = await fetchTmdbWithCustomPageSize<TMDBRawItem>(
+  // Build TMDB parameters
+  const fetchParams: Record<string, string | number | undefined> = {
+    query: cleanQuery,
+    include_adult: "false",
+  };
+  if (targetYear && type === "movie") {
+    fetchParams.primary_release_year = targetYear;
+  } else if (targetYear && type === "tv") {
+    fetchParams.first_air_date_year = targetYear;
+  }
+
+  // 3. Primary search via TMDB
+  let customRes = await fetchTmdbWithCustomPageSize<TMDBRawItem>(
     (tmdbPage) =>
       tmdbFetch<TMDBPaginatedResponse<TMDBRawItem>>(
         endpoint,
-        { query: trimmed, page: tmdbPage, include_adult: "false" },
-        300 // 5 minute cache for searches
+        { ...fetchParams, page: tmdbPage },
+        300
       ),
     page,
     pageSize,
     (item) => {
       if (type === "movie") return true;
       if (type === "tv") return true;
-      return item.media_type === "movie" || item.media_type === "tv";
+      return item.media_type === "movie" || item.media_type === "tv" || item.media_type === "person";
     }
   );
 
-  const results = customRes.results.map((item) =>
+  // 3.5. Typo tolerance: if zero results and on page 1, check fuzzy correction
+  if (page === 1 && customRes.results.length === 0) {
+    const correction = findFuzzyCorrection(cleanQuery);
+    if (correction && correction.toLowerCase() !== cleanQuery.toLowerCase()) {
+      effectiveQuery = correction;
+      const correctedParams = { ...fetchParams, query: correction };
+      const fallbackRes = await fetchTmdbWithCustomPageSize<TMDBRawItem>(
+        (tmdbPage) =>
+          tmdbFetch<TMDBPaginatedResponse<TMDBRawItem>>(
+            endpoint,
+            { ...correctedParams, page: tmdbPage },
+            300
+          ),
+        page,
+        pageSize,
+        (item) => {
+          if (type === "movie") return true;
+          if (type === "tv") return true;
+          return item.media_type === "movie" || item.media_type === "tv" || item.media_type === "person";
+        }
+      );
+      if (fallbackRes.results.length > 0) {
+        customRes = fallbackRes;
+      }
+    }
+  }
+
+  // 4. Handle Actor / Director discovery & filmography
+  let rawItems = [...customRes.results];
+  const personItems = rawItems.filter((i) => i.media_type === "person");
+  rawItems = rawItems.filter((i) => i.media_type === "movie" || i.media_type === "tv");
+
+  // If person items were returned or movie/tv results are scarce on page 1, fetch person's top filmography
+  if (page === 1 && (personItems.length > 0 || rawItems.length === 0)) {
+    let topPersonId: number | null = personItems[0]?.id || null;
+
+    // If no person in results yet and 0 movie/tv items, check /search/person directly
+    if (!topPersonId && rawItems.length === 0) {
+      try {
+        const personSearch = await tmdbFetch<TMDBPaginatedResponse<{ id: number; name: string }>>(
+          "/search/person",
+          { query: effectiveQuery, page: 1, include_adult: "false" },
+          300
+        );
+        if (personSearch?.results && personSearch.results.length > 0 && personSearch.results[0]) {
+          topPersonId = personSearch.results[0].id;
+        }
+      } catch {
+        // Fallback silently
+      }
+    }
+
+    // If we matched a person (actor or director), fetch their top combined credits
+    if (topPersonId) {
+      try {
+        const credits = await tmdbFetch<TMDBCreditsResponse>(
+          `/person/${topPersonId}/combined_credits`,
+          {},
+          3600
+        );
+
+        const personWorks: TMDBRawItem[] = [];
+        // Acting credits
+        if (credits?.cast && Array.isArray(credits.cast)) {
+          personWorks.push(...credits.cast);
+        }
+        // Directing, writing, producing credits (critical for directors like Nolan, Tarantino, Spielberg)
+        if (credits?.crew && Array.isArray(credits.crew)) {
+          const directOrKeyCrew = credits.crew.filter(
+            (c) =>
+              c.job === "Director" ||
+              c.department === "Directing" ||
+              c.department === "Writing" ||
+              c.job === "Producer"
+          );
+          personWorks.push(...directOrKeyCrew);
+        }
+
+        if (personWorks.length > 0) {
+          const sortedWorks = personWorks
+            .filter((c) => {
+              if (!c.poster_path) return false;
+              if (type === "movie") return c.media_type === "movie";
+              if (type === "tv") return c.media_type === "tv";
+              return c.media_type === "movie" || c.media_type === "tv";
+            })
+            .sort(
+              (a, b) =>
+                (b.vote_count || 0) * (b.vote_average || 1) -
+                (a.vote_count || 0) * (a.vote_average || 1)
+            )
+            .slice(0, 30);
+
+          rawItems = [...sortedWorks, ...rawItems];
+        }
+      } catch {
+        // Fallback silently
+      }
+    }
+
+    // Also extract known_for from any person items
+    for (const p of personItems) {
+      if (p.known_for && Array.isArray(p.known_for)) {
+        for (const k of p.known_for) {
+          if (k && (k.media_type === "movie" || k.media_type === "tv")) {
+            rawItems.push(k);
+          }
+        }
+      }
+    }
+  }
+
+  // 4.5. If targetYear is specified, also pull matching year items if movie/tv
+  if (targetYear && page === 1 && (type === "all" || type === "movie")) {
+    try {
+      const yearSpecificRes = await tmdbFetch<TMDBPaginatedResponse<TMDBRawItem>>(
+        "/search/movie",
+        { query: cleanQuery, primary_release_year: targetYear, page: 1 },
+        300
+      );
+      if (yearSpecificRes?.results && yearSpecificRes.results.length > 0) {
+        rawItems = [...yearSpecificRes.results, ...rawItems];
+      }
+    } catch {
+      // Fallback silently
+    }
+  }
+
+  // 5. Deduplicate items by media_type and id
+  const seen = new Set<string>();
+  const uniqueRawItems: TMDBRawItem[] = [];
+  for (const item of rawItems) {
+    const key = `${item.media_type || "item"}-${item.id}`;
+    if (!seen.has(key)) {
+      seen.add(key);
+      uniqueRawItems.push(item);
+    }
+  }
+
+  // 6. Normalize items
+  const results = uniqueRawItems.map((item) =>
     normalizeTMDBItem(item, type === "all" ? undefined : type, genreMap)
   );
 
+  // 7. Intelligent Relevance Scoring & Sorting on Page 1
+  if (page === 1 && results.length > 1) {
+    const qLower = effectiveQuery.toLowerCase();
+    const qTokens = qLower.split(/\s+/).filter(Boolean);
+
+    // Canonical helper that strips leading articles and non-alphanumeric chars
+    const cleanCanonical = (str: string) =>
+      str
+        .toLowerCase()
+        .replace(/^(the|a|an)\s+/, "")
+        .replace(/[^a-z0-9]/g, "");
+
+    const qCanonical = cleanCanonical(qLower);
+
+    results.sort((a, b) => {
+      const aTitle = a.title.toLowerCase();
+      const bTitle = b.title.toLowerCase();
+      const aCanonical = cleanCanonical(aTitle);
+      const bCanonical = cleanCanonical(bTitle);
+
+      let aScore = 0;
+      let bScore = 0;
+
+      // Exact title match
+      if (aTitle === qLower) aScore += 10000;
+      if (bTitle === qLower) bScore += 10000;
+
+      // Canonical title match (e.g. "The Batman" vs "Batman")
+      if (aCanonical === qCanonical) aScore += 8000;
+      if (bCanonical === qCanonical) bScore += 8000;
+
+      // Starts with
+      if (aTitle.startsWith(qLower) || aCanonical.startsWith(qCanonical)) aScore += 5000;
+      if (bTitle.startsWith(qLower) || bCanonical.startsWith(qCanonical)) bScore += 5000;
+
+      // Contains query
+      if (aTitle.includes(qLower)) aScore += 2500;
+      if (bTitle.includes(qLower)) bScore += 2500;
+
+      // Matches all query tokens
+      if (qTokens.length > 1) {
+        if (qTokens.every((t) => aTitle.includes(t))) aScore += 2000;
+        if (qTokens.every((t) => bTitle.includes(t))) bScore += 2000;
+      }
+
+      // Explicit target release year match (MASSIVE boost so "batman 2022" ranks The Batman 2022 at top)
+      if (targetYear) {
+        if (a.releaseYear === targetYear) aScore += 30000;
+        if (b.releaseYear === targetYear) bScore += 30000;
+      }
+
+      // Popularity and rating weighting
+      aScore += Math.min(a.voteCount || 0, 30000) * 0.15 + (a.rating || 0) * 20;
+      bScore += Math.min(b.voteCount || 0, 30000) * 0.15 + (b.rating || 0) * 20;
+
+      return bScore - aScore;
+    });
+  }
+
+  const effectiveTotalResults = Math.max(results.length, customRes.totalResults);
+  const effectiveTotalPages = Math.max(1, Math.ceil(effectiveTotalResults / pageSize));
+
   return {
     page: customRes.page,
-    results,
-    totalPages: customRes.totalPages,
-    totalResults: customRes.totalResults,
+    results: results.slice(0, pageSize),
+    totalPages: effectiveTotalPages,
+    totalResults: effectiveTotalResults,
   };
 }
 

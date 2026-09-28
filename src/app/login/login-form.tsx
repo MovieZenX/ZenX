@@ -138,6 +138,9 @@ export function LoginForm() {
                 name="identifier"
                 type="text"
                 autoComplete="username"
+                autoCapitalize="none"
+                autoCorrect="off"
+                spellCheck={true}
                 placeholder="you@example.com or username"
                 value={identifier}
                 onChange={(e) => setIdentifier(e.target.value)}
@@ -169,17 +172,20 @@ export function LoginForm() {
                 name="password"
                 type={showPassword ? "text" : "password"}
                 autoComplete="current-password"
+                autoCapitalize="none"
+                autoCorrect="off"
+                spellCheck={true}
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={isLoading}
                 required
-                className={`${styles.input} ${styles.inputWithIcon} pr-10`}
+                className={`${styles.input} ${styles.inputWithIcon} pr-11`}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 p-1 text-gray-400 hover:text-white transition-colors focus-visible:outline-none cursor-pointer"
+                className={styles.passwordToggleBtn}
                 aria-label={showPassword ? "Hide password" : "Show password"}
                 tabIndex={-1}
               >

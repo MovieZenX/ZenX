@@ -130,6 +130,7 @@
 
 .input {
   width: 100%;
+  min-height: 44px;
   padding: 10px 14px;
   border: 1px solid transparent;
   border-radius: 13px;
@@ -138,6 +139,8 @@
   outline: none;
   font-size: 14px;
   transition: all 0.2s ease;
+  -webkit-appearance: none;
+  appearance: none;
 }
 
 .input:focus {
@@ -157,12 +160,123 @@
   color: rgba(255, 255, 255, 0.45);
 }
 
+.passwordToggleBtn {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 44px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: color 0.2s ease;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.passwordToggleBtn:hover,
+.passwordToggleBtn:focus-visible {
+  color: #ffffff;
+  outline: none;
+}
+
+/* Real-time Password Requirements Card */
+.requirementsBox {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.requirementsTitle {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 2px;
+}
+
+.requirementsGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 5px;
+}
+
+@media (min-width: 380px) {
+  .requirementsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.requirementItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  transition: color 0.2s ease;
+}
+
+.requirementItemValid {
+  color: #ffffff;
+  font-weight: 500;
+}
+
+.requirementItemInvalid {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.requirementDot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 9px;
+  transition: all 0.2s ease;
+}
+
+.requirementDotValid {
+  background: #ffffff;
+  color: #000000;
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.4);
+}
+
+.requirementDotInvalid {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: transparent;
+}
+
 .button {
   width: 100%;
-  height: 42px;
+  min-height: 46px;
+  height: 46px;
   border: none;
-  border-radius: 21px;
-  font-size: 14px;
+  border-radius: 23px;
+  font-size: 14.5px;
   font-weight: 600;
   cursor: pointer;
   display: flex;
@@ -171,11 +285,13 @@
   gap: 10px;
   background: var(--button-color);
   color: #ffffff;
-  transition: all 0.3s ease;
+  transition: all 0.25s ease;
   box-shadow:
     inset 0px 3px 6px -4px rgba(255, 255, 255, 0.6),
     inset 0px -3px 6px -2px rgba(0, 0, 0, 0.8);
   margin-top: 6px;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .button:hover:not(:disabled) {
@@ -184,6 +300,10 @@
     inset 0px 3px 6px rgba(255, 255, 255, 0.6),
     inset 0px -3px 6px rgba(0, 0, 0, 0.8),
     0px 0px 10px rgba(255, 255, 255, 0.12);
+}
+
+.button:active:not(:disabled) {
+  transform: scale(0.99);
 }
 
 .button:disabled {
@@ -195,7 +315,7 @@
   width: 100%;
   text-align: center;
   color: var(--footer-color);
-  font-size: 12px;
+  font-size: 12.5px;
   margin-top: 16px;
   line-height: 1.6;
 }
@@ -206,48 +326,108 @@
   font-weight: 600;
   text-decoration: none;
   transition: color 0.3s ease;
+  display: inline-block;
+  padding: 2px 4px;
 }
 
 .link::after {
   content: "";
   position: absolute;
-  left: 0;
-  bottom: -2px;
-  width: 0;
-  border-radius: 6px;
+  left: 4px;
+  right: 4px;
+  bottom: 0px;
   height: 1px;
   background: currentColor;
-  transition: width 0.3s ease;
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 0.25s ease;
 }
 
 .link:hover::after {
-  width: 100%;
+  transform: scaleX(1);
 }
 
-/* Mobile Responsiveness */
-@media (max-width: 480px) {
+/* Mobile & Touch Responsiveness */
+@media (max-width: 640px) {
   .cardContainer {
     max-width: 100%;
-    border-radius: 24px;
-  }
-
-  .loginBox {
-    padding: 22px 18px;
     border-radius: 22px;
   }
 
+  .cardContainer::before {
+    /* Reduce overdraw on mobile GPUs */
+    inset: -80px;
+    animation-duration: 5s;
+  }
+
+  .loginBox {
+    padding: 24px 18px;
+    border-radius: 20px;
+  }
+
   .header {
-    font-size: 20px;
+    font-size: 21px;
   }
 
   .subHeader {
-    font-size: 12px;
-    margin-bottom: 14px;
+    font-size: 12.5px;
+    margin-bottom: 15px;
   }
 
   .logo {
-    width: 52px;
-    height: 52px;
-    border-radius: 15px;
+    width: 54px;
+    height: 54px;
+    border-radius: 16px;
+  }
+
+  /* Critical: 16px font-size prevents iOS Safari from automatically zooming the viewport on focus */
+  .input {
+    font-size: 16px;
+    min-height: 48px;
+    padding-top: 12px;
+    padding-bottom: 12px;
+  }
+
+  .button {
+    min-height: 48px;
+    height: 48px;
+    font-size: 15px;
+    border-radius: 24px;
+  }
+}
+
+/* Extra-small mobile screens (e.g. iPhone SE, Galaxy Fold cover screen <= 360px) */
+@media (max-width: 360px) {
+  .loginBox {
+    padding: 20px 14px;
+  }
+
+  .header {
+    font-size: 19px;
+  }
+
+  .subHeader {
+    font-size: 11.5px;
+  }
+
+  .inputWithIcon {
+    padding-left: 36px;
+  }
+
+  .inputIcon {
+    left: 10px;
+  }
+}
+
+/* Accessibility: Respect Reduced Motion Preferences */
+@media (prefers-reduced-motion: reduce) {
+  .cardContainer::before {
+    animation: none;
+  }
+
+  .logo,
+  .button,
+  .input {
+    transition: none;
   }
 }

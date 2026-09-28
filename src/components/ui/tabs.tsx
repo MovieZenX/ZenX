@@ -30,7 +30,7 @@ export function Tabs({
     <div
       role="tablist"
       className={cn(
-        "inline-flex items-center rounded-xl bg-white/[0.05] p-1 border border-white/[0.08]",
+        "inline-flex items-center max-w-full overflow-x-auto scrollbar-hide rounded-xl bg-white/[0.05] p-1 border border-white/[0.08]",
         className
       )}
     >
@@ -45,8 +45,8 @@ export function Tabs({
             aria-selected={isActive}
             onClick={() => onChange(tab.id)}
             className={cn(
-              "relative flex items-center justify-center font-medium transition-all duration-200 select-none cursor-pointer rounded-lg",
-              size === "sm" ? "px-3 py-1 text-xs gap-1.5" : "px-4 py-1.5 text-sm gap-2",
+              "relative flex items-center justify-center font-medium transition-all duration-200 select-none cursor-pointer rounded-lg whitespace-nowrap shrink-0 touch-manipulation",
+              size === "sm" ? "px-2.5 sm:px-3 py-1 text-xs gap-1.5" : "px-3 sm:px-4 py-1.5 text-xs sm:text-sm gap-1.5 sm:gap-2",
               isActive
                 ? "bg-white/15 text-white shadow-sm border border-white/10"
                 : "text-gray-400 hover:text-white hover:bg-white/[0.05]"

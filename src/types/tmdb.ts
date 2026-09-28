@@ -21,6 +21,8 @@ export interface TMDBRawItem {
   popularity: number;
   genre_ids?: number[];
   adult?: boolean;
+  known_for?: TMDBRawItem[];
+  profile_path?: string | null;
 }
 
 export interface TMDBPaginatedResponse<T> {

@@ -76,27 +76,23 @@ describe("Phase 7 — Authentication & User Sessions Tests", () => {
       assert.equal(validateUsername("").isValid, false);
     });
 
-    it("validates compliant passwords (min 8 chars, 1 uppercase, 1 lowercase, 1 number)", () => {
+    it("validates compliant passwords (relaxed freedom policy, min 4 chars)", () => {
+      assert.equal(validatePassword("1234").isValid, true);
+      assert.equal(validatePassword("pass").isValid, true);
       assert.equal(validatePassword("SecurePass1").isValid, true);
-      assert.equal(validatePassword("C1nematicStream").isValid, true);
+      assert.equal(validatePassword("nouppercase123").isValid, true);
+      assert.equal(validatePassword("NOLOWERCASE123").isValid, true);
+      assert.equal(validatePassword("NoNumberPassword").isValid, true);
     });
 
     it("rejects non-compliant passwords with descriptive error messages", () => {
-      const short = validatePassword("Short1");
+      const empty = validatePassword("");
+      assert.equal(empty.isValid, false);
+      assert.match(empty.error || "", /required/i);
+
+      const short = validatePassword("123");
       assert.equal(short.isValid, false);
-      assert.match(short.error || "", /at least 8 characters/i);
-
-      const noUpper = validatePassword("nouppercase123");
-      assert.equal(noUpper.isValid, false);
-      assert.match(noUpper.error || "", /uppercase/i);
-
-      const noLower = validatePassword("NOLOWERCASE123");
-      assert.equal(noLower.isValid, false);
-      assert.match(noLower.error || "", /lowercase/i);
-
-      const noNumber = validatePassword("NoNumberPassword");
-      assert.equal(noNumber.isValid, false);
-      assert.match(noNumber.error || "", /number/i);
+      assert.match(short.error || "", /at least 4 characters/i);
     });
 
     it("performs comprehensive registration input validation", () => {
@@ -129,8 +125,8 @@ describe("Phase 7 — Authentication & User Sessions Tests", () => {
       const weakPass = validateRegistrationInput({
         email: "user@example.com",
         username: "valid_user",
-        password: "weak",
-        confirmPassword: "weak",
+        password: "123",
+        confirmPassword: "123",
       });
       assert.equal(weakPass.isValid, false);
       assert.match(weakPass.error || "", /password/i);

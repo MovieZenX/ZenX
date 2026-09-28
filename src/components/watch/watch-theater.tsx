@@ -5,6 +5,8 @@ import Link from "next/link";
 import type { MediaDetail, SeasonItem, EpisodeItem, CastMember } from "@/types/metadata";
 import { Badge } from "@/components/ui/badge";
 import { Spinner } from "@/components/ui/spinner";
+import { ContentRow } from "@/components/media/content-row";
+import { ContentCard } from "@/components/media/content-card";
 import { cn } from "@/lib/utils";
 
 export interface WatchTheaterProps {
@@ -37,6 +39,7 @@ export function WatchTheater({
   const [lightsOff, setLightsOff] = useState<boolean>(false);
   const [episodeSearch, setEpisodeSearch] = useState<string>("");
   const [isReloading, setIsReloading] = useState<boolean>(false);
+  const [episodeViewMode, setEpisodeViewMode] = useState<"grid" | "carousel">("carousel");
 
   // TV Seasons & Episodes Cache
   const [seasonsCache, setSeasonsCache] = useState<Record<number, SeasonItem>>(() => {
@@ -48,6 +51,17 @@ export function WatchTheater({
   });
   const [loadingSeason, setLoadingSeason] = useState<boolean>(false);
   const playerRef = useRef<HTMLDivElement>(null);
+  const carouselRef = useRef<HTMLDivElement>(null);
+  const activeEpisodeRef = useRef<HTMLDivElement>(null);
+
+  const scrollCarousel = (direction: "left" | "right") => {
+    if (!carouselRef.current) return;
+    const scrollAmount = carouselRef.current.clientWidth * 0.75;
+    carouselRef.current.scrollBy({
+      left: direction === "left" ? -scrollAmount : scrollAmount,
+      behavior: "smooth",
+    });
+  };
 
   // Sync state with props during render without triggering cascading effect renders
   const [prevProps, setPrevProps] = useState({
@@ -114,9 +128,12 @@ export function WatchTheater({
     ? `https://vidfast.vc/movie/${media.id}?autoPlay=true`
     : `https://vidsrc.to/embed/movie/${media.id}`;
 
-  const currentSeasonData = seasonsCache[seasonNum] ?? initialSeasonData;
+  const currentSeasonData =
+    seasonsCache[seasonNum] ??
+    (initialSeasonData?.seasonNumber === seasonNum ? initialSeasonData : null);
   const episodes: EpisodeItem[] = currentSeasonData?.episodes ?? [];
   const currentEpisodeData = episodes.find((ep) => ep.episodeNumber === episodeNum);
+  const positiveSeasons = (media.seasons || []).filter((s) => s.seasonNumber > 0);
 
   const totalEpisodesInSeason = episodes.length;
   const hasPrevEpisode = isTv && episodeNum > 1;
@@ -126,9 +143,9 @@ export function WatchTheater({
   const filteredEpisodes = episodeSearch.trim()
     ? episodes.filter(
         (ep) =>
-          ep.name.toLowerCase().includes(episodeSearch.toLowerCase()) ||
+          (ep.name || "").toLowerCase().includes(episodeSearch.toLowerCase()) ||
           ep.episodeNumber.toString() === episodeSearch.trim() ||
-          ep.overview.toLowerCase().includes(episodeSearch.toLowerCase())
+          (ep.overview || "").toLowerCase().includes(episodeSearch.toLowerCase())
       )
     : episodes;
 
@@ -146,9 +163,28 @@ export function WatchTheater({
         "",
         `/watch/${media.id}?type=tv&season=${s}&episode=${targetEp}`
       );
+
+      // Smoothly scroll back up to player if it is scrolled out of view
+      if (playerRef.current) {
+        const rect = playerRef.current.getBoundingClientRect();
+        if (rect.top < -50 || rect.bottom < 150) {
+          playerRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }
     },
     [media.id, seasonNum]
   );
+
+  // Auto-scroll carousel to active episode when in carousel mode
+  useEffect(() => {
+    if (episodeViewMode === "carousel" && activeEpisodeRef.current && carouselRef.current) {
+      activeEpisodeRef.current.scrollIntoView({
+        behavior: "smooth",
+        inline: "center",
+        block: "nearest",
+      });
+    }
+  }, [episodeNum, seasonNum, episodeViewMode]);
 
   // Switch season
   const handleSelectSeason = (newSeasonNum: number) => {
@@ -235,19 +271,6 @@ export function WatchTheater({
         />
       )}
 
-      {/* Floating Lights Off Active Indicator Banner */}
-      {lightsOff && (
-        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 px-4 py-2 rounded-full bg-black/90 border border-white/25 shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-top-4 duration-300">
-          <span className="text-xs font-medium text-white/90">Cinema Lights Off Mode</span>
-          <button
-            type="button"
-            onClick={() => setLightsOff(false)}
-            className="ml-2 px-3 py-1 rounded-full bg-white text-black text-xs font-semibold hover:bg-gray-200 transition-colors cursor-pointer"
-          >
-            Lights On (Esc)
-          </button>
-        </div>
-      )}
 
       <div
         suppressHydrationWarning
@@ -567,10 +590,211 @@ export function WatchTheater({
           </div>
         </div>
 
-        {/* Main Content Details & Netflix-Style Episode Drawer */}
-        <div className="mt-8 grid grid-cols-1 xl:grid-cols-12 gap-6 xl:gap-8 items-start min-w-0">
-          {/* Primary Column: Rich TMDB Info Hub, Intel, Bento Specs & Visual Cast */}
-          <div className={cn("space-y-6 min-w-0", isTv ? "xl:col-span-7 2xl:col-span-8" : "xl:col-span-12")}>
+        {/* 1. EPISODES PLAYLIST SECTION (Directly Below Player) */}
+        {isTv && (
+          <section
+            className="mt-6 sm:mt-8 rounded-xl sm:rounded-2xl border border-white/10 bg-white/[0.02] backdrop-blur-xl p-3 sm:p-6 shadow-2xl relative overflow-hidden space-y-3.5 sm:space-y-5"
+            aria-label="Episodes Playlist"
+          >
+            {/* Subtle top rim accent */}
+            <div className="pointer-events-none absolute inset-x-6 top-0 h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+
+            {/* Header: Title, Season Selector, Search & View Controls */}
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 sm:gap-4 border-b border-white/[0.08] pb-3 sm:pb-4">
+              {/* Left: Heading & Season Selector Tabs */}
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                <div className="flex items-center gap-1.5 sm:gap-2">
+                  <h2 className="text-sm sm:text-lg font-bold text-white tracking-tight">
+                    Episodes
+                  </h2>
+                  <span className="text-[10px] sm:text-[11px] font-mono px-2 py-0.5 rounded-full bg-white/10 text-white/80 border border-white/10">
+                    {episodes.length} Ep
+                  </span>
+                </div>
+
+                {/* Season Tabs */}
+                {positiveSeasons.length > 1 ? (
+                  <div className="flex items-center gap-1 sm:gap-1.5 overflow-x-auto pb-1 scrollbar-hide max-w-full">
+                    {positiveSeasons.map((s) => {
+                      const isCurrent = s.seasonNumber === seasonNum;
+                      return (
+                        <button
+                          key={s.id}
+                          type="button"
+                          onClick={() => handleSelectSeason(s.seasonNumber)}
+                          className={cn(
+                            "rounded-full px-2.5 sm:px-3.5 py-0.5 sm:py-1 text-[11px] sm:text-xs font-semibold shrink-0 transition-all cursor-pointer",
+                            isCurrent
+                              ? "bg-white text-black shadow-md font-bold"
+                              : "bg-white/[0.05] border border-white/10 text-gray-300 hover:text-white hover:bg-white/[0.12]"
+                          )}
+                        >
+                          Season {s.seasonNumber}
+                        </button>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <span className="text-xs text-gray-400 font-medium px-1">
+                    Season {seasonNum}
+                  </span>
+                )}
+              </div>
+
+              {/* Right: Search & View Controls */}
+              <div className="flex items-center gap-2 self-stretch lg:self-auto w-full lg:w-auto">
+                {/* Search in Season */}
+                <div className="relative flex-1 lg:w-56">
+                  <input
+                    type="text"
+                    value={episodeSearch}
+                    onChange={(e) => setEpisodeSearch(e.target.value)}
+                    placeholder="Search episode..."
+                    className="w-full bg-white/[0.05] border border-white/10 rounded-xl px-2.5 sm:px-3 py-1 sm:py-1.5 text-xs text-white placeholder-gray-400 focus:outline-none focus:border-white/30"
+                  />
+                  {episodeSearch && (
+                    <button
+                      type="button"
+                      onClick={() => setEpisodeSearch("")}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white text-xs cursor-pointer"
+                      title="Clear search"
+                    >
+                      ✕
+                    </button>
+                  )}
+                </div>
+
+                {/* Row / Grid Toggle (Row by default) */}
+                <div className="inline-flex items-center p-0.5 rounded-xl bg-white/[0.04] border border-white/10 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => setEpisodeViewMode("carousel")}
+                    className={cn(
+                      "flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-0.5 sm:py-1 rounded-lg text-[11px] sm:text-xs font-medium transition-all cursor-pointer",
+                      episodeViewMode === "carousel"
+                        ? "bg-white text-black font-semibold shadow-sm"
+                        : "text-gray-400 hover:text-white"
+                    )}
+                    title="Row / Carousel View"
+                  >
+                    <svg className="h-3 w-3 sm:h-3.5 sm:w-3.5" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M4 6h4v12H4zm6 0h4v12h-4zm6 0h4v12h-4z" />
+                    </svg>
+                    <span>Row</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEpisodeViewMode("grid")}
+                    className={cn(
+                      "flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-0.5 sm:py-1 rounded-lg text-[11px] sm:text-xs font-medium transition-all cursor-pointer",
+                      episodeViewMode === "grid"
+                        ? "bg-white text-black font-semibold shadow-sm"
+                        : "text-gray-400 hover:text-white"
+                    )}
+                    title="Grid View"
+                  >
+                    <svg className="h-3 w-3 sm:h-3.5 sm:w-3.5" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M3 3h8v8H3zm10 0h8v8h-8zM3 13h8v8H3zm10 0h8v8h-8z" />
+                    </svg>
+                    <span>Grid</span>
+                  </button>
+                </div>
+
+                {/* Carousel Navigation Arrows */}
+                {episodeViewMode === "carousel" && (
+                  <div className="hidden sm:flex items-center gap-1 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => scrollCarousel("left")}
+                      className="h-7 w-7 rounded-lg bg-white/[0.05] hover:bg-white/[0.15] border border-white/10 flex items-center justify-center text-white/80 hover:text-white transition-all cursor-pointer"
+                      aria-label="Previous episodes"
+                    >
+                      <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                      </svg>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => scrollCarousel("right")}
+                      className="h-7 w-7 rounded-lg bg-white/[0.05] hover:bg-white/[0.15] border border-white/10 flex items-center justify-center text-white/80 hover:text-white transition-all cursor-pointer"
+                      aria-label="Next episodes"
+                    >
+                      <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Episodes List / Grid / Carousel */}
+            {loadingSeason ? (
+              <div className="flex flex-col items-center justify-center py-12 sm:py-16 space-y-3">
+                <Spinner size="md" />
+                <p className="text-xs text-gray-400">Loading season {seasonNum} episodes...</p>
+              </div>
+            ) : filteredEpisodes.length > 0 ? (
+              episodeViewMode === "grid" ? (
+                /* Grid View: 2 columns on mobile, 3 on lg, 4 on xl */
+                <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-4 gap-2 sm:gap-4">
+                  {filteredEpisodes.map((ep) => {
+                    const isPlaying = ep.episodeNumber === episodeNum;
+                    return (
+                      <div
+                        key={ep.id}
+                        ref={isPlaying ? activeEpisodeRef : undefined}
+                      >
+                        <EpisodeCard
+                          ep={ep}
+                          isPlaying={isPlaying}
+                          onSelect={() => handleSelectEpisode(ep.episodeNumber)}
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                /* Carousel / Row View: compact w-36 xs:w-44 on mobile, w-64+ on desktop */
+                <div
+                  ref={carouselRef}
+                  className="flex gap-2.5 sm:gap-4 overflow-x-auto scrollbar-hide snap-x pb-2 pt-0.5"
+                >
+                  {filteredEpisodes.map((ep) => {
+                    const isPlaying = ep.episodeNumber === episodeNum;
+                    return (
+                      <div
+                        key={ep.id}
+                        ref={isPlaying ? activeEpisodeRef : undefined}
+                        className="w-36 xs:w-44 sm:w-64 md:w-72 lg:w-80 shrink-0 snap-start"
+                      >
+                        <EpisodeCard
+                          ep={ep}
+                          isPlaying={isPlaying}
+                          onSelect={() => handleSelectEpisode(ep.episodeNumber)}
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+              )
+            ) : (
+              <div className="py-10 text-center text-xs text-gray-500 space-y-2">
+                <p>No episodes found matching &ldquo;{episodeSearch}&rdquo;.</p>
+                <button
+                  type="button"
+                  onClick={() => setEpisodeSearch("")}
+                  className="text-xs text-white underline hover:no-underline cursor-pointer"
+                >
+                  Clear filter
+                </button>
+              </div>
+            )}
+          </section>
+        )}
+
+        {/* 2. MEDIA DETAILS & INTEL SECTION (Directly Below Episodes) */}
+        <section className="mt-10 space-y-6 min-w-0" aria-label="Media Details">
             {/* 1. Official TMDB Score & Verification Header Card */}
             <div className="rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-3.5 sm:p-5 shadow-2xl relative overflow-hidden min-w-0">
               {/* Subtle top rim highlight with TMDB cyan accent */}
@@ -761,7 +985,7 @@ export function WatchTheater({
 
             {/* 4. Dual Narrative Section: Active Episode Intel + Series Lore */}
             {isTv ? (
-              <div className="space-y-4">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 items-start">
                 {/* Active Episode Intel Box */}
                 <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 sm:p-5 space-y-3">
                   <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/[0.08] pb-3">
@@ -794,8 +1018,7 @@ export function WatchTheater({
                   </h3>
 
                   <p className="text-sm sm:text-base text-gray-300 leading-relaxed">
-                    {currentEpisodeData?.overview ||
-                      "Harry Da Souza is called upon to make a problem disappear. No further confidential notes available for this episode."}
+                    {currentEpisodeData?.overview || "No overview available for this episode."}
                   </p>
 
                   {/* Quick Next Episode Action */}
@@ -834,7 +1057,7 @@ export function WatchTheater({
                       {media.overview}
                     </p>
 
-                    {media.overview.length > 200 && (
+                    {(media.overview?.length ?? 0) > 200 && (
                       <button
                         type="button"
                         onClick={() => setSeriesOverviewExpanded(!seriesOverviewExpanded)}
@@ -908,170 +1131,36 @@ export function WatchTheater({
               </div>
               <span className="font-mono text-[10px]">ID: {media.id}</span>
             </div>
-          </div>
+        </section>
 
-          {/* Secondary Column: Netflix-Style Episode Drawer */}
-          {isTv && (
-            <div className="xl:col-span-5 2xl:col-span-4 min-w-0 rounded-2xl border border-white/15 bg-black/70 backdrop-blur-xl overflow-hidden shadow-2xl">
-              {/* Header: Season Selector & Episode Stats */}
-              <div className="p-4 border-b border-white/10 space-y-3 bg-white/[0.02]">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-sm font-bold text-white tracking-tight">
-                      Episodes
-                    </h3>
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-white/10 text-white/70 border border-white/10">
-                      {episodes.length} Available
-                    </span>
-                  </div>
+        {/* 3. RECOMMENDED "MORE LIKE THIS" SECTION (Directly Below Details) */}
+        {media.similar && media.similar.length > 0 && (
+          <section className="mt-12 pt-8 border-t border-white/[0.08]" aria-label="More Like This">
+            <ContentRow
+              title="More Like This"
+              subtitle={`Recommended titles similar to ${media.title}`}
+              actionHref={`/search?q=${encodeURIComponent(media.genres[0] || media.title)}`}
+              actionLabel="View More"
+            >
+              {media.similar.map((item) => (
+                <div
+                  key={item.id}
+                  className="w-32 sm:w-40 md:w-44 lg:w-48 xl:w-52 shrink-0 snap-start"
+                >
+                  <ContentCard
+                    id={item.id}
+                    title={item.title}
+                    posterUrl={item.posterUrl}
+                    contentType={item.contentType}
+                    releaseYear={item.releaseYear}
+                    rating={item.rating}
+                    quality={item.quality}
+                  />
                 </div>
-
-                {/* Season Tabs / Selector */}
-                {media.seasons && media.seasons.length > 1 ? (
-                  <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
-                    {media.seasons.map((s) => (
-                      <button
-                        key={s.id}
-                        type="button"
-                        onClick={() => handleSelectSeason(s.seasonNumber)}
-                        className={cn(
-                          "rounded-lg px-3 py-1 text-xs font-semibold shrink-0 transition-all cursor-pointer",
-                          s.seasonNumber === seasonNum
-                            ? "bg-white text-black shadow-sm"
-                            : "bg-white/5 border border-white/10 text-gray-300 hover:text-white hover:bg-white/10"
-                        )}
-                      >
-                        Season {s.seasonNumber}
-                      </button>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-xs text-gray-400">Season {seasonNum}</p>
-                )}
-
-                {/* Quick Search in Season */}
-                {episodes.length > 6 && (
-                  <div className="relative">
-                    <input
-                      type="text"
-                      value={episodeSearch}
-                      onChange={(e) => setEpisodeSearch(e.target.value)}
-                      placeholder="Search episode name or number..."
-                      className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-1.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-white/30"
-                    />
-                    {episodeSearch && (
-                      <button
-                        type="button"
-                        onClick={() => setEpisodeSearch("")}
-                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white text-xs"
-                      >
-                        ✕
-                      </button>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              {/* Scrollable Netflix-Style Episode Cards */}
-              <div className="max-h-[480px] sm:max-h-[560px] xl:max-h-[600px] overflow-y-auto divide-y divide-white/[0.06] p-2 space-y-1.5">
-                {loadingSeason ? (
-                  <div className="flex flex-col items-center justify-center p-12 space-y-3">
-                    <Spinner size="md" />
-                    <p className="text-xs text-gray-400">Loading season episodes...</p>
-                  </div>
-                ) : filteredEpisodes.length > 0 ? (
-                  filteredEpisodes.map((ep) => {
-                    const isPlaying = ep.episodeNumber === episodeNum;
-                    return (
-                      <button
-                        key={ep.id}
-                        type="button"
-                        onClick={() => handleSelectEpisode(ep.episodeNumber)}
-                        className={cn(
-                          "w-full text-left p-2 sm:p-2.5 rounded-xl transition-all duration-150 flex gap-2.5 sm:gap-3 items-start group cursor-pointer border min-w-0",
-                          isPlaying
-                            ? "bg-white/[0.12] border-white/30 shadow-lg border-l-4 border-l-white"
-                            : "border-transparent hover:bg-white/[0.05]"
-                        )}
-                      >
-                        {/* 16:9 Episode Thumbnail with Live Equalizer */}
-                        <div className="relative aspect-video w-20 sm:w-24 md:w-28 shrink-0 rounded-lg overflow-hidden bg-black/80 border border-white/15">
-                          {ep.stillUrl ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img
-                              src={ep.stillUrl}
-                              alt={ep.name}
-                              className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
-                            />
-                          ) : (
-                            <div className="flex h-full w-full items-center justify-center text-[10px] sm:text-xs font-mono text-gray-500">
-                              EP {ep.episodeNumber}
-                            </div>
-                          )}
-
-                          {/* Duration Tag */}
-                          {ep.duration && (
-                            <div className="absolute bottom-1 right-1 px-1 sm:px-1.5 py-0.5 rounded bg-black/80 backdrop-blur-sm text-[8px] sm:text-[9px] font-mono text-white/90">
-                              {ep.duration}
-                            </div>
-                          )}
-
-                          {/* Playing State: Live Animated Equalizer Overlay */}
-                          {isPlaying && (
-                            <div className="absolute inset-0 bg-black/60 backdrop-blur-[1px] flex items-center justify-center gap-1.5">
-                              <div className="flex items-end gap-[2px] h-3.5 w-3.5 sm:h-4 sm:w-4">
-                                <span className="w-0.5 sm:w-1 bg-white rounded-full equalizer-bar-1" />
-                                <span className="w-0.5 sm:w-1 bg-white rounded-full equalizer-bar-2" />
-                                <span className="w-0.5 sm:w-1 bg-white rounded-full equalizer-bar-3" />
-                                <span className="w-0.5 sm:w-1 bg-white rounded-full equalizer-bar-4" />
-                              </div>
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Episode Info */}
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between gap-1.5">
-                            <span
-                              className={cn(
-                                "text-xs font-semibold truncate",
-                                isPlaying ? "text-white" : "text-gray-200 group-hover:text-white"
-                              )}
-                            >
-                              <span className="font-mono text-gray-400 mr-1">
-                                {ep.episodeNumber < 10 ? `0${ep.episodeNumber}` : ep.episodeNumber}.
-                              </span>
-                              {ep.name}
-                            </span>
-                            {isPlaying && (
-                              <span className="inline-flex items-center text-[8px] sm:text-[9px] font-bold tracking-wider uppercase text-white bg-white/20 border border-white/30 px-1.5 sm:px-2 py-0.5 rounded-full shrink-0">
-                                Playing
-                              </span>
-                            )}
-                          </div>
-
-                          <div className="flex items-center gap-2 mt-0.5 sm:mt-1 text-[10px] sm:text-[11px] text-gray-400">
-                            {ep.airDate && <span>{ep.airDate}</span>}
-                          </div>
-
-                          {ep.overview && (
-                            <p className="mt-1 line-clamp-2 text-[10px] sm:text-[11px] text-gray-400 leading-normal">
-                              {ep.overview}
-                            </p>
-                          )}
-                        </div>
-                      </button>
-                    );
-                  })
-                ) : (
-                  <div className="p-8 text-center text-xs text-gray-500">
-                    No episodes found matching &ldquo;{episodeSearch}&rdquo;.
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-        </div>
+              ))}
+            </ContentRow>
+          </section>
+        )}
       </div>
     </div>
   );
@@ -1080,8 +1169,10 @@ export function WatchTheater({
 function CastPortraitCard({ actor }: { actor: CastMember }) {
   const [imgError, setImgError] = useState(false);
   const initials =
-    actor.name
-      .split(" ")
+    (actor?.name || "")
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean)
       .map((n) => n[0])
       .join("")
       .slice(0, 2)
@@ -1095,7 +1186,7 @@ function CastPortraitCard({ actor }: { actor: CastMember }) {
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={actor.profileUrl}
-              alt={actor.name}
+              alt={actor.name || "Cast member"}
               loading="lazy"
               onError={() => setImgError(true)}
               className="h-full w-full object-cover object-top transition-transform duration-300 group-hover:scale-110"
@@ -1109,16 +1200,129 @@ function CastPortraitCard({ actor }: { actor: CastMember }) {
       </div>
       <span
         className="text-[11px] sm:text-xs font-semibold text-white line-clamp-1 group-hover:text-gray-200 transition-colors w-full"
-        title={actor.name}
+        title={actor.name || ""}
       >
-        {actor.name}
+        {actor.name || "Unknown"}
       </span>
       <span
         className="text-[10px] sm:text-[11px] text-gray-400 line-clamp-1 mt-0.5 w-full"
-        title={actor.character}
+        title={actor.character || ""}
       >
         {actor.character ? `as ${actor.character}` : "Cast"}
       </span>
     </div>
+  );
+}
+
+function EpisodeCard({
+  ep,
+  isPlaying,
+  onSelect,
+}: {
+  ep: EpisodeItem;
+  isPlaying: boolean;
+  onSelect: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onSelect}
+      className={cn(
+        "group relative flex flex-col text-left rounded-xl sm:rounded-2xl border transition-all duration-200 overflow-hidden cursor-pointer min-w-0 w-full",
+        isPlaying
+          ? "bg-white/[0.12] border-white/50 ring-2 ring-white/60 shadow-xl shadow-white/5"
+          : "border-white/10 bg-white/[0.03] hover:bg-white/[0.07] hover:border-white/30 hover:shadow-lg"
+      )}
+      aria-label={`Play Episode ${ep.episodeNumber}: ${ep.name}`}
+    >
+      {/* 16:9 Thumbnail Header */}
+      <div className="relative aspect-video w-full overflow-hidden bg-black/80">
+        {/* Episode Index Badge */}
+        <div className="absolute top-1.5 left-1.5 sm:top-2 sm:left-2 z-10 px-1.5 sm:px-2 py-0.5 rounded sm:rounded-md bg-black/85 backdrop-blur-md border border-white/20 text-[9px] sm:text-[11px] font-mono font-bold text-white shadow-sm">
+          EP {ep.episodeNumber < 10 ? `0${ep.episodeNumber}` : ep.episodeNumber}
+        </div>
+
+        {/* Duration Badge */}
+        {ep.duration && (
+          <div className="absolute bottom-1.5 right-1.5 sm:bottom-2 sm:right-2 z-10 px-1 sm:px-2 py-0.5 rounded bg-black/85 backdrop-blur-md border border-white/15 text-[8px] sm:text-[10px] font-mono text-white/90">
+            {ep.duration}
+          </div>
+        )}
+
+        {/* Thumbnail Image */}
+        {ep.stillUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={ep.stillUrl}
+            alt={ep.name}
+            loading="lazy"
+            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center bg-white/[0.03] text-gray-500 font-mono text-[10px] sm:text-xs font-bold">
+            EPISODE {ep.episodeNumber}
+          </div>
+        )}
+
+        {/* Playing Overlay: Live Animated Equalizer */}
+        {isPlaying ? (
+          <div className="absolute inset-0 bg-black/65 backdrop-blur-[2px] flex flex-col items-center justify-center gap-1 sm:gap-2">
+            <div className="flex items-end gap-[2px] sm:gap-[3px] h-3.5 w-3.5 sm:h-5 sm:w-5">
+              <span className="w-0.5 sm:w-1 bg-white rounded-full equalizer-bar-1" />
+              <span className="w-0.5 sm:w-1 bg-white rounded-full equalizer-bar-2" />
+              <span className="w-0.5 sm:w-1 bg-white rounded-full equalizer-bar-3" />
+              <span className="w-0.5 sm:w-1 bg-white rounded-full equalizer-bar-4" />
+            </div>
+            <span className="text-[8px] sm:text-[10px] font-bold uppercase tracking-wider text-white bg-white/25 border border-white/40 px-1.5 sm:px-2.5 py-0.5 rounded-full shadow-sm">
+              Playing
+            </span>
+          </div>
+        ) : (
+          /* Hover Play Button Overlay */
+          <div className="absolute inset-0 bg-black/35 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+            <div className="h-7 w-7 sm:h-10 sm:w-10 rounded-full bg-white/25 backdrop-blur-md border border-white/40 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+              <svg className="h-3 w-3 sm:h-4 sm:w-4 fill-white ml-0.5" viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z" />
+              </svg>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Episode Content Info */}
+      <div className="p-2 sm:p-3 md:p-4 flex-1 flex flex-col justify-between space-y-1 sm:space-y-2">
+        <div className="space-y-0.5 sm:space-y-1">
+          <div className="flex items-start justify-between gap-1.5">
+            <h4
+              className={cn(
+                "text-[11px] sm:text-xs md:text-sm font-semibold leading-tight line-clamp-1 transition-colors",
+                isPlaying ? "text-white font-bold" : "text-gray-200 group-hover:text-white"
+              )}
+            >
+              <span className="text-gray-400 font-mono mr-1">
+                {ep.episodeNumber < 10 ? `0${ep.episodeNumber}` : ep.episodeNumber}.
+              </span>
+              {ep.name || `Episode ${ep.episodeNumber}`}
+            </h4>
+          </div>
+
+          {ep.airDate && (
+            <p className="text-[9px] sm:text-[11px] text-gray-400 font-mono">
+              Aired {ep.airDate}
+            </p>
+          )}
+
+          {ep.overview ? (
+            <p className="text-[10px] sm:text-xs text-gray-400 line-clamp-1 sm:line-clamp-2 leading-snug pt-0.5">
+              {ep.overview}
+            </p>
+          ) : (
+            <p className="text-[10px] sm:text-xs text-gray-500 italic pt-0.5">
+              No episode synopsis.
+            </p>
+          )}
+        </div>
+      </div>
+    </button>
   );
 }

@@ -22,7 +22,7 @@ Validate:
 - **Cookies**: HTTP-only, `SameSite=Lax`, `path=/`, `secure` in production mode to prevent XSS session theft.
 - **Credential Sanitization**: Passwords and password hashes are never logged, serialized to client responses, or exposed in error messages.
 - **Generic Error Responses**: Failed authentication attempts return generic sanitized messages ("Invalid email or password.") without revealing account existence.
-- **Input Validation**: Strict email, username (alphanumeric, 3-30 chars), and password complexity (min 8 chars, uppercase, lowercase, number) enforced before processing.
+- **Input Validation**: Strict email, username (alphanumeric, 3-30 chars), and relaxed password policy (min 4 chars) enforced before processing.
 - **Open Redirect Protection**: Redirect query parameters on login and registration validate against open redirects.
 - **Secrets Management**: `AUTH_SECRET` kept strictly server-side in `.env.local` / `.env`.
 

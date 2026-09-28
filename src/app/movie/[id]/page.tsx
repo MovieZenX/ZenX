@@ -81,15 +81,15 @@ export default async function MovieDetailPage({
       >
         {/* Hero Information */}
         <Container size="wide" className="relative z-10">
-          <div className="flex flex-col sm:flex-row gap-6 sm:gap-8 2xl:gap-10 items-center sm:items-start">
+          <div className="flex flex-col sm:flex-row gap-6 sm:gap-8 lg:gap-10 items-center sm:items-start">
             {/* 2:3 3D Tilt Poster Card (uiverse.io/kennyotsu/witty-deer-12) */}
             <PosterTiltCard
               posterUrl={movie.posterUrl}
               title={movie.title}
-              className="w-44 xs:w-52 sm:w-56 lg:w-64 xl:w-72 2xl:w-80 mx-auto sm:mx-0 shadow-2xl"
+              className="w-44 xs:w-52 sm:w-56 lg:w-64 xl:w-72 mx-auto sm:mx-0 shadow-2xl shrink-0"
             />
 
-            <div className="w-full flex-1 space-y-4 2xl:space-y-5 max-w-3xl 2xl:max-w-4xl text-left">
+            <div className="w-full flex-1 space-y-4 text-left max-w-xl lg:max-w-[540px] xl:max-w-[580px]">
               {/* Metadata Badges */}
               <div className="flex flex-wrap items-center gap-2">
                 <span className="px-3 py-1 rounded-full bg-black/75 backdrop-blur-md border border-white/15 text-xs font-semibold text-white shadow-sm">
@@ -129,11 +129,11 @@ export default async function MovieDetailPage({
 
               {/* Title & Tagline */}
               <div>
-                <h1 className="text-3xl sm:text-5xl 2xl:text-6xl font-extrabold tracking-tight text-white leading-tight drop-shadow-md">
+                <h1 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-tight drop-shadow-md">
                   {movie.title}
                 </h1>
                 {movie.tagline ? (
-                  <p className="mt-1 text-sm sm:text-base 2xl:text-lg italic text-gray-300">
+                  <p className="mt-1 text-sm sm:text-base italic text-gray-300">
                     &ldquo;{movie.tagline}&rdquo;
                   </p>
                 ) : null}
@@ -155,7 +155,7 @@ export default async function MovieDetailPage({
 
               {/* Overview */}
               {movie.overview ? (
-                <p className="text-sm sm:text-base 2xl:text-lg text-gray-200 leading-relaxed drop-shadow-md">
+                <p className="text-sm sm:text-base text-gray-200 leading-relaxed drop-shadow-md max-w-lg lg:max-w-[520px]">
                   {movie.overview}
                 </p>
               ) : null}

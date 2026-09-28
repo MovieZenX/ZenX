@@ -30,26 +30,27 @@ StreamVault features an ultra-premium, cinematic Watch Theater designed for dist
   - Quick episode navigation (`Prev`, `S{season} : E{episode}`, `Next`).
   - Animated 360-degree stream reload button.
   - Link sharing with instant clipboard copy confirmation.
-- **Netflix-Style Interactive Episode Drawer**:
-  - Scrollable episode drawer alongside the theater screen.
+- **Top Priority Episode Playlist Section (Directly Below Player)**:
+  - Positioned directly underneath the player and HUD bar for frictionless episode switching without scrolling past metadata.
   - Interactive season tabs and instant in-season search/filter input.
-  - 16:9 thumbnails with episode runtime tags and hover zoom effects.
-  - Real-time animated 4-bar equalizer (`equalizer-bar-1` through `4`) and "STREAMING" badge on the active playing episode.
-  - Instant client-side episode switching with URL synchronization.
+  - Dual layout view mode: sleek horizontal **Carousel / Row View (Default)** with left/right navigation arrows and auto-centering, or responsive multi-column **Grid View** (2 columns on mobile, 4 on desktop).
+  - Rich compact episode cards scaled down for mobile: 16:9 thumbnails (`w-36 xs:w-44` on mobile), episode number badges (`EP 01`), duration tags, air dates, and overview synopsis.
+  - Real-time animated 4-bar equalizer (`equalizer-bar-1` through `4`), glowing active border, and "Playing Now" badge on the active playing episode.
+  - Instant client-side episode switching with URL synchronization and smooth auto-scroll to player.
   - On-demand season API caching (`/api/metadata/tv/[id]/season/[seasonNumber]`).
-- **Rich TMDB Media Info Hub & Cast**:
+- **Rich TMDB Media Info Hub & Cast (Directly Below Episodes)**:
   - **TMDB Verified Score & Community Hub**: Signature TMDB circular score gauge ring (color-coded approval percentage), verified vote count counter, series production status pill, and direct external TMDB entry button (`https://www.themoviedb.org/...`).
   - **4-Card Production Bento Grid**: Compact frosted cards showing Production Status (Television Series / Motion Picture), Original Premiere Date, Series Scope / Feature Runtime, and Master Audio & Video specs (4K UHD HDR10, Dolby 5.1).
-  - **Dual Narrative Intel Architecture**: Active Episode Intel Card (episode air date, runtime, TMDB episode rating, synopsis, and quick next episode navigation) alongside full Series Lore & Storyline (`media.overview`) with expandable controls so the theater info column never appears empty.
+  - **Dual Narrative Intel Architecture**: Active Episode Intel Card (episode air date, runtime, TMDB episode rating, synopsis, and quick next episode navigation) alongside full Series Lore & Storyline (`media.overview`) with expandable controls.
   - **Visual Cast Showcase**: High-definition circular actor portraits (`profileUrl`) with glowing ring hover effects, character attribution (`as {character}`), and initials fallback.
   - **Clickable Genre Chips & Attribution**: Direct genre search integration and official TMDB metadata attribution footer.
 
-### 2. Continuous Recommendations
-- Below the theater view, `WatchPage` dynamically displays a "More Like This" carousel powered by `ContentRow` and `ContentCard`, allowing users to discover similar titles seamlessly.
+### 2. Continuous Recommendations ("More Like This")
+- Positioned directly below the Details section, `WatchTheater` dynamically displays a "More Like This" carousel powered by `ContentRow` and `ContentCard`, allowing users to discover similar titles seamlessly within the unified theater container.
 
 ### 3. Fluid Responsive & Zoom Architecture
 - **Multi-Level Zoom Adaptability**: Theater layout dynamically adjusts across all browser zoom scales (33% to 250% zoom):
-  - Primary Content Column and Netflix Episode Drawer utilize an `xl:grid-cols-12` breakpoint (`xl:col-span-7 2xl:col-span-8` & `xl:col-span-5 2xl:col-span-4`) with `min-w-0` to gracefully stack on high-zoom viewports instead of cramming columns.
+  - Episode cards adjust fluidly in Grid (`grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4`) or compact Row mode (`w-36 xs:w-44` on mobile, `w-64+` on desktop).
   - Bento Grid cards automatically adjust with `grid-cols-2 md:grid-cols-4`, `break-words`, and `min-w-0` to prevent any text clipping or overflow.
   - TMDB score header, circular progress gauge, external TMDB link, and episode playlist thumbnails scale fluidly.
   - Maximum width boundary (`max-w-[1720px] mx-auto`) keeps the theater and cards crisp on ultrawide displays and deep zoom-out scales.

@@ -44,6 +44,38 @@ body {
   overflow-x: hidden;
 }
 
+/* ─── Touch & Mobile Ergonomics ────────────────────────────────── */
+
+button, select, input, a {
+  touch-action: manipulation;
+}
+
+@media (max-width: 640px) {
+  /* Prevent iOS Safari automatic viewport zoom when inputs or selects gain focus */
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}
+
+/* ─── Disable Browser Native Search Cancel Button (Prevent Double Cross Bug) ── */
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-decoration,
+input[type="search"]::-webkit-search-results-button,
+input[type="search"]::-webkit-search-results-decoration {
+  -webkit-appearance: none;
+  appearance: none;
+  display: none !important;
+}
+
+input[type="search"]::-ms-clear,
+input[type="search"]::-ms-reveal {
+  display: none !important;
+  width: 0;
+  height: 0;
+}
+
 /* ─── Selection ────────────────────────────────────────────────── */
 
 ::selection {

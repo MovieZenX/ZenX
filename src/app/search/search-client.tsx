@@ -44,114 +44,7 @@ const SUGGESTED_SEARCHES = [
   "Fallout",
 ];
 
-interface GenreCategory {
-  name: string;
-  query: string;
-  subtitle: string;
-  gradient: string;
-  borderHover: string;
-  icon: (className: string) => React.ReactNode;
-}
 
-const CURATED_GENRES: GenreCategory[] = [
-  {
-    name: "Action & Adventure",
-    query: "Action",
-    subtitle: "High-octane adrenaline & blockbusters",
-    gradient: "from-red-600/20 via-orange-600/10 to-transparent",
-    borderHover: "group-hover:border-red-500/40",
-    icon: (cls) => (
-      <svg className={cls} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M13 10V3L4 14h7v7l9-11h-7z" />
-      </svg>
-    ),
-  },
-  {
-    name: "Sci-Fi & Cyberpunk",
-    query: "Sci-Fi",
-    subtitle: "Future worlds, space & alternate realities",
-    gradient: "from-cyan-600/20 via-blue-600/10 to-transparent",
-    borderHover: "group-hover:border-cyan-500/40",
-    icon: (cls) => (
-      <svg className={cls} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
-      </svg>
-    ),
-  },
-  {
-    name: "Crime & Thriller",
-    query: "Thriller",
-    subtitle: "Edge-of-your-seat suspense & twists",
-    gradient: "from-amber-600/20 via-yellow-600/10 to-transparent",
-    borderHover: "group-hover:border-amber-500/40",
-    icon: (cls) => (
-      <svg className={cls} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-      </svg>
-    ),
-  },
-  {
-    name: "Animation & Anime",
-    query: "Animation",
-    subtitle: "Stunning visuals & animated classics",
-    gradient: "from-pink-600/20 via-rose-600/10 to-transparent",
-    borderHover: "group-hover:border-pink-500/40",
-    icon: (cls) => (
-      <svg className={cls} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-      </svg>
-    ),
-  },
-  {
-    name: "Comedy & Sitcoms",
-    query: "Comedy",
-    subtitle: "Feel-good laughs & witty satires",
-    gradient: "from-emerald-600/20 via-teal-600/10 to-transparent",
-    borderHover: "group-hover:border-emerald-500/40",
-    icon: (cls) => (
-      <svg className={cls} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-    ),
-  },
-  {
-    name: "Horror & Suspense",
-    query: "Horror",
-    subtitle: "Dark tales, psychological dread & frights",
-    gradient: "from-purple-600/20 via-violet-600/10 to-transparent",
-    borderHover: "group-hover:border-purple-500/40",
-    icon: (cls) => (
-      <svg className={cls} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-      </svg>
-    ),
-  },
-  {
-    name: "Drama & Prestige",
-    query: "Drama",
-    subtitle: "Critically acclaimed character journeys",
-    gradient: "from-indigo-600/20 via-blue-600/10 to-transparent",
-    borderHover: "group-hover:border-indigo-500/40",
-    icon: (cls) => (
-      <svg className={cls} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" />
-      </svg>
-    ),
-  },
-  {
-    name: "Documentary & Truth",
-    query: "Documentary",
-    subtitle: "Real stories, history & natural wonders",
-    gradient: "from-sky-600/20 via-teal-600/10 to-transparent",
-    borderHover: "group-hover:border-sky-500/40",
-    icon: (cls) => (
-      <svg className={cls} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-    ),
-  },
-];
 
 const SORT_OPTIONS = [
   { value: "default", label: "TMDB Relevance" },
@@ -189,6 +82,65 @@ export function SearchClient({ initialTrending = [] }: SearchClientProps) {
   const [sortBy, setSortBy] = useState<string>("default");
   const [selectedGenreFilter, setSelectedGenreFilter] = useState<string>("all");
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
+
+  // Live autocomplete dropdown state
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [liveSuggestions, setLiveSuggestions] = useState<MediaItem[]>([]);
+  const [isLiveLoading, setIsLiveLoading] = useState(false);
+  const [highlightedIndex, setHighlightedIndex] = useState<number>(-1);
+  const searchContainerRef = useRef<HTMLDivElement>(null);
+  const liveFetchTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Close dropdown on click outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        searchContainerRef.current &&
+        !searchContainerRef.current.contains(e.target as Node)
+      ) {
+        setIsDropdownOpen(false);
+        setHighlightedIndex(-1);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Fetch instant autocomplete previews when typing (min 2 chars)
+  useEffect(() => {
+    const trimmed = inputQuery.trim();
+    if (trimmed.length < 2) {
+      return;
+    }
+
+    if (liveFetchTimerRef.current) {
+      clearTimeout(liveFetchTimerRef.current);
+    }
+
+    liveFetchTimerRef.current = setTimeout(async () => {
+      setIsLiveLoading(true);
+      try {
+        const typeParam = typeFromUrl !== "all" ? `&type=${typeFromUrl}` : "";
+        const res = await fetch(
+          `/api/metadata/search?q=${encodeURIComponent(trimmed)}${typeParam}&pageSize=5&page=1`
+        );
+        if (res.ok) {
+          const json = await res.json();
+          setLiveSuggestions(json.results?.slice(0, 5) || []);
+        }
+      } catch (err) {
+        console.error("[Search] Autocomplete error:", err);
+      } finally {
+        setIsLiveLoading(false);
+      }
+    }, 200);
+
+    return () => {
+      if (liveFetchTimerRef.current) {
+        clearTimeout(liveFetchTimerRef.current);
+      }
+    };
+  }, [inputQuery, typeFromUrl]);
 
   // Load recent searches from localStorage on mount
   useEffect(() => {
@@ -347,24 +299,63 @@ export function SearchClient({ initialTrending = [] }: SearchClientProps) {
     };
   }, [inputQuery, queryFromUrl, updateQueryInUrl]);
 
-  // Handle immediate form submission on Enter key
+  const totalDropdownOptions =
+    inputQuery.trim().length >= 2
+      ? liveSuggestions.length + 1
+      : 0;
+
+  // Handle keyboard navigation & selection inside live suggestions or search form
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
+    if (!isDropdownOpen) {
+      if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+        setIsDropdownOpen(true);
+        return;
+      }
+    }
+
+    if (e.key === "ArrowDown") {
       e.preventDefault();
+      if (totalDropdownOptions > 0) {
+        setHighlightedIndex((prev) => (prev + 1) % totalDropdownOptions);
+      }
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      if (totalDropdownOptions > 0) {
+        setHighlightedIndex((prev) =>
+          prev <= 0 ? totalDropdownOptions - 1 : prev - 1
+        );
+      }
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      if (
+        highlightedIndex >= 0 &&
+        highlightedIndex < liveSuggestions.length
+      ) {
+        const selected = liveSuggestions[highlightedIndex];
+        if (selected) {
+          setIsDropdownOpen(false);
+          saveRecentSearch(selected.title);
+          router.push(`/watch/${selected.id}`);
+          return;
+        }
+      }
+      setIsDropdownOpen(false);
       updateQueryInUrl(inputQuery);
       if (inputQuery.trim()) {
         saveRecentSearch(inputQuery.trim());
       }
     } else if (e.key === "Escape") {
       e.preventDefault();
-      setInputQuery("");
-      updateQueryInUrl("");
+      setIsDropdownOpen(false);
+      setHighlightedIndex(-1);
     }
   };
 
   const handleClear = () => {
     setInputQuery("");
     updateQueryInUrl("");
+    setLiveSuggestions([]);
+    setHighlightedIndex(-1);
     searchInputRef.current?.focus();
   };
 
@@ -461,7 +452,7 @@ export function SearchClient({ initialTrending = [] }: SearchClientProps) {
   const isSearching = Boolean(queryFromUrl.trim() || providerFromUrl);
 
   return (
-    <div className="relative min-h-[calc(100vh-4rem)]">
+    <div className="relative min-h-[calc(100vh-4rem)] overflow-x-clip">
       {/* Cosmic Parallax Starfield Background (uiverse.io/jaykdoe/tasty-dragon-12) */}
       <StarfieldBackground />
 
@@ -471,29 +462,45 @@ export function SearchClient({ initialTrending = [] }: SearchClientProps) {
         className="pointer-events-none absolute -top-16 left-1/2 -translate-x-1/2 w-[800px] h-[350px] bg-gradient-to-b from-white/[0.08] via-white/[0.02] to-transparent blur-3xl rounded-full select-none z-10"
       />
 
-      <Container className="relative z-10 pt-24 sm:pt-28 pb-20">
+      <Container className="relative z-10 pt-20 sm:pt-28 pb-14 sm:pb-20">
         {/* Header & Search Control Hub */}
-        <div className="max-w-3xl mx-auto mb-10 text-center space-y-5">
+        <div className="max-w-3xl mx-auto mb-7 sm:mb-10 text-center space-y-3.5 sm:space-y-5">
 
-          <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-white">
+          <h1 className="text-2xl sm:text-4xl md:text-5xl font-black tracking-tight text-white">
             Find What to Watch
           </h1>
-          <p className="text-sm sm:text-base text-gray-400 max-w-xl mx-auto leading-relaxed">
+          <p className="text-xs sm:text-base text-gray-400 max-w-xl mx-auto leading-relaxed px-2 sm:px-0">
             Search across thousands of blockbusters, series, and streaming platforms powered by live metadata.
           </p>
 
-          {/* Search Input Box */}
-          <div className="relative pt-2 group">
+          {/* Search Input Box with Live Suggestions Dropdown */}
+          <div ref={searchContainerRef} className="relative pt-2 group z-30">
             <div className="relative flex items-center shadow-2xl rounded-2xl">
               <Input
                 ref={searchInputRef}
+                type="search"
+                inputMode="search"
+                enterKeyHint="search"
+                autoCapitalize="none"
+                autoCorrect="off"
+                spellCheck={true}
                 value={inputQuery}
-                onChange={(e) => setInputQuery(e.target.value)}
+                onFocus={() => setIsDropdownOpen(true)}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setInputQuery(val);
+                  if (!isDropdownOpen) setIsDropdownOpen(true);
+                  if (val.trim().length < 2) {
+                    setLiveSuggestions([]);
+                    setIsLiveLoading(false);
+                    setHighlightedIndex(-1);
+                  }
+                }}
                 onKeyDown={handleKeyDown}
                 onClear={handleClear}
-                placeholder="Type a title, actor, or genre (e.g. Inception, Breaking Bad, Sci-Fi)..."
+                placeholder="Search movies, series, genres, actors..."
                 aria-label="Search movies and TV shows"
-                className="h-14 sm:h-16 pl-13 pr-24 rounded-2xl bg-zinc-900/80 backdrop-blur-xl border-white/15 focus:border-white/40 focus:ring-4 focus:ring-white/10 text-base sm:text-lg shadow-inner placeholder:text-gray-500"
+                className="h-13 sm:h-16 pl-11 sm:pl-13 pr-11 sm:pr-24 rounded-2xl bg-zinc-900/80 backdrop-blur-xl border-white/15 focus:border-white/40 focus:ring-4 focus:ring-white/10 text-base sm:text-lg shadow-inner placeholder:text-gray-500"
                 leftIcon={
                   <svg
                     className="h-5 w-5 text-gray-400 group-focus-within:text-white transition-colors"
@@ -511,7 +518,7 @@ export function SearchClient({ initialTrending = [] }: SearchClientProps) {
                 }
                 rightIcon={
                   <div className="flex items-center gap-2">
-                    {isPending ? (
+                    {isPending || isLiveLoading ? (
                       <svg
                         className="h-5 w-5 animate-spin text-white"
                         fill="none"
@@ -540,6 +547,213 @@ export function SearchClient({ initialTrending = [] }: SearchClientProps) {
                 }
               />
             </div>
+
+            {/* Instant Live Autocomplete Dropdown */}
+            {isDropdownOpen && (
+              <div
+                role="listbox"
+                className="absolute left-0 right-0 top-full mt-2.5 z-50 rounded-2xl bg-zinc-950/95 backdrop-blur-2xl border border-white/15 shadow-2xl shadow-black/90 overflow-hidden transition-all duration-200 text-left"
+              >
+                {inputQuery.trim().length < 2 ? (
+                  /* Recent & Popular Quick Searches */
+                  <div className="p-3.5 space-y-3.5">
+                    {recentSearches.length > 0 && (
+                      <div>
+                        <div className="flex items-center justify-between pb-2 mb-1.5 border-b border-white/10 px-1">
+                          <span className="text-[11px] font-semibold uppercase tracking-wider text-gray-400 flex items-center gap-1.5">
+                            <svg className="w-3.5 h-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Recent Searches
+                          </span>
+                          <button
+                            type="button"
+                            onClick={clearAllRecentSearches}
+                            className="text-[11px] text-gray-500 hover:text-white transition-colors"
+                          >
+                            Clear all
+                          </button>
+                        </div>
+                        <div className="flex flex-wrap gap-1.5">
+                          {recentSearches.map((term) => (
+                            <div
+                              key={term}
+                              onClick={() => {
+                                handleSuggestionClick(term);
+                                setIsDropdownOpen(false);
+                              }}
+                              className="group/chip inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 hover:bg-white/15 border border-white/10 hover:border-white/25 text-xs text-gray-200 transition-all cursor-pointer touch-manipulation"
+                            >
+                              <span>{term}</span>
+                              <button
+                                type="button"
+                                onClick={(e) => removeRecentSearch(term, e)}
+                                className="p-0.5 text-gray-500 hover:text-white rounded-full hover:bg-white/10 transition-colors"
+                                aria-label={`Remove ${term}`}
+                              >
+                                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    <div>
+                      <div className="text-[11px] font-semibold uppercase tracking-wider text-gray-400 pb-2 mb-1.5 border-b border-white/10 px-1 flex items-center gap-1.5">
+                        <svg className="w-3.5 h-3.5 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.316.492-.63 1.077-.96 1.705C8.42 6.136 7.6 7.747 7.02 9.4c-.58-1.653-1.4-3.264-2.143-4.647a32.06 32.06 0 00-.96-1.705c-.208-.322-.477-.65-.822-.88a1 1 0 00-1.45.385A9.972 9.972 0 000 10c0 5.523 4.477 10 10 10s10-4.477 10-10a9.972 9.972 0 00-7.605-7.447zM10 18a8 8 0 110-16 8 8 0 010 16z" clipRule="evenodd" />
+                        </svg>
+                        Quick Popular Searches
+                      </div>
+                      <div className="flex flex-wrap gap-1.5">
+                        {["Dune: Part Two", "Oppenheimer", "Deadpool & Wolverine", "The Dark Knight", "Inception", "Breaking Bad", "Stranger Things"].map((term) => (
+                          <button
+                            key={term}
+                            type="button"
+                            onClick={() => {
+                              handleSuggestionClick(term);
+                              setIsDropdownOpen(false);
+                            }}
+                            className="px-3 py-1.5 rounded-full bg-white/5 hover:bg-white/15 border border-white/10 hover:border-white/25 text-xs text-gray-200 transition-all touch-manipulation cursor-pointer"
+                          >
+                            {term}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  /* Live Query Preview Cards */
+                  <div>
+                    {isLiveLoading && liveSuggestions.length === 0 ? (
+                      <div className="p-4 space-y-3">
+                        {[1, 2, 3].map((n) => (
+                          <div key={n} className="flex items-center gap-3 animate-pulse">
+                            <div className="w-10 h-14 rounded-lg bg-white/10 shrink-0" />
+                            <div className="flex-1 space-y-1.5">
+                              <div className="h-4 bg-white/10 rounded w-1/2" />
+                              <div className="h-3 bg-white/5 rounded w-1/4" />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : liveSuggestions.length > 0 ? (
+                      <div className="max-h-[360px] sm:max-h-[420px] overflow-y-auto divide-y divide-white/5 p-1.5">
+                        {liveSuggestions.map((item, idx) => {
+                          const isSelected = idx === highlightedIndex;
+                          return (
+                            <Link
+                              key={item.id}
+                              href={`/watch/${item.id}`}
+                              onClick={() => {
+                                setIsDropdownOpen(false);
+                                saveRecentSearch(item.title);
+                              }}
+                              onMouseEnter={() => setHighlightedIndex(idx)}
+                              className={cn(
+                                "flex items-center gap-3.5 p-2 rounded-xl transition-all duration-150 group touch-manipulation",
+                                isSelected ? "bg-white/15" : "hover:bg-white/10"
+                              )}
+                            >
+                              <div className="relative w-10 sm:w-11 h-14 sm:h-15 rounded-lg overflow-hidden bg-zinc-800 shrink-0 shadow-sm">
+                                {item.posterUrl ? (
+                                  <Image
+                                    src={item.posterUrl}
+                                    alt={item.title}
+                                    fill
+                                    sizes="48px"
+                                    className="object-cover"
+                                  />
+                                ) : (
+                                  <div className="w-full h-full flex items-center justify-center text-xs text-gray-500">
+                                    🎬
+                                  </div>
+                                )}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2">
+                                  <span className="font-semibold text-sm sm:text-base text-white truncate group-hover:text-blue-300 transition-colors">
+                                    {item.title}
+                                  </span>
+                                  {item.releaseYear && (
+                                    <span className="text-xs text-gray-400 shrink-0">
+                                      ({item.releaseYear})
+                                    </span>
+                                  )}
+                                </div>
+                                <div className="flex flex-wrap items-center gap-2 mt-1 text-xs text-gray-400">
+                                  <span className="px-1.5 py-0.5 rounded bg-white/10 text-[10px] font-medium uppercase tracking-wide text-gray-300">
+                                    {item.contentType === "tv" ? "TV Series" : "Movie"}
+                                  </span>
+                                  {item.rating && item.rating > 0 && (
+                                    <span className="flex items-center gap-1 text-amber-400 font-medium">
+                                      ★ {item.rating.toFixed(1)}
+                                    </span>
+                                  )}
+                                  {item.genres && item.genres.length > 0 && (
+                                    <span className="text-gray-400 truncate hidden sm:inline">
+                                      • {item.genres.slice(0, 2).join(", ")}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                              <div className="shrink-0 pr-1 text-gray-500 group-hover:text-white transition-colors">
+                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                </svg>
+                              </div>
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      <div className="py-7 px-4 text-center">
+                        <p className="text-sm text-gray-400">
+                          No instant preview for &ldquo;{inputQuery}&rdquo;
+                        </p>
+                        <p className="text-xs text-gray-500 mt-1">
+                          Press Enter to search entire database & credits
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Bottom Bar: Search all results */}
+                    <div className="p-2 border-t border-white/10 bg-white/[0.02]">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsDropdownOpen(false);
+                          updateQueryInUrl(inputQuery);
+                          if (inputQuery.trim()) {
+                            saveRecentSearch(inputQuery.trim());
+                          }
+                        }}
+                        onMouseEnter={() => setHighlightedIndex(liveSuggestions.length)}
+                        className={cn(
+                          "w-full flex items-center justify-between px-3.5 py-2 rounded-xl text-xs sm:text-sm font-medium transition-colors touch-manipulation cursor-pointer",
+                          highlightedIndex === liveSuggestions.length
+                            ? "bg-white/15 text-white"
+                            : "text-gray-300 hover:bg-white/10 hover:text-white"
+                        )}
+                      >
+                        <span className="flex items-center gap-2 truncate">
+                          <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                          </svg>
+                          Search all results for &ldquo;{inputQuery}&rdquo;
+                        </span>
+                        <span className="shrink-0 text-xs text-gray-400 font-mono hidden sm:inline">
+                          ↵ Enter
+                        </span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Media Type Tabs Switcher */}
@@ -627,9 +841,9 @@ export function SearchClient({ initialTrending = [] }: SearchClientProps) {
         {!isPending && !hasError && data && data.results.length > 0 && (
           <div className="space-y-6 animate-in fade-in duration-300">
             {/* Results Filter & Toolbar Bar */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 rounded-2xl bg-zinc-900/60 border border-white/[0.08] backdrop-blur-md">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-3.5 sm:gap-4 p-3.5 sm:p-4 rounded-2xl bg-zinc-900/60 border border-white/[0.08] backdrop-blur-md">
               <div className="flex items-center gap-3">
-                <div className="flex items-center justify-center h-8 w-8 rounded-xl bg-white/10 text-white">
+                <div className="flex items-center justify-center h-8 w-8 rounded-xl bg-white/10 text-white shrink-0">
                   <svg
                     className="h-4 w-4"
                     fill="none"
@@ -644,8 +858,8 @@ export function SearchClient({ initialTrending = [] }: SearchClientProps) {
                     />
                   </svg>
                 </div>
-                <div>
-                  <div className="text-sm font-semibold text-white">
+                <div className="min-w-0">
+                  <div className="text-xs sm:text-sm font-semibold text-white truncate">
                     {providerFromUrl ? (
                       <>
                         Showing{" "}
@@ -670,24 +884,24 @@ export function SearchClient({ initialTrending = [] }: SearchClientProps) {
                       </>
                     )}
                   </div>
-                  <div className="text-xs text-gray-400">
+                  <div className="text-[11px] sm:text-xs text-gray-400">
                     Page {data.page} of {Math.min(data.totalPages, 500).toLocaleString()} • Live catalog index
                   </div>
                 </div>
               </div>
 
               {/* Toolbar: Sort & View Toggle */}
-              <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
-                {/* Mini Top Pager for instant flipping */}
+              <div className="flex items-center justify-between md:justify-end gap-2 sm:gap-3 w-full md:w-auto">
+                {/* Mini Top Pager for instant flipping (tablet & desktop) */}
                 {data.totalPages > 1 && (
-                  <div className="hidden sm:inline-flex items-center gap-1 rounded-xl bg-white/[0.06] p-1 border border-white/10 text-xs">
+                  <div className="hidden sm:inline-flex items-center gap-1 rounded-xl bg-white/[0.06] p-1 border border-white/10 text-xs shrink-0">
                     <button
                       type="button"
                       disabled={pageFromUrl <= 1}
                       onClick={() => handlePageChange(pageFromUrl - 1)}
                       title="Previous Page"
                       aria-label="Previous Page"
-                      className="p-1 rounded-lg text-gray-400 hover:text-white disabled:opacity-30 disabled:hover:text-gray-400 transition-colors cursor-pointer disabled:cursor-not-allowed"
+                      className="p-1 rounded-lg text-gray-400 hover:text-white disabled:opacity-30 disabled:hover:text-gray-400 transition-colors cursor-pointer disabled:cursor-not-allowed touch-manipulation"
                     >
                       <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -702,7 +916,7 @@ export function SearchClient({ initialTrending = [] }: SearchClientProps) {
                       onClick={() => handlePageChange(pageFromUrl + 1)}
                       title="Next Page"
                       aria-label="Next Page"
-                      className="p-1 rounded-lg text-gray-400 hover:text-white disabled:opacity-30 disabled:hover:text-gray-400 transition-colors cursor-pointer disabled:cursor-not-allowed"
+                      className="p-1 rounded-lg text-gray-400 hover:text-white disabled:opacity-30 disabled:hover:text-gray-400 transition-colors cursor-pointer disabled:cursor-not-allowed touch-manipulation"
                     >
                       <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -711,26 +925,26 @@ export function SearchClient({ initialTrending = [] }: SearchClientProps) {
                   </div>
                 )}
 
-                {/* Sort Selector */}
-                <div className="w-44 sm:w-48">
+                {/* Sort Selector with text-base sm:text-xs to prevent iOS auto-zoom */}
+                <div className="flex-1 sm:flex-initial sm:w-48 min-w-[130px]">
                   <Select
                     options={SORT_OPTIONS}
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value)}
                     aria-label="Sort search results"
-                    className="h-9 py-1 text-xs rounded-xl bg-white/[0.06] border-white/10"
+                    className="h-9 py-1 text-base sm:text-xs rounded-xl bg-white/[0.06] border-white/10"
                   />
                 </div>
 
                 {/* View Mode Toggle */}
-                <div className="inline-flex rounded-xl bg-white/[0.06] p-1 border border-white/10">
+                <div className="inline-flex rounded-xl bg-white/[0.06] p-1 border border-white/10 shrink-0">
                   <button
                     type="button"
                     onClick={() => setViewMode("grid")}
                     title="Grid View"
                     aria-label="Grid View"
                     className={cn(
-                      "p-1.5 rounded-lg transition-colors cursor-pointer",
+                      "p-1.5 rounded-lg transition-colors cursor-pointer touch-manipulation",
                       viewMode === "grid"
                         ? "bg-white text-black shadow-sm"
                         : "text-gray-400 hover:text-white"
@@ -751,7 +965,7 @@ export function SearchClient({ initialTrending = [] }: SearchClientProps) {
                     title="Detailed View"
                     aria-label="Detailed View"
                     className={cn(
-                      "p-1.5 rounded-lg transition-colors cursor-pointer",
+                      "p-1.5 rounded-lg transition-colors cursor-pointer touch-manipulation",
                       viewMode === "detailed"
                         ? "bg-white text-black shadow-sm"
                         : "text-gray-400 hover:text-white"
@@ -770,9 +984,9 @@ export function SearchClient({ initialTrending = [] }: SearchClientProps) {
               </div>
             </div>
 
-            {/* In-Result Genre Filter Chips */}
+            {/* In-Result Genre Filter Chips (Edge-to-edge horizontal swipe on mobile) */}
             {availableResultGenres.length > 1 && (
-              <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide pt-1">
+              <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide pt-1 touch-pan-x -mx-4 px-4 sm:mx-0 sm:px-0">
                 <span className="text-xs font-semibold text-gray-400 shrink-0 uppercase tracking-wider pl-1">
                   Genre:
                 </span>
@@ -780,7 +994,7 @@ export function SearchClient({ initialTrending = [] }: SearchClientProps) {
                   type="button"
                   onClick={() => setSelectedGenreFilter("all")}
                   className={cn(
-                    "px-3 py-1 rounded-full text-xs font-medium transition-all shrink-0 cursor-pointer",
+                    "px-3 py-1.5 rounded-full text-xs font-medium transition-all shrink-0 cursor-pointer touch-manipulation",
                     selectedGenreFilter === "all"
                       ? "bg-white text-black font-semibold shadow-sm"
                       : "bg-white/[0.06] text-gray-300 hover:bg-white/[0.12] hover:text-white border border-white/[0.08]"
@@ -794,7 +1008,7 @@ export function SearchClient({ initialTrending = [] }: SearchClientProps) {
                     type="button"
                     onClick={() => setSelectedGenreFilter(name)}
                     className={cn(
-                      "px-3 py-1 rounded-full text-xs font-medium transition-all shrink-0 cursor-pointer",
+                      "px-3 py-1.5 rounded-full text-xs font-medium transition-all shrink-0 cursor-pointer touch-manipulation",
                       selectedGenreFilter.toLowerCase() === name.toLowerCase()
                         ? "bg-white text-black font-semibold shadow-sm"
                         : "bg-white/[0.06] text-gray-300 hover:bg-white/[0.12] hover:text-white border border-white/[0.08]"
@@ -808,7 +1022,7 @@ export function SearchClient({ initialTrending = [] }: SearchClientProps) {
 
             {/* Content Display: Grid vs Detailed View */}
             {viewMode === "grid" ? (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
                 {processedResults.map((item) => (
                   <ContentCard
                     key={`${item.contentType}-${item.id}`}
@@ -823,8 +1037,8 @@ export function SearchClient({ initialTrending = [] }: SearchClientProps) {
                 ))}
               </div>
             ) : (
-              /* Detailed List View */
-              <div className="space-y-4">
+              /* Detailed List View - Responsive layout */
+              <div className="space-y-3 sm:space-y-4">
                 {processedResults.map((item) => {
                   const detailHref =
                     item.contentType === "movie"
@@ -838,12 +1052,12 @@ export function SearchClient({ initialTrending = [] }: SearchClientProps) {
                   return (
                     <div
                       key={`${item.contentType}-${item.id}`}
-                      className="group relative flex flex-col sm:flex-row gap-4 sm:gap-6 p-4 sm:p-5 rounded-2xl bg-zinc-900/60 border border-white/[0.08] hover:border-white/25 hover:bg-zinc-900/90 transition-all duration-300"
+                      className="group relative flex flex-row gap-3 sm:gap-6 p-3 sm:p-5 rounded-2xl bg-zinc-900/60 border border-white/[0.08] hover:border-white/25 hover:bg-zinc-900/90 transition-all duration-300"
                     >
                       {/* Left: Poster */}
                       <Link
                         href={detailHref}
-                        className="relative aspect-[2/3] w-28 sm:w-36 shrink-0 rounded-xl overflow-hidden bg-zinc-950 border border-white/10 group-hover:border-white/30 transition-colors shadow-lg"
+                        className="relative aspect-[2/3] w-24 sm:w-36 shrink-0 rounded-xl overflow-hidden bg-zinc-950 border border-white/10 group-hover:border-white/30 transition-colors shadow-lg"
                       >
                         {item.posterUrl ? (
                           // eslint-disable-next-line @next/next/no-img-element
@@ -859,7 +1073,7 @@ export function SearchClient({ initialTrending = [] }: SearchClientProps) {
                           </div>
                         )}
                         {item.quality && (
-                          <span className="absolute top-2 left-2 rounded bg-black/80 px-1.5 py-0.5 text-[10px] font-bold text-white backdrop-blur-md border border-white/10">
+                          <span className="absolute top-1.5 left-1.5 sm:top-2 sm:left-2 rounded bg-black/80 px-1.5 py-0.5 text-[9px] sm:text-[10px] font-bold text-white backdrop-blur-md border border-white/10">
                             {item.quality}
                           </span>
                         )}
@@ -868,17 +1082,17 @@ export function SearchClient({ initialTrending = [] }: SearchClientProps) {
                       {/* Right: Info, Synopsis & Actions */}
                       <div className="flex flex-col justify-between flex-1 min-w-0">
                         <div>
-                          <div className="flex flex-wrap items-center gap-2 mb-2">
-                            <span className="rounded bg-white/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
+                          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-1 sm:mb-2">
+                            <span className="rounded bg-white/10 px-2 py-0.5 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-white">
                               {item.contentType === "movie" ? "Movie" : "TV Series"}
                             </span>
                             {item.releaseYear && (
-                              <span className="text-xs text-gray-400 font-medium">
+                              <span className="text-[11px] sm:text-xs text-gray-400 font-medium">
                                 {item.releaseYear}
                               </span>
                             )}
                             {item.rating > 0 && (
-                              <div className="flex items-center gap-1 rounded-full bg-white/10 border border-white/15 px-2 py-0.5 text-[11px] font-semibold text-white">
+                              <div className="flex items-center gap-1 rounded-full bg-white/10 border border-white/15 px-2 py-0.5 text-[10px] sm:text-[11px] font-semibold text-white">
                                 <svg
                                   className="w-3 h-3 fill-amber-400 text-amber-400"
                                   viewBox="0 0 20 20"
@@ -887,7 +1101,7 @@ export function SearchClient({ initialTrending = [] }: SearchClientProps) {
                                 </svg>
                                 <span>{item.rating.toFixed(1)}</span>
                                 {item.voteCount ? (
-                                  <span className="text-[10px] text-gray-400 font-normal">
+                                  <span className="text-[10px] text-gray-400 font-normal hidden xs:inline">
                                     (
                                     {item.voteCount > 1000
                                       ? `${(item.voteCount / 1000).toFixed(1)}k`
@@ -900,18 +1114,18 @@ export function SearchClient({ initialTrending = [] }: SearchClientProps) {
                           </div>
 
                           <Link href={detailHref}>
-                            <h3 className="text-lg sm:text-xl font-bold text-white hover:text-gray-200 transition-colors line-clamp-1">
+                            <h3 className="text-sm sm:text-xl font-bold text-white hover:text-gray-200 transition-colors line-clamp-1">
                               {item.title}
                             </h3>
                           </Link>
 
                           {/* Genre Pills */}
                           {item.genres && item.genres.length > 0 && (
-                            <div className="flex flex-wrap gap-1.5 mt-2.5">
-                              {item.genres.slice(0, 4).map((g) => (
+                            <div className="flex flex-wrap gap-1 mt-1.5 sm:mt-2.5">
+                              {item.genres.slice(0, 3).map((g) => (
                                 <span
                                   key={g}
-                                  className="rounded-md bg-white/[0.05] border border-white/[0.08] px-2 py-0.5 text-[11px] text-gray-300"
+                                  className="rounded-md bg-white/[0.05] border border-white/[0.08] px-1.5 sm:px-2 py-0.5 text-[10px] sm:text-[11px] text-gray-300"
                                 >
                                   {g}
                                 </span>
@@ -921,18 +1135,18 @@ export function SearchClient({ initialTrending = [] }: SearchClientProps) {
 
                           {/* Synopsis */}
                           {item.overview && (
-                            <p className="mt-3 text-xs sm:text-sm text-gray-400 line-clamp-2 sm:line-clamp-3 leading-relaxed">
+                            <p className="mt-2 text-xs sm:text-sm text-gray-400 line-clamp-2 sm:line-clamp-3 leading-relaxed">
                               {item.overview}
                             </p>
                           )}
                         </div>
 
                         {/* Action buttons footer */}
-                        <div className="mt-5 pt-3 border-t border-white/[0.06] flex items-center justify-between">
-                          <div className="flex items-center gap-2.5">
+                        <div className="mt-3 sm:mt-5 pt-2 sm:pt-3 border-t border-white/[0.06] flex items-center justify-between">
+                          <div className="flex items-center gap-2 sm:gap-2.5">
                             <Link
                               href={watchHref}
-                              className="inline-flex items-center gap-2 rounded-xl bg-white text-black px-4 py-2 text-xs font-semibold hover:bg-gray-200 transition-colors shadow-sm"
+                              className="inline-flex items-center gap-1.5 sm:gap-2 rounded-xl bg-white text-black px-3 sm:px-4 py-1.5 sm:py-2 text-xs font-semibold hover:bg-gray-200 transition-colors shadow-sm touch-manipulation"
                             >
                               <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
                                 <path d="M8 5v14l11-7z" />
@@ -941,13 +1155,13 @@ export function SearchClient({ initialTrending = [] }: SearchClientProps) {
                             </Link>
                             <Link
                               href={detailHref}
-                              className="inline-flex items-center gap-1.5 rounded-xl bg-white/10 hover:bg-white/15 text-white px-3.5 py-2 text-xs font-medium transition-colors border border-white/10"
+                              className="inline-flex items-center gap-1 rounded-xl bg-white/10 hover:bg-white/15 text-white px-2.5 sm:px-3.5 py-1.5 sm:py-2 text-xs font-medium transition-colors border border-white/10 touch-manipulation"
                             >
                               Details
                             </Link>
                           </div>
 
-                          <span className="text-[11px] text-gray-500 hidden sm:inline">
+                          <span className="text-[11px] text-gray-500 hidden md:inline">
                             Free streaming in HD / 4K
                           </span>
                         </div>
@@ -1018,7 +1232,7 @@ export function SearchClient({ initialTrending = [] }: SearchClientProps) {
 
         {/* DEFAULT DISCOVERY STATE (When no search query is active) */}
         {!isPending && !hasError && !isSearching && (
-          <div className="space-y-14 animate-in fade-in duration-300">
+          <div className="space-y-8 sm:space-y-14 animate-in fade-in duration-300">
             {/* 1. Recent Searches (If present) */}
             {recentSearches.length > 0 && (
               <div className="p-5 rounded-2xl bg-zinc-900/40 border border-white/[0.08] backdrop-blur-sm">
@@ -1053,13 +1267,13 @@ export function SearchClient({ initialTrending = [] }: SearchClientProps) {
                     <div
                       key={term}
                       onClick={() => handleSuggestionClick(term)}
-                      className="group inline-flex items-center gap-2 rounded-full bg-white/[0.06] hover:bg-white/[0.12] border border-white/[0.1] px-3.5 py-1.5 text-xs text-gray-200 hover:text-white transition-all cursor-pointer"
+                      className="group inline-flex items-center gap-2 rounded-full bg-white/[0.06] hover:bg-white/[0.12] border border-white/[0.1] px-3.5 py-1.5 text-xs text-gray-200 hover:text-white transition-all cursor-pointer touch-manipulation"
                     >
                       <span>{term}</span>
                       <button
                         type="button"
                         onClick={(e) => removeRecentSearch(term, e)}
-                        className="text-gray-500 group-hover:text-gray-300 hover:!text-white transition-colors"
+                        className="text-gray-500 group-hover:text-gray-300 hover:!text-white transition-colors p-0.5 touch-manipulation"
                         aria-label={`Remove ${term}`}
                       >
                         ✕
@@ -1083,15 +1297,15 @@ export function SearchClient({ initialTrending = [] }: SearchClientProps) {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
+              <div className="grid grid-cols-4 sm:grid-cols-4 lg:grid-cols-8 gap-2 sm:gap-3">
                 {STREAMING_PLATFORMS.slice(0, 8).map((platform) => (
                   <button
                     key={platform.id}
                     type="button"
                     onClick={() => handlePlatformClick(platform)}
-                    className="group relative flex flex-col items-center justify-center p-3.5 rounded-2xl bg-zinc-900/60 border border-white/[0.08] hover:border-white/30 hover:bg-zinc-800/80 hover:-translate-y-1 transition-all duration-200 cursor-pointer shadow-lg"
+                    className="group relative flex flex-col items-center justify-center p-2.5 sm:p-3.5 rounded-2xl bg-zinc-900/60 border border-white/[0.08] hover:border-white/30 hover:bg-zinc-800/80 hover:-translate-y-1 transition-all duration-200 cursor-pointer shadow-lg touch-manipulation"
                   >
-                    <div className="relative h-10 w-10 sm:h-12 sm:w-12 rounded-xl overflow-hidden mb-2 shadow-inner border border-white/10 bg-black/40 p-1 flex items-center justify-center">
+                    <div className="relative h-8 w-8 sm:h-12 sm:w-12 rounded-xl overflow-hidden mb-1.5 sm:mb-2 shadow-inner border border-white/10 bg-black/40 p-1 flex items-center justify-center">
                       <Image
                         src={platform.logoUrl}
                         alt={platform.name}
@@ -1100,7 +1314,7 @@ export function SearchClient({ initialTrending = [] }: SearchClientProps) {
                         className="object-contain rounded-lg"
                       />
                     </div>
-                    <span className="text-xs font-semibold text-gray-300 group-hover:text-white transition-colors text-center line-clamp-1">
+                    <span className="text-[10px] sm:text-xs font-semibold text-gray-300 group-hover:text-white transition-colors text-center line-clamp-1">
                       {platform.name}
                     </span>
                   </button>
@@ -1108,64 +1322,10 @@ export function SearchClient({ initialTrending = [] }: SearchClientProps) {
               </div>
             </div>
 
-            {/* 3. Curated Genre Collections */}
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="text-xl font-bold tracking-tight text-white">
-                    Explore Curated Genres
-                  </h2>
-                  <p className="text-xs text-gray-400">
-                    Discover handpicked collections organized by atmosphere and mood
-                  </p>
-                </div>
-              </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {CURATED_GENRES.map((genre) => (
-                  <button
-                    key={genre.name}
-                    type="button"
-                    onClick={() => handleSuggestionClick(genre.query)}
-                    className={cn(
-                      "group relative text-left p-4 sm:p-5 rounded-2xl border border-white/[0.08] bg-zinc-900/50 hover:bg-zinc-800/60 transition-all duration-300 overflow-hidden cursor-pointer",
-                      genre.borderHover
-                    )}
-                  >
-                    {/* Gradient backdrop */}
-                    <div
-                      className={cn(
-                        "absolute inset-0 bg-gradient-to-br opacity-40 group-hover:opacity-80 transition-opacity duration-300",
-                        genre.gradient
-                      )}
-                    />
 
-                    <div className="relative z-10 flex flex-col h-full justify-between space-y-3">
-                      <div className="flex items-center justify-between">
-                        <div className="p-2 rounded-xl bg-white/[0.08] border border-white/10 text-white">
-                          {genre.icon("h-5 w-5")}
-                        </div>
-                        <span className="text-xs text-gray-400 group-hover:text-white transition-colors">
-                          Explore →
-                        </span>
-                      </div>
-
-                      <div>
-                        <h3 className="text-base font-bold text-white group-hover:text-white transition-colors">
-                          {genre.name}
-                        </h3>
-                        <p className="text-xs text-gray-400 mt-1 line-clamp-1 leading-relaxed">
-                          {genre.subtitle}
-                        </p>
-                      </div>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* 4. Popular Search Keywords */}
-            <div className="p-5 rounded-2xl bg-zinc-900/40 border border-white/[0.08] backdrop-blur-sm">
+            {/* 4. Popular Search Keywords (Hidden on mobile for compact discovery) */}
+            <div className="hidden md:block p-4 sm:p-5 rounded-2xl bg-zinc-900/40 border border-white/[0.08] backdrop-blur-sm">
               <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-gray-300 mb-3">
                 <svg
                   className="h-4 w-4 text-white"
@@ -1188,7 +1348,7 @@ export function SearchClient({ initialTrending = [] }: SearchClientProps) {
                     key={term}
                     type="button"
                     onClick={() => handleSuggestionClick(term)}
-                    className="rounded-full bg-white/[0.05] hover:bg-white/[0.12] border border-white/[0.08] px-3.5 py-1.5 text-xs text-gray-300 hover:text-white transition-all cursor-pointer"
+                    className="rounded-full bg-white/[0.05] hover:bg-white/[0.12] border border-white/[0.08] px-3.5 py-1.5 text-xs text-gray-300 hover:text-white transition-all cursor-pointer touch-manipulation"
                   >
                     {term}
                   </button>

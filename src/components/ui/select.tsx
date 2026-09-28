@@ -31,8 +31,8 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
             ref={ref}
             id={id}
             className={cn(
-              "w-full appearance-none rounded-xl bg-white/[0.05] border border-white/[0.1] px-4 py-2.5 pr-10 text-sm text-foreground",
-              "transition-colors duration-150 cursor-pointer",
+              "w-full appearance-none rounded-xl bg-white/[0.05] border border-white/[0.1] px-4 py-2.5 pr-10 text-base sm:text-sm text-foreground",
+              "transition-colors duration-150 cursor-pointer touch-manipulation",
               "focus:border-white/40 focus:bg-white/[0.08] focus:outline-none focus:ring-2 focus:ring-white/15",
               "disabled:opacity-50 disabled:cursor-not-allowed",
               error && "border-red-500/80 focus:border-red-500",

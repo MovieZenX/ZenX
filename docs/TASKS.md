@@ -53,6 +53,7 @@
 - [x] Loading skeleton grid and sanitized error handling
 - [x] SEO & OpenGraph search page metadata
 - [x] Search unit tests and cross-device browser verification
+- [x] Mobile ergonomics, iOS viewport zoom prevention (16px base font), and edge-to-edge touch gestures
 
 ## Phase 6 - Production Movie & TV Details Pages
 

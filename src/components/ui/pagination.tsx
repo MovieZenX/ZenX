@@ -166,7 +166,7 @@ export function Pagination({
           aria-label="Go to first page"
           title="First page"
           className={cn(
-            "h-8 sm:h-9 px-2 sm:px-2.5 rounded-xl text-xs font-medium flex items-center justify-center transition-all cursor-pointer",
+            "hidden sm:flex h-8 sm:h-9 px-2 sm:px-2.5 rounded-xl text-xs font-medium items-center justify-center transition-all cursor-pointer touch-manipulation",
             currentPage <= 1
               ? "opacity-30 cursor-not-allowed text-gray-500 bg-white/[0.02] border border-transparent"
               : "text-gray-300 hover:text-white bg-white/[0.04] hover:bg-white/10 border border-white/10 hover:border-white/20 active:scale-95"
@@ -187,7 +187,7 @@ export function Pagination({
           aria-label="Go to previous page"
           title="Previous page"
           className={cn(
-            "h-8 sm:h-9 px-2.5 sm:px-3 rounded-xl text-xs font-medium flex items-center gap-1 transition-all cursor-pointer",
+            "h-8 sm:h-9 px-2.5 sm:px-3 rounded-xl text-xs font-medium flex items-center gap-1 transition-all cursor-pointer touch-manipulation",
             currentPage <= 1
               ? "opacity-30 cursor-not-allowed text-gray-500 bg-white/[0.02] border border-transparent"
               : "text-gray-300 hover:text-white bg-white/[0.04] hover:bg-white/10 border border-white/10 hover:border-white/20 active:scale-95"
@@ -224,7 +224,7 @@ export function Pagination({
               aria-current={isActive ? "page" : undefined}
               aria-label={`Page ${item}`}
               className={cn(
-                "min-w-8 sm:min-w-9 h-8 sm:h-9 px-2 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center justify-center cursor-pointer",
+                "min-w-8 sm:min-w-9 h-8 sm:h-9 px-2 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center justify-center cursor-pointer touch-manipulation",
                 isActive
                   ? "bg-white text-black font-bold border border-white"
                   : "bg-white/[0.04] hover:bg-white/10 text-gray-300 hover:text-white border border-white/10 hover:border-white/20 active:scale-95"
@@ -243,7 +243,7 @@ export function Pagination({
           aria-label="Go to next page"
           title="Next page"
           className={cn(
-            "h-8 sm:h-9 px-2.5 sm:px-3 rounded-xl text-xs font-medium flex items-center gap-1 transition-all cursor-pointer",
+            "h-8 sm:h-9 px-2.5 sm:px-3 rounded-xl text-xs font-medium flex items-center gap-1 transition-all cursor-pointer touch-manipulation",
             currentPage >= effectiveTotalPages
               ? "opacity-30 cursor-not-allowed text-gray-500 bg-white/[0.02] border border-transparent"
               : "text-gray-300 hover:text-white bg-white/[0.04] hover:bg-white/10 border border-white/10 hover:border-white/20 active:scale-95"
@@ -264,7 +264,7 @@ export function Pagination({
           aria-label="Go to last page"
           title="Last page"
           className={cn(
-            "h-8 sm:h-9 px-2 sm:px-2.5 rounded-xl text-xs font-medium flex items-center justify-center transition-all cursor-pointer",
+            "hidden sm:flex h-8 sm:h-9 px-2 sm:px-2.5 rounded-xl text-xs font-medium items-center justify-center transition-all cursor-pointer touch-manipulation",
             currentPage >= effectiveTotalPages
               ? "opacity-30 cursor-not-allowed text-gray-500 bg-white/[0.02] border border-transparent"
               : "text-gray-300 hover:text-white bg-white/[0.04] hover:bg-white/10 border border-white/10 hover:border-white/20 active:scale-95"
@@ -293,12 +293,12 @@ export function Pagination({
             value={jumpInput}
             onChange={(e) => setJumpInput(e.target.value)}
             aria-label="Enter page number to jump to"
-            className="w-14 h-8 text-center text-xs font-semibold rounded-xl bg-white/[0.06] border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-white/40 transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            className="w-14 h-8 text-center text-base sm:text-xs font-semibold rounded-xl bg-white/[0.06] border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-white/40 transition-all touch-manipulation [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
           />
           <span className="text-xs text-gray-500 font-medium">/ {effectiveTotalPages}</span>
           <button
             type="submit"
-            className="h-8 px-2.5 rounded-xl text-xs font-medium bg-white/10 hover:bg-white/20 text-white border border-white/10 hover:border-white/25 active:scale-95 transition-all cursor-pointer"
+            className="h-8 px-3 rounded-xl text-xs font-medium bg-white/10 hover:bg-white/20 text-white border border-white/10 hover:border-white/25 active:scale-95 transition-all cursor-pointer touch-manipulation"
           >
             Go
           </button>
