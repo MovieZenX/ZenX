@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "npx tsx src/server.ts",
-    "start": "npx tsx src/server.ts",
+    "dev": "npx tsx --env-file=.env src/server.ts",
+    "start": "npx tsx --env-file=.env src/server.ts",
     "test": "npx tsx --env-file=.env --test tests/**/*.test.ts tests/*.test.ts",
     "db:push": "npx prisma db push",
     "db:studio": "npx prisma studio"

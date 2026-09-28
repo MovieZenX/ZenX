@@ -27,7 +27,7 @@ function NavbarContent() {
   const searchParams = useSearchParams();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const { user, isLoading, logout } = useAuth();
+  const { user, isLoading } = useAuth();
 
   // Sliding Nav Indicator State
   const itemRefs = useRef<(HTMLLIElement | null)[]>([]);
@@ -220,43 +220,24 @@ function NavbarContent() {
             <div className="h-6 w-14 rounded-full bg-white/10 animate-pulse" />
           ) : user ? (
             /* Authenticated User Capsule */
-            <div className="flex items-center gap-0.5">
-              <Link
-                href={ROUTES.PROFILE}
-                className={cn(
-                  "group flex items-center gap-1.5 rounded-full p-0.5 sm:pr-2.5 h-7 transition-colors",
-                  "hover:bg-white/10 text-white/80 hover:text-white",
-                  "focus-visible:outline-2 focus-visible:outline-white",
-                  pathname === ROUTES.PROFILE && "bg-white/10 text-white"
-                )}
-                aria-label={`User profile for ${user.username}`}
-                title="Profile & Settings"
-              >
-                <div className="flex h-5 w-5 items-center justify-center rounded-full bg-white text-black text-[9.5px] font-bold">
-                  {user.username.charAt(0).toUpperCase()}
-                </div>
-                <span className="hidden sm:inline text-[11px] font-medium max-w-[65px] truncate">
-                  {user.username}
-                </span>
-              </Link>
-
-              <button
-                type="button"
-                onClick={() => logout()}
-                title="Sign Out"
-                aria-label="Sign Out"
-                className="flex h-7 w-7 items-center justify-center rounded-full text-white/50 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
-              >
-                <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                  />
-                </svg>
-              </button>
-            </div>
+            <Link
+              href={ROUTES.PROFILE}
+              className={cn(
+                "group flex items-center gap-1.5 rounded-full p-0.5 sm:px-2.5 h-7 transition-colors",
+                "hover:bg-white/10 text-white/80 hover:text-white",
+                "focus-visible:outline-2 focus-visible:outline-white",
+                pathname === ROUTES.PROFILE && "bg-white/10 text-white"
+              )}
+              aria-label={`User profile for ${user.username}`}
+              title="Profile & Settings"
+            >
+              <div className="flex h-5 w-5 items-center justify-center rounded-full bg-white text-black text-[9.5px] font-bold">
+                {user.username.charAt(0).toUpperCase()}
+              </div>
+              <span className="hidden sm:inline text-[11px] font-medium max-w-[85px] truncate">
+                {user.username}
+              </span>
+            </Link>
           ) : (
             /* Unauthenticated: Soft minimalist links */
             <div className="flex items-center gap-0.5">
@@ -345,19 +326,6 @@ function NavbarContent() {
                       <div className="text-[11px] text-gray-400">{user.email}</div>
                     </div>
                   </Link>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMobileOpen(false);
-                      logout();
-                    }}
-                    className="flex w-full items-center gap-2 rounded-xl px-3.5 py-2 text-sm font-medium text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors cursor-pointer touch-manipulation"
-                  >
-                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                    </svg>
-                    <span>Sign Out</span>
-                  </button>
                 </div>
               ) : (
                 <div className="grid grid-cols-2 gap-2 pt-1">
