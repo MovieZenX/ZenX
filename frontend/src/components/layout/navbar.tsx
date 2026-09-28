@@ -217,26 +217,30 @@ function NavbarContent() {
 
           {/* Auth State */}
           {isLoading ? (
-            <div className="h-6 w-14 rounded-full bg-white/10 animate-pulse" />
+            <div className="h-7 w-7 rounded-full bg-white/10 animate-pulse" />
           ) : user ? (
-            /* Authenticated User Capsule */
+            /* Authenticated User: Profile Avatar Only */
             <Link
               href={ROUTES.PROFILE}
               className={cn(
-                "group flex items-center gap-1.5 rounded-full p-0.5 sm:px-2.5 h-7 transition-colors",
-                "hover:bg-white/10 text-white/80 hover:text-white",
-                "focus-visible:outline-2 focus-visible:outline-white",
-                pathname === ROUTES.PROFILE && "bg-white/10 text-white"
+                "relative flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition-all duration-200 hover:scale-105 active:scale-95",
+                "ring-1 ring-white/20 hover:ring-white/60 focus-visible:outline-2 focus-visible:outline-white",
+                pathname === ROUTES.PROFILE && "ring-2 ring-white shadow-sm shadow-white/30"
               )}
               aria-label={`User profile for ${user.username}`}
-              title="Profile & Settings"
+              title={`Profile (${user.username})`}
             >
-              <div className="flex h-5 w-5 items-center justify-center rounded-full bg-white text-black text-[9.5px] font-bold">
-                {user.username.charAt(0).toUpperCase()}
-              </div>
-              <span className="hidden sm:inline text-[11px] font-medium max-w-[85px] truncate">
-                {user.username}
-              </span>
+              {user.avatar ? (
+                <img
+                  src={user.avatar}
+                  alt={user.username}
+                  className="h-full w-full rounded-full object-cover"
+                />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center rounded-full bg-white text-black text-[11px] font-bold select-none">
+                  {user.username.charAt(0).toUpperCase()}
+                </div>
+              )}
             </Link>
           ) : (
             /* Unauthenticated: Soft minimalist links */
@@ -318,9 +322,17 @@ function NavbarContent() {
                         : "text-gray-300 hover:bg-white/10 hover:text-white"
                     )}
                   >
-                    <div className="flex h-7 w-7 items-center justify-center rounded-full bg-white text-xs font-bold text-black shadow-sm">
-                      {user.username.charAt(0).toUpperCase()}
-                    </div>
+                    {user.avatar ? (
+                      <img
+                        src={user.avatar}
+                        alt={user.username}
+                        className="h-7 w-7 rounded-full object-cover shadow-sm"
+                      />
+                    ) : (
+                      <div className="flex h-7 w-7 items-center justify-center rounded-full bg-white text-xs font-bold text-black shadow-sm">
+                        {user.username.charAt(0).toUpperCase()}
+                      </div>
+                    )}
                     <div>
                       <div className="text-white text-sm font-medium">{user.username}</div>
                       <div className="text-[11px] text-gray-400">{user.email}</div>
