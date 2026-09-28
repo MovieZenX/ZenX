@@ -1,9 +1,10 @@
-import { cookies } from "next/headers";
 import crypto from "crypto";
-import { serverEnv } from "@/config/env";
+import { serverEnv } from "../config/env";
 
 export const SESSION_COOKIE_NAME = "streamvault_session";
 const SESSION_DURATION_SECONDS = 30 * 24 * 60 * 60; // 30 days
+
+let activeSessionToken: string | null = null;
 
 export interface SessionPayload {
   userId: string;
@@ -70,25 +71,23 @@ export function decryptSession(token: string): SessionPayload | null {
 }
 
 /**
- * Retrieves the current session from incoming request cookies.
+ * Retrieves the current session.
  */
-export async function getSession(): Promise<SessionPayload | null> {
-  const cookieStore = await cookies();
-  const sessionCookie = cookieStore.get(SESSION_COOKIE_NAME);
-
-  if (!sessionCookie?.value) {
+export async function getSession(tokenOverride?: string): Promise<SessionPayload | null> {
+  const token = tokenOverride || activeSessionToken;
+  if (!token) {
     return null;
   }
 
-  return decryptSession(sessionCookie.value);
+  return decryptSession(token);
 }
 
 /**
- * Sets an encrypted, HTTP-only session cookie in the response.
+ * Sets an encrypted session token.
  */
 export async function setSessionCookie(
   data: Omit<SessionPayload, "createdAt" | "expiresAt">
-): Promise<void> {
+): Promise<string> {
   const now = Date.now();
   const payload: SessionPayload = {
     ...data,
@@ -97,21 +96,13 @@ export async function setSessionCookie(
   };
 
   const encryptedToken = encryptSession(payload);
-  const cookieStore = await cookies();
-
-  cookieStore.set(SESSION_COOKIE_NAME, encryptedToken, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    path: "/",
-    maxAge: SESSION_DURATION_SECONDS,
-  });
+  activeSessionToken = encryptedToken;
+  return encryptedToken;
 }
 
 /**
- * Clears the session cookie on logout.
+ * Clears the active session.
  */
 export async function clearSessionCookie(): Promise<void> {
-  const cookieStore = await cookies();
-  cookieStore.delete(SESSION_COOKIE_NAME);
+  activeSessionToken = null;
 }

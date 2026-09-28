@@ -9,7 +9,7 @@ import {
   type ReactNode,
 } from "react";
 import { useRouter } from "next/navigation";
-import type { SafeUser } from "@/lib/auth";
+import type { SafeUser } from "@/types";
 
 interface AuthContextType {
   user: SafeUser | null;

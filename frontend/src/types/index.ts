@@ -22,6 +22,8 @@ export interface User {
   updatedAt: Date;
 }
 
+export type SafeUser = User;
+
 /** Watchlist entry — matches `watchlist` table */
 export interface WatchlistItem {
   id: string;

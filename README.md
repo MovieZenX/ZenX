@@ -1,64 +1,61 @@
 # StreamVault
 
-A modern, cinematic movie and TV streaming web application built with **Next.js (App Router)**, **React 19**, **TypeScript**, and **Tailwind CSS**.
+A modern, cinematic movie and TV streaming web application with separated **Frontend** and **Backend** architecture.
 
 ---
 
-## Project Documentation (`docs/`)
+## Project Structure
 
-All architectural specifications, database schemas, APIs, and design guidelines are organized in the [`docs/`](./docs) folder:
-
-| Document | Description |
-|---|---|
-| [**PROJECT.md**](./docs/PROJECT.md) | Vision, scope, core features, and non-functional requirements |
-| [**REQUIREMENTS.md**](./docs/REQUIREMENTS.md) | Detailed functional & system requirements |
-| [**FEATURES.md**](./docs/FEATURES.md) | Feature matrix, pages, and planned releases |
-| [**TECH_STACK.md**](./docs/TECH_STACK.md) | Technology choices, frameworks, and database stack |
-| [**ARCHITECTURE.md**](./docs/ARCHITECTURE.md) | System architecture, frontend/backend separation, and auth flow |
-| [**API.md**](./docs/API.md) | TMDB metadata integration, internal proxy routes, and auth endpoints |
-| [**DATABASE.md**](./docs/DATABASE.md) | SQLite schema (Prisma models: User, Watchlist, WatchHistory, UserPreferences) |
-| [**SECURITY.md**](./docs/SECURITY.md) | Password hashing (bcrypt), AES-GCM session tokens, and sanitized responses |
-| [**UI_UX.md**](./docs/UI_UX.md) | Dark cinematic design system, tokens, and UX guidelines |
-| [**PLAYER.md**](./docs/PLAYER.md) | Video player specification (HLS streaming, controls) |
-| [**TESTING.md**](./docs/TESTING.md) | Test plan, coverage strategy, and test commands |
-| [**DEPLOYMENT.md**](./docs/DEPLOYMENT.md) | Production build, environment configuration, and hosting guidelines |
-| [**TASKS.md**](./docs/TASKS.md) | Implementation roadmap and phase checklist |
-| [**CHANGELOG.md**](./docs/CHANGELOG.md) | Detailed historical log of all features and architectural additions |
+```
+movie/
+├── frontend/             # Next.js 16 Web Application (UI / Pages / Components / Tests)
+│   ├── src/
+│   │   ├── app/          # Next.js App Router (pages: /, /watch, /search, /login, etc.)
+│   │   ├── components/   # UI components (watch, media, auth, layout, ui)
+│   │   ├── config/       # Navigation, theme, constants
+│   │   ├── hooks/        # React hooks (useAuth, etc.)
+│   │   ├── lib/          # Utilities & API clients
+│   │   ├── providers/    # Auth and global providers
+│   │   └── types/        # TypeScript models & types
+│   ├── public/           # Static assets & icons
+│   ├── tests/            # Frontend unit & integration tests (39 tests)
+│   ├── .env.local        # Frontend environment variables
+│   ├── package.json      # Frontend dependencies & scripts
+│   └── tsconfig.json     # Frontend TypeScript configuration
+│
+└── backend/              # Authentication & User Service (Auth / DB / API / Tests)
+    ├── src/
+    │   ├── auth/         # User auth, bcrypt hashing, AES-GCM sessions, validation
+    │   ├── config/       # Backend environment configuration
+    │   ├── db/           # Prisma SQLite database client singleton
+    │   └── server.ts     # Standalone auth API server (port 5000)
+    ├── prisma/           # Prisma schema (schema.prisma) & SQLite DB (dev.db)
+    ├── docs/             # Project documentation & specs
+    ├── tests/            # Backend auth tests (19 tests)
+    ├── .env              # Backend environment variables
+    ├── package.json      # Backend dependencies & scripts
+    └── tsconfig.json     # Backend TypeScript configuration
+```
 
 ---
 
 ## Getting Started
 
-### Prerequisites
-- Node.js 20+
-- npm
+### Frontend (`cd frontend`)
 
-### Installation
 ```bash
-npm install
+cd frontend
+npm run dev      # Starts Next.js frontend on http://localhost:3000
+npm test         # Runs 39 frontend unit/integration tests
+npm run build    # Builds production bundle
 ```
 
-### Environment Setup
-Create a `.env.local` file with the required environment variables:
-```env
-TMDB_API_KEY=your_tmdb_api_key
-AUTH_SECRET=your_32_byte_random_auth_secret
-DATABASE_URL="file:./dev.db"
-```
+### Backend (`cd backend`)
 
-### Database Migration
 ```bash
-npm run db:push
+cd backend
+npm run dev      # Starts backend auth server on http://localhost:5000
+npm test         # Runs 19 backend auth/db tests
+npm run db:push  # Syncs Prisma schema with SQLite
 ```
 
-### Development Server
-```bash
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-### Test Suite
-```bash
-npm test
-```

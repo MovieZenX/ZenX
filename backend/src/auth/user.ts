@@ -1,4 +1,3 @@
-import { redirect } from "next/navigation";
 import { prisma } from "../db";
 import { getSession, setSessionCookie } from "./session";
 import { hashPassword, verifyPassword } from "./password";
@@ -47,13 +46,10 @@ export async function getCurrentUser(): Promise<SafeUser | null> {
  * Ensures the request is authenticated.
  * If not authenticated, redirects to /login with a return URL.
  */
-export async function requireAuth(returnUrl?: string): Promise<SafeUser> {
+export async function requireAuth(): Promise<SafeUser> {
   const user = await getCurrentUser();
   if (!user) {
-    const destination = returnUrl
-      ? `/login?returnUrl=${encodeURIComponent(returnUrl)}`
-      : "/login";
-    redirect(destination);
+    throw new Error("Authentication required");
   }
   return user;
 }
