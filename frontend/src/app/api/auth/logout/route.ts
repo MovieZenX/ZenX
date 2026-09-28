@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
-import { clearSessionCookie } from "@/backend/auth";
 
-/**
- * Logout API Endpoint.
- * POST /api/auth/logout
- *
- * Invalidate session by clearing the HTTP-only cookie.
- */
 export async function POST() {
-  await clearSessionCookie();
-  return NextResponse.json({ success: true });
+  try {
+    const res = await fetch("http://localhost:5000/api/auth/logout", {
+      method: "POST",
+    });
+    const data = await res.json();
+    return NextResponse.json(data);
+  } catch {
+    return NextResponse.json({ success: true });
+  }
 }

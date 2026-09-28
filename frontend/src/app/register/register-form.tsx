@@ -1,3 +1,3 @@
 "use client";
 
-export { RegisterForm } from "@/frontend/components/auth/register-form";
+export { RegisterForm } from "@/components/auth/register-form";

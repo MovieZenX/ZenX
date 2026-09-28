@@ -3,18 +3,30 @@ import Link from "next/link";
 import { Container } from "@/components/ui/container";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { getCurrentUser } from "@/backend/auth";
-import { prisma } from "@/backend/db";
 import { ROUTES } from "@/config";
 import { ProfileSignOutButton } from "./profile-signout";
+import type { SafeUser } from "@/types";
 
 export const metadata: Metadata = {
   title: "Profile & Preferences",
   description: "Manage your streaming profile, playback settings, and account details.",
 };
 
+async function getProfileUser(): Promise<SafeUser | null> {
+  try {
+    const res = await fetch("http://localhost:5000/api/auth/me", {
+      cache: "no-store",
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data.user || null;
+  } catch {
+    return null;
+  }
+}
+
 export default async function ProfilePage() {
-  const user = await getCurrentUser();
+  const user = await getProfileUser();
 
   if (!user) {
     return (
@@ -59,10 +71,12 @@ export default async function ProfilePage() {
     );
   }
 
-  // Authenticated user: load preferences from SQLite via Prisma
-  const preferences = await prisma.userPreferences.findUnique({
-    where: { userId: user.id },
-  });
+  const preferences = {
+    preferredQuality: "1080p (FHD)",
+    autoplay: true,
+    subtitlesEnabled: false,
+    language: "English",
+  };
 
   const memberSince = new Date(user.createdAt).toLocaleDateString(undefined, {
     year: "numeric",

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { useAuth } from "@/frontend/providers/auth-provider";
+import { useAuth } from "@/providers/auth-provider";
 import { ROUTES } from "@/config";
 import styles from "./fluffy-treefrog-form.module.css";
 

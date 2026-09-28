@@ -1,8 +1,8 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import { Container } from "@/components/ui/container";
-import { RegisterForm } from "@/frontend/components/auth/register-form";
-import { MidnightSkyBackground } from "@/frontend/components/auth/midnight-sky-background";
+import { RegisterForm } from "@/components/auth/register-form";
+import { MidnightSkyBackground } from "@/components/auth/midnight-sky-background";
 
 export const metadata: Metadata = {
   title: "Create Account",

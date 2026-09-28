@@ -1,32 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
-import { authenticateUser } from "@/backend/auth";
 
-/**
- * Login API Endpoint.
- * POST /api/auth/login
- *
- * Complies with SECURITY.md: Delegates to backend authentication service
- * and returns generic user-facing messages on failure.
- */
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { identifier, password } = body || {};
-
-    const result = await authenticateUser(identifier, password);
-    if (!result.success) {
-      return NextResponse.json({ error: result.error }, { status: result.status });
-    }
-
-    return NextResponse.json({
-      success: true,
-      user: result.user,
+    const res = await fetch("http://localhost:5000/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
     });
+
+    const data = await res.json();
+    return NextResponse.json(data, { status: res.status });
   } catch (err) {
-    console.error("[API /api/auth/login] Error:", (err as Error).message);
+    console.error("[API /api/auth/login] Backend forward error:", (err as Error).message);
     return NextResponse.json(
-      { error: "An unexpected error occurred during login. Please try again." },
-      { status: 500 }
+      { error: "Backend authentication service unavailable." },
+      { status: 503 }
     );
   }
 }

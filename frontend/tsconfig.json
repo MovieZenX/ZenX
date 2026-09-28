@@ -23,10 +23,7 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"],
-      "@/components/*": ["./src/components/*"],
-      "@/frontend/*": ["./src/*"],
-      "@/backend/*": ["../backend/src/*"]
+      "@/*": ["./src/*"]
     }
   },
   "include": [

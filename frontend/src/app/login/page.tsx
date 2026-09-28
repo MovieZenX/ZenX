@@ -1,8 +1,8 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import { Container } from "@/components/ui/container";
-import { LoginForm } from "@/frontend/components/auth/login-form";
-import { MidnightSkyBackground } from "@/frontend/components/auth/midnight-sky-background";
+import { LoginForm } from "@/components/auth/login-form";
+import { MidnightSkyBackground } from "@/components/auth/midnight-sky-background";
 
 export const metadata: Metadata = {
   title: "Sign In",

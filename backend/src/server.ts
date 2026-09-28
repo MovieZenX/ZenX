@@ -101,8 +101,6 @@ export const server = http.createServer(async (req, res) => {
   return sendJson(res, 404, { error: "Endpoint not found." });
 });
 
-if (require.main === module) {
-  server.listen(PORT, () => {
-    console.log(`[StreamVault Backend] Server listening at http://localhost:${PORT}`);
-  });
-}
+server.listen(PORT, () => {
+  console.log(`[StreamVault Backend] Server listening at http://localhost:${PORT}`);
+});

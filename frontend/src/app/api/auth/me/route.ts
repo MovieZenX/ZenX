@@ -1,18 +1,14 @@
 import { NextResponse } from "next/server";
-import { getCurrentUser } from "@/backend/auth";
 
-/**
- * Current Session / Profile API Endpoint.
- * GET /api/auth/me
- *
- * Returns current authenticated user or null.
- */
 export async function GET() {
   try {
-    const user = await getCurrentUser();
-    return NextResponse.json({ user });
+    const res = await fetch("http://localhost:5000/api/auth/me", {
+      cache: "no-store",
+    });
+    const data = await res.json();
+    return NextResponse.json(data);
   } catch (err) {
-    console.error("[API /api/auth/me] Error:", (err as Error).message);
+    console.error("[API /api/auth/me] Backend forward error:", (err as Error).message);
     return NextResponse.json({ user: null });
   }
 }
